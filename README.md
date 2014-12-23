@@ -1,6 +1,10 @@
 BLOB
 ====
 
-Platform game about hiding from the conscious made with Phaser.
+Platform game about hiding from the conscious.
+
+Made with Phaser and based on the mechanics explanined in http://gamemechanicexplorer.com/.
+
+Press D for show, or hide, the development tools.
 
 
