@@ -1,3 +1,7 @@
+/* COLORCOMBO
+ * http://www.colorcombos.com/color-schemes/5897/ColorCombo5897.html
+ */
+
 var BasicGame = BasicGame || {};
 
 BasicGame.Preloader = function (game) {
@@ -19,16 +23,25 @@ BasicGame.Preloader.prototype.preload = function(){
 
   //Here we load the rest of the assets our game needs.
   //As this is just a Project Template I've not provided these assets, swap them for your own.
+
+  //  ---| The assets for the Main menu
   this.load.image('mainMenuBackground', 'assets/images/main_menu_background.png');
   this.load.spritesheet('playButton','assets/sprites/play_button.png',400,128);
+  this.load.audio('mainMenuMusic',['assets/music/main_menu.ogg'],true);
+
+  //  ---| The assets for the Intro
+  
+
+  //  ---| The assets for the Game
   this.load.image('light', 'assets/images/light.png');
   this.load.image('sky', 'assets/images/sky.png');
   this.load.image('platform', 'assets/images/platform.png');
   this.load.spritesheet('player','assets/sprites/player.png',32,32);
   this.load.spritesheet('eye','assets/sprites/eye.png',192,96);
-  this.load.audio('mainMenuMusic',['assets/music/main_menu.ogg'],true);
   this.load.audio('level001Music',['assets/music/level001.ogg'],true);
-  this.load.bitmapFont('carrier_command','assets/fonts/carrier_command.png','assets/fonts/carrier_command.xml');
+  //this.load.bitmapFont('font','assets/fonts/coco.png','assets/fonts/coco.xml');
+  //this.load.bitmapFont('font','assets/fonts/pera.png','assets/fonts/pera.xml');
+  this.load.bitmapFont('font','assets/fonts/carrier_command.png','assets/fonts/carrier_command.xml');
 };
 
 BasicGame.Preloader.prototype.create = function(){

@@ -1,3 +1,7 @@
+/* COLORCOMBO
+ * http://www.colorcombos.com/color-schemes/6343/ColorCombo6343.html
+ */
+ 
 var BasicGame = BasicGame || {};
 
 BasicGame.Game = function (game) {

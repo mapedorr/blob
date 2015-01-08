@@ -1,3 +1,7 @@
+/* COLORCOMBO
+ * http://www.colorcombos.com/color-schemes/5897/ColorCombo5897.html
+ */
+
 var BasicGame = BasicGame || {};
 
 BasicGame.MainMenu = function (game) {
@@ -15,7 +19,7 @@ BasicGame.MainMenu.prototype.create = function(){
 
   this.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'mainMenuBackground');
 
-  this.playButton = this.add.button(this.world.width/2 - 200, this.world.height/2 - 64, 'playButton', this.startGame, this, 1,0,2);
+  this.playButton = this.add.button(this.world.width/2 - 200, this.world.height/2 - 64, 'playButton', this.showIntro, this, 1,0,2);
   this.playButton.scale.setTo(1,1);
 };
 
@@ -23,9 +27,9 @@ BasicGame.MainMenu.prototype.update = function(){
   //TODO};
 };
 
-BasicGame.MainMenu.prototype.startGame = function(){
+BasicGame.MainMenu.prototype.showIntro = function(){
   //Ok, the Play Button has been clicked or touched, so let's stop the music (otherwise it'll carry on playing)
   this.music.stop();
   //And start the actual game
-  this.state.start('Game');
+  this.state.start('Intro');
 };
