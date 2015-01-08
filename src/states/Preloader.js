@@ -25,7 +25,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('sky', 'assets/images/sky.png');
   this.load.image('platform', 'assets/images/platform.png');
   this.load.spritesheet('player','assets/sprites/player.png',32,32);
-  this.load.spritesheet('eye','assets/sprites/eye.png',192,96);
+  this.load.spritesheet('eye','assets/sprites/eye_ver03.png',192,96);
   this.load.audio('mainMenuMusic',['assets/music/main_menu.ogg'],true);
   this.load.audio('level001Music',['assets/music/level001.ogg'],true);
   this.load.bitmapFont('carrier_command','assets/fonts/carrier_command.png','assets/fonts/carrier_command.xml');
@@ -46,8 +46,9 @@ BasicGame.Preloader.prototype.update = function(){
   //If you don't have any music in your game then put the game.state.start line into the create function and delete
   //the update function completely.
 
-  if (this.cache.isSoundDecoded('mainMenuMusic')
-        && this.ready == false) {
+  //this.cache.isSoundDecoded('mainMenuMusic')
+
+  if (this.ready == false) {
     this.ready = true;
     this.state.start('MainMenu');
   }
