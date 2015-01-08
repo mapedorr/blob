@@ -25,7 +25,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('sky', 'assets/images/sky.png');
   this.load.image('platform', 'assets/images/platform.png');
   this.load.spritesheet('player','assets/sprites/player.png',32,32);
-  this.load.spritesheet('eye','assets/sprites/eye_ver03.png',192,96);
+  this.load.spritesheet('eye','assets/sprites/eye.png',192,96);
   this.load.audio('mainMenuMusic',['assets/music/main_menu.ogg'],true);
   this.load.audio('level001Music',['assets/music/level001.ogg'],true);
   this.load.bitmapFont('carrier_command','assets/fonts/carrier_command.png','assets/fonts/carrier_command.xml');
