@@ -44,9 +44,9 @@ BasicGame.Player.prototype.create = function (level) {
     Phaser.Keyboard.LEFT,
     Phaser.Keyboard.RIGHT,
     Phaser.Keyboard.UP,
-    Phaser.Keyboard.DOWN,
-    Phaser.Keyboard.D,//This will be used for enable/disable development mode
-    Phaser.Keyboard.L//This will be used for enable/disable lights
+    Phaser.Keyboard.DOWN
+    //Phaser.Keyboard.D,//This will be used for enable/disable development mode
+    //Phaser.Keyboard.L//This will be used for enable/disable lights
   ]);
 
   //Make the player collide with world bounds
