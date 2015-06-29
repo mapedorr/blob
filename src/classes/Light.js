@@ -50,7 +50,7 @@ BasicGame.Light.prototype.create = function (walls) {
 
 BasicGame.Light.prototype.update = function () {
   // Move the light to the pointer/touch location
-  this.rayBitmapImage.visible = BasicGame.Game.developmentMode;
+  this.rayBitmapImage.visible = BasicGame.Game.developmentMode || false;
 
   // Next, fill the entire light bitmap with a dark shadow color.
   this.bitmap.context.fillStyle = 'rgb(31, 31, 31)';

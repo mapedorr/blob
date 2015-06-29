@@ -84,7 +84,7 @@ BasicGame.Eye.prototype.update = function () {
       this.calmDown();
 
       //- - - | DEVELOPMENT MODE | - - -
-      if(BasicGame.Game.developmentMode){
+      if(BasicGame.Game.developmentMode === true){
         target.tint = 0xffffff;
       }
     } else {
@@ -92,7 +92,7 @@ BasicGame.Eye.prototype.update = function () {
       this.shootPlayer(target);
 
       //- - - | DEVELOPMENT MODE | - - -
-      if(BasicGame.Game.developmentMode) {
+      if(BasicGame.Game.developmentMode === true) {
         target.tint = 0x00ff00;
       }
     }
@@ -196,7 +196,7 @@ BasicGame.Eye.prototype.shootPlayer = function(target){
   }
 
   //- - - | DEVELOPMENT MODE | - - -
-  if(BasicGame.Game.developmentMode) {
+  if(BasicGame.Game.developmentMode === true) {
     this.drawLinesToTarget(target);
   }
 };

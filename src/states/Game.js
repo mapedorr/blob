@@ -12,7 +12,7 @@ BasicGame.Game = function (game) {
   this.lightning = null;
 
   this.showFPS = false;
-  this.developmentMode = false;
+  this.developmentMode = null;
 };
 
 BasicGame.Game.prototype.preload = function(){

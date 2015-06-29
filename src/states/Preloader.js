@@ -27,7 +27,7 @@ BasicGame.Preloader.prototype.preload = function(){
   //  ---| The assets for the Main menu
   this.load.image('mainMenuBackground', 'assets/images/main_menu_background.png');
   this.load.spritesheet('playButton','assets/sprites/play_button.png',400,128);
-  this.load.audio('mainMenuMusic',['assets/music/main_menu.ogg'],true);
+  //  this.load.audio('mainMenuMusic',['assets/music/main_menu.ogg'],true);
 
   //  ---| The assets for the Intro
   
@@ -38,7 +38,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('platform', 'assets/images/platform.png');
   this.load.spritesheet('player','assets/sprites/player.png',32,32);
   this.load.spritesheet('eye','assets/sprites/eye.png',192,96);
-  this.load.audio('level001Music',['assets/music/level001.ogg'],true);
+  //  this.load.audio('level001Music',['assets/music/level001.ogg'],true);
   //this.load.bitmapFont('font','assets/fonts/coco.png','assets/fonts/coco.xml');
   //this.load.bitmapFont('font','assets/fonts/pera.png','assets/fonts/pera.xml');
   this.load.bitmapFont('font','assets/fonts/carrier_command.png','assets/fonts/carrier_command.xml');

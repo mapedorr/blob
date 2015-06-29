@@ -8,8 +8,8 @@ BasicGame.Level001 = function (game) {
 };
 
 BasicGame.Level001.prototype.create = function () {
-  this.levelMusic = this.game.add.audio('level001Music');
-  this.levelMusic.play();
+  // this.levelMusic = this.game.add.audio('level001Music');
+  // this.levelMusic.play();
 
   //Create the ground
   this.ground = this.game.add.tileSprite(0, this.game.world.height - 32, this.game.world.width, 32, 'platform');

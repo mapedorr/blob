@@ -45,8 +45,6 @@ BasicGame.Player.prototype.create = function (level) {
     Phaser.Keyboard.RIGHT,
     Phaser.Keyboard.UP,
     Phaser.Keyboard.DOWN
-    //Phaser.Keyboard.D,//This will be used for enable/disable development mode
-    //Phaser.Keyboard.L//This will be used for enable/disable lights
   ]);
 
   //Make the player collide with world bounds
@@ -87,14 +85,6 @@ BasicGame.Player.prototype.update = function () {
     this.player.body.velocity.y = this.JUMP_SPEED;
   }
 
-  if(this.dInputIsActive()){
-    if(!BasicGame.Game.developmentMode){
-      BasicGame.Game.developmentMode = true;
-    }else{
-      BasicGame.Game.developmentMode = false;
-    }
-  }
-
   // This just tells the engine it should update the texture cache
   this.bitmap.dirty = true;
 };
@@ -120,17 +110,13 @@ BasicGame.Player.prototype.upInputIsActive = function (duration) {
   return this.input.keyboard.justPressed(Phaser.Keyboard.UP, duration);
 };
 
-BasicGame.Player.prototype.dInputIsActive = function () {
-  return this.input.keyboard.justPressed(Phaser.Keyboard.D);
-};
-
 //Function that checks if  the player is completely in shadows or not
 BasicGame.Player.prototype.isInShadow = function () {
   //Trace rays toward the light from each corner of the player sprite.
   //If ALL the rays intersects a wall, then the player is in the shadows
   var lightImage = BasicGame.light.lightGroup.getAt(0);
 
-  if(BasicGame.Game.developmentMode){
+  if(BasicGame.Game.developmentMode === true){
     this.drawLinesToLight(lightImage);
   }
 

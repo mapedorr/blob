@@ -149,6 +149,8 @@ BasicGame.Lightning.prototype.createLightningTexture = function (x, y, segments,
   this.lightningBitmap.dirty = true;
 };
 
+
+/*
 // Fragment shaders are small programs that run on the graphics card and alter
 // the pixels of a texture. Every framework implements shaders differently but
 // the concept is the same. This shader takes the lightning texture and alters
@@ -191,3 +193,4 @@ Phaser.Filter.Glow = function (game) {
 
 Phaser.Filter.Glow.prototype = Object.create(Phaser.Filter.prototype);
 Phaser.Filter.Glow.prototype.constructor = Phaser.Filter.Glow;
+*/
