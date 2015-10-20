@@ -285,3 +285,7 @@ BasicGame.Light.prototype.getWallIntersection = function (ray) {
 
   return closestIntersection;
 };
+
+BasicGame.Light.prototype.moveLight = function(){
+  this.light.x++;
+};

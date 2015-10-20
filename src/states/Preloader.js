@@ -25,7 +25,7 @@ BasicGame.Preloader.prototype.preload = function(){
   //As this is just a Project Template I've not provided these assets, swap them for your own.
 
   //  ---| The assets for the Main menu
-  this.load.image('mainMenuBackground', 'assets/images/main_menu_background.png');
+  this.load.image('mainMenuBackground', 'assets/images/main_menu_background_900x640.png');
   this.load.spritesheet('playButton','assets/sprites/play_button.png',400,128);
   //  this.load.audio('mainMenuMusic',['assets/music/main_menu.ogg'],true);
 
