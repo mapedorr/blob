@@ -66,7 +66,7 @@ BasicGame.Player.prototype.update = function () {
 
   //Check collisions
   this.game.physics.arcade.collide(this.player, this.level.walls);
-  this.game.physics.arcade.collide(this.player, this.level.ground);
+  // this.game.physics.arcade.collide(this.player, this.level.ground);
 
   if (this.leftInputIsActive()) {
     // If the LEFT key is down, set the player velocity to move left
@@ -80,7 +80,7 @@ BasicGame.Player.prototype.update = function () {
 
   // Set a variable that is true when the player is touching the ground
   var onTheGround = this.player.body.touching.down;
-  if (onTheGround && this.upInputIsActive()) {
+  if (this.upInputIsActive()) {
     // Jump when the player is touching the ground and the up arrow is pressed
     this.player.body.velocity.y = this.JUMP_SPEED;
   }

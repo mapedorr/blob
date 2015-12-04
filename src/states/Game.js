@@ -12,15 +12,16 @@ BasicGame.Game = function (game) {
   this.lightning = null;
 
   this.showFPS = false;
-  this.developmentMode = null;
+
+  this.map = null;
 };
 
+BasicGame.Game.developmentMode = false;
 BasicGame.Game.prototype.preload = function(){
   //Phaser has ARCADE physics (perfect for mobile browsers), NINJA physics and P2.JS Full-Body physics.
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
   //Define the size of the world
-  //  this.game.world.setBounds(this.world.x, this.world.y, 1024, 700);
   this.game.world.setBounds(-10, -10, this.game.width + 20, this.game.height + 20);
 
   //Init the player
@@ -33,10 +34,10 @@ BasicGame.Game.prototype.preload = function(){
   this.light = new BasicGame.Light(this.game);
   BasicGame.light = this.light;
 
-  //Init THE EYE
+  // //Init THE EYE
   this.eye = new BasicGame.Eye(this.game);
 
-  //Init the lightning
+  // //Init the lightning
   this.lightning = new BasicGame.Lightning(this.game);
 };
 
@@ -52,11 +53,11 @@ BasicGame.Game.prototype.create = function(){
   //Create the player
   this.player.create(this.level001);
 
-  //Create the light
+  // //Create the light
   this.light.create(this.level001.walls);
 
-  //Create THE EYE
-  this.eye.create(this.player, this.level001, this.lightning);
+  // //Create THE EYE
+  // this.eye.create(this.player, this.level001, this.lightning);
 
 
   // Show FPS
@@ -69,13 +70,13 @@ BasicGame.Game.prototype.create = function(){
 // The update() method is called every frame
 BasicGame.Game.prototype.update = function() {
   //UPDATE THE LIGHT
-  this.light.update();
+  // this.light.update();
 
   //UPDATE THE PLAYER
   this.player.update(this.light);
 
   //UPDATE THE EYE
-  this.eye.update();
+  // this.eye.update();
 
   //Show development information
   if(this.showFPS){

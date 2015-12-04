@@ -42,6 +42,9 @@ BasicGame.Preloader.prototype.preload = function(){
   //this.load.bitmapFont('font','assets/fonts/coco.png','assets/fonts/coco.xml');
   //this.load.bitmapFont('font','assets/fonts/pera.png','assets/fonts/pera.xml');
   this.load.bitmapFont('font','assets/fonts/carrier_command.png','assets/fonts/carrier_command.xml');
+
+  // load the map for the first level
+  this.game.load.tilemap('lvl01', 'assets/tilemaps/maps/level01.json', null, Phaser.Tilemap.TILED_JSON);
 };
 
 BasicGame.Preloader.prototype.create = function(){

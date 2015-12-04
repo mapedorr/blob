@@ -74,22 +74,22 @@ BasicGame.Light.prototype.update = function () {
     var intersect;
     var i;
 
-    this.walls.forEach(function (wall) {
+    this.walls.getTiles(0, 0, 1024, 640, true, true).forEach(function (wall) {
       // Create a ray from the light through each corner out to the edge of the stage.
       // This array defines points just inside of each corner to make sure we hit each one.
       // It also defines points just outside of each corner so we can see to the stage edges.
       var corners = [
-        new Phaser.Point(wall.x + 0.1, wall.y + 0.1),
-        new Phaser.Point(wall.x - 0.1, wall.y - 0.1),
+        new Phaser.Point(wall.worldX + 0.1, wall.worldY + 0.1),
+        new Phaser.Point(wall.worldX - 0.1, wall.worldY - 0.1),
 
-        new Phaser.Point(wall.x - 0.1 + wall.width, wall.y + 0.1),
-        new Phaser.Point(wall.x + 0.1 + wall.width, wall.y - 0.1),
+        new Phaser.Point(wall.worldX - 0.1 + wall.width, wall.worldY + 0.1),
+        new Phaser.Point(wall.worldX + 0.1 + wall.width, wall.worldY - 0.1),
 
-        new Phaser.Point(wall.x - 0.1 + wall.width, wall.y - 0.1 + wall.height),
-        new Phaser.Point(wall.x + 0.1 + wall.width, wall.y + 0.1 + wall.height),
+        new Phaser.Point(wall.worldX - 0.1 + wall.width, wall.worldY - 0.1 + wall.height),
+        new Phaser.Point(wall.worldX + 0.1 + wall.width, wall.worldY + 0.1 + wall.height),
 
-        new Phaser.Point(wall.x + 0.1, wall.y - 0.1 + wall.height),
-        new Phaser.Point(wall.x - 0.1, wall.y + 0.1 + wall.height)
+        new Phaser.Point(wall.worldX + 0.1, wall.worldY - 0.1 + wall.height),
+        new Phaser.Point(wall.worldX - 0.1, wall.worldY + 0.1 + wall.height)
       ];
 
       // Calculate rays through each point to the edge of the stage
@@ -228,24 +228,28 @@ BasicGame.Light.prototype.update = function () {
     this.bitmap.context.closePath();
     this.bitmap.context.fill();
 
-    // Draw each of the rays on the rayBitmap
-    this.rayBitmap.context.clearRect(0, 0, this.game.world.width, this.game.height);
-    this.rayBitmap.context.beginPath();
-    this.rayBitmap.context.strokeStyle = 'rgb(255, 255, 255)';
-    this.rayBitmap.context.fillStyle = 'rgb(255, 255, 255)';
-    this.rayBitmap.context.moveTo(points[0].x, points[0].y);
-    for (var k = 0; k < points.length; k++) {
-      this.rayBitmap.context.moveTo(light.x, light.y);
-      this.rayBitmap.context.lineTo(points[k].x, points[k].y);
-      this.rayBitmap.context.fillRect(points[k].x - 2, points[k].y - 2, 4, 4);
+    if(BasicGame.Game.developmentMode){
+      // Draw each of the rays on the rayBitmap
+      this.rayBitmap.context.clearRect(0, 0, this.game.world.width, this.game.height);
+      this.rayBitmap.context.beginPath();
+      this.rayBitmap.context.strokeStyle = 'rgb(255, 255, 255)';
+      this.rayBitmap.context.fillStyle = 'rgb(255, 255, 255)';
+      this.rayBitmap.context.moveTo(points[0].x, points[0].y);
+      for (var k = 0; k < points.length; k++) {
+        this.rayBitmap.context.moveTo(light.x, light.y);
+        this.rayBitmap.context.lineTo(points[k].x, points[k].y);
+        this.rayBitmap.context.fillRect(points[k].x - 2, points[k].y - 2, 4, 4);
+      }
+      this.rayBitmap.context.stroke();
     }
-    this.rayBitmap.context.stroke();
 
   }, this);
 
   // This just tells the engine it should update the texture cache
   this.bitmap.dirty = true;
-  this.rayBitmap.dirty = true;
+  if(BasicGame.Game.developmentMode){
+    this.rayBitmap.dirty = true;
+  }
 };
 
 // Given a ray, this function iterates through all of the walls and
@@ -256,15 +260,15 @@ BasicGame.Light.prototype.getWallIntersection = function (ray) {
   var closestIntersection = null;
 
   // For each of the walls...
-  this.walls.forEach(function (wall) {
+  this.walls.getTiles(0, 0, 1024, 640, true, true).forEach(function (wall) {
     // Create an array of lines that represent the four edges of each wall
     var lines = [
-      new Phaser.Line(wall.x, wall.y, wall.x + wall.width, wall.y),
-      new Phaser.Line(wall.x, wall.y, wall.x, wall.y + wall.height),
-      new Phaser.Line(wall.x + wall.width, wall.y,
-        wall.x + wall.width, wall.y + wall.height),
-      new Phaser.Line(wall.x, wall.y + wall.height,
-        wall.x + wall.width, wall.y + wall.height)
+      new Phaser.Line(wall.worldX, wall.worldY, wall.worldX + wall.width, wall.worldY),
+      new Phaser.Line(wall.worldX, wall.worldY, wall.worldX, wall.worldY + wall.height),
+      new Phaser.Line(wall.worldX + wall.width, wall.worldY,
+        wall.worldX + wall.width, wall.worldY + wall.height),
+      new Phaser.Line(wall.worldX, wall.worldY + wall.height,
+        wall.worldX + wall.width, wall.worldY + wall.height)
     ];
 
     // Test each of the edges in this wall against the ray.
