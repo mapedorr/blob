@@ -13,16 +13,19 @@ BasicGame.Level001.prototype.create = function () {
   // this.levelMusic.play();
   // 
   this.map = this.game.add.tilemap('lvl01');
-  this.map.addTilesetImage('platforms', 'platform');
-  this.layer = this.map.createLayer('plataformas');
-  this.layer.resizeWorld();
-  this.map.setCollisionByExclusion([], true, "plataformas");
+  // this.map.addTilesetImage('platforms', 'platform');
+  
+  // this.layer = this.map.createLayer('plataformas');
+  // this.layer.resizeWorld();
+  // this.map.setCollisionByExclusion([], true, "plataformas");
   
   this.walls = this.game.add.group();
   // this.game.physics.arcade.enable(this.walls);
   // this.walls.body.allowGravity = false;
-  this.map.createFromObjects('coco', 34, 'platform', null, true, false, this.walls);
-
+  this.map.createFromObjects("platforms", 0, 'platform', null, true, false, this.walls);
+  this.map.objects.platforms.forEach(function(object){
+    console.log(object);
+  });
 
   //Create the ground
   // this.ground = this.game.add.tileSprite(0, this.game.world.height - 32, this.game.world.width, 32, 'platform');
