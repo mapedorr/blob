@@ -74,22 +74,22 @@ BasicGame.Light.prototype.update = function () {
     var intersect;
     var i;
 
-    this.walls.getTiles(0, 0, 1024, 640, true, true).forEach(function (wall) {
+    this.walls.forEach(function (wall) {
       // Create a ray from the light through each corner out to the edge of the stage.
       // This array defines points just inside of each corner to make sure we hit each one.
       // It also defines points just outside of each corner so we can see to the stage edges.
       var corners = [
-        new Phaser.Point(wall.worldX + 0.1, wall.worldY + 0.1),
-        new Phaser.Point(wall.worldX - 0.1, wall.worldY - 0.1),
+        new Phaser.Point(wall.x + 0.1, wall.y + 0.1),
+        new Phaser.Point(wall.x - 0.1, wall.y - 0.1),
 
-        new Phaser.Point(wall.worldX - 0.1 + wall.width, wall.worldY + 0.1),
-        new Phaser.Point(wall.worldX + 0.1 + wall.width, wall.worldY - 0.1),
+        new Phaser.Point(wall.x - 0.1 + wall.width, wall.y + 0.1),
+        new Phaser.Point(wall.x + 0.1 + wall.width, wall.y - 0.1),
 
-        new Phaser.Point(wall.worldX - 0.1 + wall.width, wall.worldY - 0.1 + wall.height),
-        new Phaser.Point(wall.worldX + 0.1 + wall.width, wall.worldY + 0.1 + wall.height),
+        new Phaser.Point(wall.x - 0.1 + wall.width, wall.y - 0.1 + wall.height),
+        new Phaser.Point(wall.x + 0.1 + wall.width, wall.y + 0.1 + wall.height),
 
-        new Phaser.Point(wall.worldX + 0.1, wall.worldY - 0.1 + wall.height),
-        new Phaser.Point(wall.worldX - 0.1, wall.worldY + 0.1 + wall.height)
+        new Phaser.Point(wall.x + 0.1, wall.y - 0.1 + wall.height),
+        new Phaser.Point(wall.x - 0.1, wall.y + 0.1 + wall.height)
       ];
 
       // Calculate rays through each point to the edge of the stage
@@ -260,15 +260,15 @@ BasicGame.Light.prototype.getWallIntersection = function (ray) {
   var closestIntersection = null;
 
   // For each of the walls...
-  this.walls.getTiles(0, 0, 1024, 640, true, true).forEach(function (wall) {
+  this.walls.forEach(function (wall) {
     // Create an array of lines that represent the four edges of each wall
     var lines = [
-      new Phaser.Line(wall.worldX, wall.worldY, wall.worldX + wall.width, wall.worldY),
-      new Phaser.Line(wall.worldX, wall.worldY, wall.worldX, wall.worldY + wall.height),
-      new Phaser.Line(wall.worldX + wall.width, wall.worldY,
-        wall.worldX + wall.width, wall.worldY + wall.height),
-      new Phaser.Line(wall.worldX, wall.worldY + wall.height,
-        wall.worldX + wall.width, wall.worldY + wall.height)
+      new Phaser.Line(wall.x, wall.y, wall.x + wall.width, wall.y),
+      new Phaser.Line(wall.x, wall.y, wall.x, wall.y + wall.height),
+      new Phaser.Line(wall.x + wall.width, wall.y,
+        wall.x + wall.width, wall.y + wall.height),
+      new Phaser.Line(wall.x, wall.y + wall.height,
+        wall.x + wall.width, wall.y + wall.height)
     ];
 
     // Test each of the edges in this wall against the ray.
@@ -288,8 +288,4 @@ BasicGame.Light.prototype.getWallIntersection = function (ray) {
   }, this);
 
   return closestIntersection;
-};
-
-BasicGame.Light.prototype.moveLight = function(){
-  this.light.x++;
 };

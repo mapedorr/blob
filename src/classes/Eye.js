@@ -57,8 +57,6 @@ BasicGame.Eye.prototype.update = function () {
   // Clear the bitmap where we are drawing our lines
   this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
 
-  BasicGame.light.moveLight();
-
   //Ray casting!!!
   //Test if each target can see the eye by casting a ray (a line) towards the eye.
   //If the ray intersects any walls before it intersects the eye then the wall

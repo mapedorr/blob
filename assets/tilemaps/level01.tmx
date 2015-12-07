@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="11">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="12">
  <tileset firstgid="1" name="platforms" tilewidth="32" tileheight="32">
   <image source="../images/platform.png" trans="ff00ff" width="32" height="32"/>
  </tileset>
  <objectgroup name="platforms">
-  <object id="7" name="p1" x="0" y="512" width="832" height="32">
+  <object id="7" name="p1" x="0" y="544" width="832" height="32">
    <properties>
     <property name="gid" value="p1"/>
    </properties>
   </object>
-  <object id="9" name="p2" x="0" y="608" width="1024" height="32">
+  <object id="9" name="p2" x="0" y="640" width="1024" height="32">
    <properties>
     <property name="gid" value="p2"/>
    </properties>

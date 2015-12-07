@@ -17,9 +17,9 @@ BasicGame.Boot.prototype.create = function () {
   this.stage.disableVisibilityChange = true;
 
   //If the parent container of the game is the browser window (ie. document.body), rather than a div, this should set to true.
-  //    this.scale.parentIsWindow = true;
+  this.scale.parentIsWindow = true;
 
-  this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+  // this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 
   if (this.game.device.desktop) {
     //  If you have any desktop specific settings, they can go in here
@@ -36,7 +36,7 @@ BasicGame.Boot.prototype.create = function () {
     this.scale.refresh();
   }
 
-  this.scale.setScreenSize(false);
+  // this.scale.setScreenSize(false);
 };
 
 BasicGame.Boot.prototype.update = function () {

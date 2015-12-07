@@ -22,7 +22,7 @@ BasicGame.Game.prototype.preload = function(){
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
   //Define the size of the world
-  this.game.world.setBounds(-10, -10, this.game.width + 20, this.game.height + 20);
+  this.game.world.setBounds(0, 0, this.game.width, this.game.height);
 
   //Init the player
   this.player = new BasicGame.Player(this.game,this.input);
@@ -57,7 +57,7 @@ BasicGame.Game.prototype.create = function(){
   this.light.create(this.level001.walls);
 
   // //Create THE EYE
-  // this.eye.create(this.player, this.level001, this.lightning);
+  this.eye.create(this.player, this.level001, this.lightning);
 
 
   // Show FPS
@@ -70,13 +70,13 @@ BasicGame.Game.prototype.create = function(){
 // The update() method is called every frame
 BasicGame.Game.prototype.update = function() {
   //UPDATE THE LIGHT
-  // this.light.update();
+  this.light.update();
 
   //UPDATE THE PLAYER
   this.player.update(this.light);
 
   //UPDATE THE EYE
-  // this.eye.update();
+  this.eye.update();
 
   //Show development information
   if(this.showFPS){

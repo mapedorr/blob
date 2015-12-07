@@ -23,7 +23,7 @@ BasicGame.Player.prototype.create = function (level) {
   this.level = level;
 
   //Put the player in the game's world
-  this.player = this.game.add.sprite(32, this.game.world.height - 74, 'player');
+  this.player = this.game.add.sprite(0, 0, 'player');
 
   //Enable physics on the player
   this.game.physics.arcade.enable(this.player);
