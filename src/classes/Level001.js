@@ -9,6 +9,7 @@ BasicGame.Level001 = function (game) {
 };
 
 BasicGame.Level001.prototype.create = function () {
+  var _me = this;
   // this.levelMusic = this.game.add.audio('level001Music');
   // this.levelMusic.play();
   // 
@@ -22,9 +23,8 @@ BasicGame.Level001.prototype.create = function () {
   this.walls = this.game.add.group();
   // this.game.physics.arcade.enable(this.walls);
   // this.walls.body.allowGravity = false;
-  this.map.createFromObjects("platforms", 0, 'platform', null, true, false, this.walls);
   this.map.objects.platforms.forEach(function(object){
-    console.log(object);
+    _me.map.createFromObjects("platforms", object.name, 'platform', null, true, false, this.walls);
   });
 
   //Create the ground

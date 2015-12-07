@@ -107,7 +107,7 @@ BasicGame.Player.prototype.rightInputIsActive = function () {
 // In this case, either holding the up arrow or tapping or clicking on the center
 // part of the screen.
 BasicGame.Player.prototype.upInputIsActive = function (duration) {
-  return this.input.keyboard.justPressed(Phaser.Keyboard.UP, duration);
+  return this.input.keyboard.isDown(Phaser.Keyboard.UP, duration);
 };
 
 //Function that checks if  the player is completely in shadows or not
