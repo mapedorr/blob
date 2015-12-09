@@ -13,6 +13,7 @@ BasicGame.Player = function (game, input) {
   this.DRAG = 1500; // pixels/second
   this.GRAVITY = 2600; // pixels/second/second
   this.JUMP_SPEED = -1000; // pixels/second (negative y is up)
+  this.SLID_SPEED = 1;
 };
 
 BasicGame.Player.prototype.preload = function () {
@@ -68,19 +69,37 @@ BasicGame.Player.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.level.walls);
   // this.game.physics.arcade.collide(this.player, this.level.ground);
 
-  if (this.leftInputIsActive()) {
+  var leftPressed = this.leftInputIsActive() == true;
+  var rightPressed = this.rightInputIsActive() == true;
+  var upPressed = this.upInputIsActive() == true;
+  var onTheGround = this.player.body.touching.down == true;
+  var onRightWall = this.player.body.touching.right == true;
+  var onLeftWall = this.player.body.touching.left == true;
+
+  if(onRightWall || onLeftWall){
+    this.player.body.velocity.y = this.SLID_SPEED;
+  }
+
+  if (leftPressed) {
     // If the LEFT key is down, set the player velocity to move left
     this.player.body.acceleration.x = -this.ACCELERATION;
-  } else if (this.rightInputIsActive()) {
+    if(!onTheGround && onRightWall && upPressed){
+      this.player.body.velocity.y = this.JUMP_SPEED;
+    }
+  } else if (rightPressed) {
     // If the RIGHT key is down, set the player velocity to move right
     this.player.body.acceleration.x = this.ACCELERATION;
+    if(!onTheGround && onLeftWall && upPressed){
+      this.player.body.velocity.y = this.JUMP_SPEED;
+    }
   } else {
     this.player.body.acceleration.x = 0;
   }
 
   // Set a variable that is true when the player is touching the ground
-  var onTheGround = this.player.body.touching.down == true;
-  if (onTheGround && this.upInputIsActive()) {
+    // (this.player.body.touching.left == true && rightPressed == true) ||
+    // (this.player.body.touching.right == true && leftPressed == true);
+  if (upPressed && onTheGround) {
     this.player.body.velocity.y = this.JUMP_SPEED;
   }
 
@@ -105,8 +124,8 @@ BasicGame.Player.prototype.rightInputIsActive = function () {
 // This function should return true when the player activates the "jump" control
 // In this case, either holding the up arrow or tapping or clicking on the center
 // part of the screen.
-BasicGame.Player.prototype.upInputIsActive = function (duration) {
-  return this.input.keyboard.isDown(Phaser.Keyboard.UP, duration);
+BasicGame.Player.prototype.upInputIsActive = function () {
+  return this.input.keyboard.isDown(Phaser.Keyboard.UP);
 };
 
 //Function that checks if  the player is completely in shadows or not
