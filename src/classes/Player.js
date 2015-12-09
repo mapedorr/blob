@@ -79,9 +79,8 @@ BasicGame.Player.prototype.update = function () {
   }
 
   // Set a variable that is true when the player is touching the ground
-  var onTheGround = this.player.body.touching.down;
-  if (this.upInputIsActive()) {
-    // Jump when the player is touching the ground and the up arrow is pressed
+  var onTheGround = this.player.body.touching.down == true;
+  if (onTheGround && this.upInputIsActive()) {
     this.player.body.velocity.y = this.JUMP_SPEED;
   }
 

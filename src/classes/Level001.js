@@ -17,7 +17,7 @@ BasicGame.Level001.prototype.create = function () {
 
   this.walls = this.game.add.group();
   this.map.objects.platforms.forEach(function(object){
-    _me.map.createFromObjects("platforms", object.name, 'platform', null, true, false, _me.walls);
+    _me.map.createFromObjects("platforms", object.name, 'platform', null, true, false, _me.walls, Phaser.Sprite, false);
   });
   this.walls.enableBody = true;
   this.game.physics.arcade.enable(this.walls);
