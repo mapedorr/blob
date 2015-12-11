@@ -6,7 +6,7 @@ var BasicGame = BasicGame || {};
 
 BasicGame.Game = function (game) {
   this.player = null;
-  this.level001 = null;
+  this.level = null;
   this.light = null;
   this.eye = null;
   this.lightning = null;
@@ -28,7 +28,7 @@ BasicGame.Game.prototype.preload = function(){
   this.player = new BasicGame.Player(this.game,this.input);
 
   //Init the level
-  this.level001 = new BasicGame.Level001(this.game);
+  this.level = new BasicGame.Level(this.game);
 
   //Init a light
   this.light = new BasicGame.Light(this.game);
@@ -42,26 +42,23 @@ BasicGame.Game.prototype.preload = function(){
 };
 
 BasicGame.Game.prototype.create = function(){
-  //Set stage background color
-  //this.game.stage.backgroundColor = 0xF39D41;
+  // set stage background
   this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'sky');
 
+  // create the level
+  this.level.create();
 
-  //Create the level
-  this.level001.create();
+  // create the player
+  this.player.create(this.level);
 
-  //Create the player
-  this.player.create(this.level001);
+  // create the light
+  this.light.create(this.level.walls);
 
-  // //Create the light
-  this.light.create(this.level001.walls);
+  // create THE EYE
+  this.eye.create(this.player, this.level, this.lightning);
 
-  // //Create THE EYE
-  this.eye.create(this.player, this.level001, this.lightning);
-
-
-  // Show FPS
-  if(this.showFPS){
+  // show FPS
+  if(BasicGame.Game.developmentMode){
     this.game.time.advancedTiming = true;
     this.fpsText = this.game.add.text(this.game.world.width / 2 - 80, 100, '', { font: '80px Arial', fill: '#fefefe' });
   }
@@ -90,4 +87,15 @@ BasicGame.Game.prototype.quitGame = function(){
   //Here you should destroy anything you no longer need.
   //Stop music, delete sprites, purge caches, free resources, all that good stuff.
   this.state.start('MainMenu');
+};
+
+BasicGame.Game.prototype.loadLevel = function(levelNumber){
+  this.level.destroyCurrentLevel();
+  this.level.createLevel(2);
+
+
+  this.player.updateLevel(this.level);
+  this.light.updateWalls(this.level);
+  this.eye.updateLevel(this.level);
+  this.lightning.updateLevel(this.level);
 };

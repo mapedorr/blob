@@ -96,9 +96,6 @@ BasicGame.Player.prototype.update = function () {
     this.player.body.acceleration.x = 0;
   }
 
-  // Set a variable that is true when the player is touching the ground
-    // (this.player.body.touching.left == true && rightPressed == true) ||
-    // (this.player.body.touching.right == true && leftPressed == true);
   if (upPressed && onTheGround) {
     this.player.body.velocity.y = this.JUMP_SPEED;
   }
@@ -207,4 +204,8 @@ BasicGame.Player.prototype.drawLinesToLight = function(lightImage){
   this.bitmap.context.moveTo(this.player.x + this.player.width, this.player.y + this.player.height);
   this.bitmap.context.lineTo(lightImage.x, lightImage.y);
   this.bitmap.context.stroke();
+};
+
+BasicGame.Player.prototype.updateLevel = function (level) {
+  this.level = level;
 };

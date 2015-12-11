@@ -223,3 +223,7 @@ BasicGame.Eye.prototype.drawLinesToTarget = function(target){
   this.bitmap.context.lineTo(this.eye.x, this.eye.y);
   this.bitmap.context.stroke();
 };
+
+BasicGame.Eye.prototype.updateLevel = function (level) {
+  this.level = level;
+};

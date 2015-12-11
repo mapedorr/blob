@@ -1,6 +1,6 @@
 var BasicGame = BasicGame || {};
 
-BasicGame.Level001 = function (game) {
+BasicGame.Level = function (game) {
   this.game = game;
   this.levelMusic = null;
   this.walls = null;
@@ -8,12 +8,17 @@ BasicGame.Level001 = function (game) {
   this.map = null;
 };
 
-BasicGame.Level001.prototype.create = function () {
+BasicGame.Level.prototype.create = function () {
+  this.createLevel(1);
+};
+
+BasicGame.Level.prototype.destroyCurrentLevel = function(){
+
+};
+
+BasicGame.Level.prototype.createLevel = function(num){
   var _me = this;
-  // this.levelMusic = this.game.add.audio('level001Music');
-  // this.levelMusic.play();
-  // 
-  this.map = this.game.add.tilemap('lvl01');
+  this.map = this.game.add.tilemap('lvl' + ((num < 10) ? '0' + num : num));
 
   this.walls = this.game.add.group();
   this.map.objects.platforms.forEach(function(object){
@@ -27,4 +32,3 @@ BasicGame.Level001.prototype.create = function () {
     platformSprite.body.allowGravity = false;
   });
 };
-
