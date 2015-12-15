@@ -54,8 +54,15 @@ BasicGame.Eye.prototype.create = function (player, level, lightning) {
 };
 
 BasicGame.Eye.prototype.update = function () {
-  // Clear the bitmap where we are drawing our lines
-  this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
+  if(BasicGame.Game.developmentMode === true){
+    // Clear the bitmap where we are drawing our lines
+    this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
+  }
+
+  if(this.level.isEnded == true){
+    this.eye.animations.play('search');
+    return;
+  }
 
   //Ray casting!!!
   //Test if each target can see the eye by casting a ray (a line) towards the eye.

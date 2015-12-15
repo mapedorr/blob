@@ -1,7 +1,7 @@
 /* COLORCOMBO
  * http://www.colorcombos.com/color-schemes/6343/ColorCombo6343.html
  */
- 
+
 var BasicGame = BasicGame || {};
 
 BasicGame.Game = function (game) {
@@ -18,26 +18,25 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.developmentMode = false;
 BasicGame.Game.prototype.preload = function(){
-  //Phaser has ARCADE physics (perfect for mobile browsers), NINJA physics and P2.JS Full-Body physics.
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
-  //Define the size of the world
+  // define the size of the world
   this.game.world.setBounds(0, 0, this.game.width, this.game.height);
 
-  //Init the player
+  // init the player
   this.player = new BasicGame.Player(this.game,this.input);
 
-  //Init the level
+  // init the level
   this.level = new BasicGame.Level(this.game);
 
-  //Init a light
+  // init a light
   this.light = new BasicGame.Light(this.game);
   BasicGame.light = this.light;
 
-  // //Init THE EYE
+  // init THE EYE
   this.eye = new BasicGame.Eye(this.game);
 
-  // //Init the lightning
+  // init the lightning
   this.lightning = new BasicGame.Lightning(this.game);
 };
 
@@ -52,7 +51,7 @@ BasicGame.Game.prototype.create = function(){
   this.player.create(this.level);
 
   // create the light
-  this.light.create(this.level.walls);
+  this.light.create(this.level);
 
   // create THE EYE
   this.eye.create(this.player, this.level, this.lightning);
@@ -64,19 +63,18 @@ BasicGame.Game.prototype.create = function(){
   }
 };
 
-// The update() method is called every frame
 BasicGame.Game.prototype.update = function() {
-  //UPDATE THE LIGHT
+  // update the light
   this.light.update();
 
-  //UPDATE THE PLAYER
+  // update The Player
   this.player.update(this.light);
 
-  //UPDATE THE EYE
+  // update The Eye
   this.eye.update();
 
-  //Show development information
-  if(this.showFPS){
+  // show development information
+  if(BasicGame.Game.developmentMode){
     if (this.game.time.fps !== 0) {
       this.fpsText.setText(this.game.time.fps + ' FPS');
     }

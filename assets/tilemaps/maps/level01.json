@@ -2,26 +2,12 @@
  "layers":[
         {
          "draworder":"topdown",
-         "height":0,
-         "name":"platforms",
+         "height":20,
+         "name":"floor",
          "objects":[
                 {
                  "height":32,
-                 "name":"p1",
-                 "properties":
-                    {
-                     "gid":"p1"
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":896,
-                 "x":0,
-                 "y":512
-                }, 
-                {
-                 "height":32,
-                 "name":"p2",
+                 "name":"2",
                  "properties":
                     {
                      "gid":"p2"
@@ -36,7 +22,59 @@
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
+         "width":32,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "height":0,
+         "name":"platforms",
+         "objects":[
+                {
+                 "height":32,
+                 "name":"1",
+                 "properties":
+                    {
+                     "gid":"p1"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":896,
+                 "x":0,
+                 "y":512
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
          "width":0,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "height":20,
+         "name":"pieces",
+         "objects":[
+                {
+                 "height":16,
+                 "name":"1",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1008,
+                 "y":592
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":32,
          "x":0,
          "y":0
         }],

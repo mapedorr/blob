@@ -8,10 +8,12 @@ BasicGame.Light = function (game) {
   this.rayBitmap = null;
   this.rayBitmapImage = null;
   this.walls = null;
+  this.level = null;
 };
 
-BasicGame.Light.prototype.create = function (walls) {
-  this.walls = walls;
+BasicGame.Light.prototype.create = function (level) {
+  this.level = level;
+  this.walls = this.level.walls;
 
   var light = null;
 
@@ -51,6 +53,10 @@ BasicGame.Light.prototype.create = function (walls) {
 BasicGame.Light.prototype.update = function () {
   // Move the light to the pointer/touch location
   this.rayBitmapImage.visible = BasicGame.Game.developmentMode || false;
+
+  if(this.level.isEnded == true){
+    return;
+  }
 
   // Next, fill the entire light bitmap with a dark shadow color.
   this.bitmap.context.fillStyle = 'rgb(31, 31, 31)';

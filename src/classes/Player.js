@@ -6,6 +6,7 @@ BasicGame.Player = function (game, input) {
   this.player = null;
   this.level = null;
   this.bitmap = null;
+  this.collectedPieces = 0;
 
   // Define movement constants
   this.MAX_SPEED = 300; // pixels/second
@@ -51,10 +52,10 @@ BasicGame.Player.prototype.create = function (level) {
   //Make the player collide with world bounds
   this.player.body.collideWorldBounds = true;
 
-  //Make the camera follow the player
-  //  this.game.camera.follow(this.player);
+  // make the camera follow the player
+  // this.game.camera.follow(this.player);
 
-  // Create a bitmap texture for drawing lines
+  // create a bitmap texture for drawing lines
   this.bitmap = this.game.add.bitmapData(this.game.width, this.game.height);
   this.bitmap.context.fillStyle = 'rgb(0, 0, 255)';
   this.bitmap.context.strokeStyle = 'rgb(0, 0, 255)';
@@ -62,12 +63,32 @@ BasicGame.Player.prototype.create = function (level) {
 };
 
 BasicGame.Player.prototype.update = function () {
-  // Clear the bitmap where we are drawing our lines
-  this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
+  if(BasicGame.Game.developmentMode === true){
+    // clear the bitmap where we are drawing our lines
+    this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
+  }
 
-  //Check collisions
+  // check collisions
   this.game.physics.arcade.collide(this.player, this.level.walls);
-  // this.game.physics.arcade.collide(this.player, this.level.ground);
+  this.game.physics.arcade.collide(this.player, this.level.ground);
+
+  if(!this.level.isEnded){
+    this.game.physics.arcade.collide(this.player, this.level.pieces,
+      function(player, piece){
+        piece.destroy();
+        this.collectedPieces++;
+        if(!this.level.pieces.children || !this.level.pieces.children.length){
+          // the level has been finished
+          this.level.endLevel();
+        }
+      },
+      null,
+      this);
+  }
+
+  if(this.level.isEnded == true){
+    return;
+  }
 
   var leftPressed = this.leftInputIsActive() == true;
   var rightPressed = this.rightInputIsActive() == true;
