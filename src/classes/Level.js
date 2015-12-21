@@ -8,6 +8,7 @@ BasicGame.Level = function (game) {
   this.map = null;
   this.endTimer = null;
   this.isEnded = null;
+  this.initPlayerPos = {x: 0, y: 0};
 };
 
 BasicGame.Level.prototype.create = function () {
@@ -66,9 +67,15 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.game.physics.arcade.enable(this.pieces);
   this.pieces.forEach(function(pieceSprite){
     pieceSprite.anchor.set(.5, .5);
-    pieceSprite.body.immovable = true;
+    pieceSprite.body.immovable = false;
     pieceSprite.body.allowGravity = false;
   });
+
+  // get the player initial position
+  if(this.map.objects.player_pos){
+    this.initPlayerPos.x = this.map.objects.player_pos[0].x;
+    this.initPlayerPos.y = this.map.objects.player_pos[0].y;
+  }
 
   // set the level as not ended
   this.isEnded = false;
@@ -84,8 +91,4 @@ BasicGame.Level.prototype.endLevel = function(){
     },
     this);
   this.endTimer.start();
-};
-
-BasicGame.Level.prototype.coco = function(){
-
 };

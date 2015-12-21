@@ -2,7 +2,7 @@
  "layers":[
         {
          "draworder":"topdown",
-         "height":20,
+         "height":0,
          "name":"floor",
          "objects":[
                 {
@@ -22,7 +22,7 @@
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
-         "width":32,
+         "width":0,
          "x":0,
          "y":0
         }, 
@@ -54,7 +54,7 @@
         }, 
         {
          "draworder":"topdown",
-         "height":20,
+         "height":0,
          "name":"pieces",
          "objects":[
                 {
@@ -70,6 +70,32 @@
                  "width":16,
                  "x":1008,
                  "y":592
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":0,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "height":20,
+         "name":"player_pos",
+         "objects":[
+                {
+                 "height":8,
+                 "name":"plyr",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":0,
+                 "y":576
                 }],
          "opacity":1,
          "type":"objectgroup",

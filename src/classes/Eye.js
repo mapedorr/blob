@@ -4,7 +4,7 @@ BasicGame.Eye = function (game) {
   this.game = game;
 
   this.eye = null;
-  this.player = null;
+  this.PlayerObj = null;
   this.level = null;
   this.lightning = null;
 
@@ -15,8 +15,8 @@ BasicGame.Eye = function (game) {
 
 BasicGame.Eye.prototype.preload = function () {};
 
-BasicGame.Eye.prototype.create = function (player, level, lightning) {
-  this.player = player;
+BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
+  this.PlayerObj = playerObj;
   this.level = level;
   this.lightning = lightning;
 
@@ -27,7 +27,7 @@ BasicGame.Eye.prototype.create = function (player, level, lightning) {
   this.eye.anchor.setTo(0.5, 0.5);
 
   //Set the animations for THE EYE
-  this.eye.animations.add('search', [0,1,2,3,3,3,2,1,0,4,5,6,6,6,5,4], 6, true);
+  this.eye.animations.add('search', [0,1,2,3,3,3,2,1,0,4,5,6,6,6,5,4], 3, true);
   this.eye.animations.add('angry', [7], 1, false);
   this.eye.animations.add('tired', [8], 1, false);
   this.eye.animations.add('happy', [9], 1, false);
@@ -43,11 +43,11 @@ BasicGame.Eye.prototype.create = function (player, level, lightning) {
   this.game.add.image(0, 0, this.bitmap);
 
   //Create the lightning for killing the player
-  this.lightning.create(this.eye,this.player,this.level);
+  this.lightning.create(this.eye,this.PlayerObj,this.level);
   this.lightningTimer = 0;
 
   //Add the player to the enemies array
-  this.enemies.push(this.player.player);
+  this.enemies.push(this.PlayerObj.player);
 
   //THE EYE starts calm
   this.anger = false;
@@ -69,25 +69,26 @@ BasicGame.Eye.prototype.update = function () {
   //If the ray intersects any walls before it intersects the eye then the wall
   //is in the way.
   this.enemies.forEach(function (target) {
-    //Define the lines that connects the target to the eye
-    //This isn't drawn on screen. This is just mathematical representation
-    //of a line to make our calculations easier. Unless you want to do a lot
-    //of math, make sure you choose an engine that has things like line intersection
-    //tests built in, like Phaser does.
+    // define the lines that connects the target to the eye
+    // this isn't drawn on screen.
     var rays = [];
     rays[0] = new Phaser.Line(target.x, target.y, this.eye.x, this.eye.y);
     rays[1] = new Phaser.Line(target.x + target.width, target.y, this.eye.x, this.eye.y);
     rays[3] = new Phaser.Line(target.x + target.width, target.y + target.height - 0.1, this.eye.x, this.eye.y);
     rays[2] = new Phaser.Line(target.x, target.y + target.height - 0.1, this.eye.x, this.eye.y);
 
-    //Test if any walls intersect the ray
+    // check if any walls intersect the ray
     var intersect = this.getWallIntersection(rays);
 
-    //Test if the player is in the shadows
-    var playerInShadow = this.player.isInShadow();
+    // check if the player is in the shadows
+    var playerInShadow = this.PlayerObj.isInShadow();
 
-    if (intersect || playerInShadow){
-      //A wall is protecting the enemy or it is in shadows....lets calm down
+    // check if the player is in the side of vision of the EYE
+    var playerInSide = this.isPlayerInSide();
+
+    if (intersect || playerInShadow || !playerInSide){
+      // a wall is protecting the enemy or it is in shadows or is not on my side of vision
+      // ....lets calm down
       this.calmDown();
 
       //- - - | DEVELOPMENT MODE | - - -
@@ -152,6 +153,24 @@ BasicGame.Eye.prototype.getWallIntersection = function (rays) {
 
   return hiddenRays == 4;
 
+};
+
+BasicGame.Eye.prototype.isPlayerInSide = function(){
+  if(this.eye.animations.currentFrame == 0){
+    // "I can see everything!"
+    return true;
+  }else if(this.eye.animations.currentFrame.index <= 3){
+    // the player have to be on the left side of the screen
+    if(this.PlayerObj.player.x <= this.game.world.width / 2){
+      return true;
+    }
+  }else if(this.eye.animations.currentFrame.index >= 4){
+    // the player have to be on the right side of the screen
+    if(this.PlayerObj.player.x >= this.game.world.width / 2){
+      return true;
+    }
+  }
+  return false;
 };
 
 BasicGame.Eye.prototype.calmDown = function(){

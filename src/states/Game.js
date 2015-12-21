@@ -23,11 +23,11 @@ BasicGame.Game.prototype.preload = function(){
   // define the size of the world
   this.game.world.setBounds(0, 0, this.game.width, this.game.height);
 
-  // init the player
-  this.player = new BasicGame.Player(this.game,this.input);
-
   // init the level
   this.level = new BasicGame.Level(this.game);
+
+  // init the player
+  this.player = new BasicGame.Player(this.game,this.input);
 
   // init a light
   this.light = new BasicGame.Light(this.game);

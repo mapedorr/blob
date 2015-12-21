@@ -25,7 +25,9 @@ BasicGame.Player.prototype.create = function (level) {
   this.level = level;
 
   //Put the player in the game's world
-  this.player = this.game.add.sprite(0, 0, 'player');
+  this.player = this.game.add.sprite(this.level.initPlayerPos.x,
+    this.level.initPlayerPos.y,
+    'player');
 
   //Enable physics on the player
   this.game.physics.arcade.enable(this.player);
@@ -72,7 +74,7 @@ BasicGame.Player.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.level.walls);
   this.game.physics.arcade.collide(this.player, this.level.ground);
 
-  if(!this.level.isEnded){
+  if(!this.level.isEnded && this.level.pieces.children){
     this.game.physics.arcade.collide(this.player, this.level.pieces,
       function(player, piece){
         piece.destroy();
@@ -229,4 +231,6 @@ BasicGame.Player.prototype.drawLinesToLight = function(lightImage){
 
 BasicGame.Player.prototype.updateLevel = function (level) {
   this.level = level;
+  this.player.position.set(this.level.initPlayerPos.x,
+    this.level.initPlayerPos.y);
 };
