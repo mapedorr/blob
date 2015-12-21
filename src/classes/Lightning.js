@@ -149,6 +149,9 @@ BasicGame.Lightning.prototype.createLightningTexture = function (x, y, segments,
   this.lightningBitmap.dirty = true;
 };
 
+BasicGame.Lightning.prototype.updateLevel = function (level) {
+  this.level = level;
+};
 
 /*
 // Fragment shaders are small programs that run on the graphics card and alter

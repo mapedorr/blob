@@ -48,6 +48,7 @@ BasicGame.Preloader.prototype.preload = function(){
 
   // load the map for the first level
   this.game.load.tilemap('lvl01', 'assets/tilemaps/maps/level01.json', null, Phaser.Tilemap.TILED_JSON);
+  this.game.load.tilemap('lvl02', 'assets/tilemaps/maps/level02.json', null, Phaser.Tilemap.TILED_JSON);
 };
 
 BasicGame.Preloader.prototype.create = function(){

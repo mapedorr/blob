@@ -299,6 +299,6 @@ BasicGame.Light.prototype.getWallIntersection = function (ray) {
 BasicGame.Light.prototype.destroyCurrentWalls = function (walls) {
 };
 
-BasicGame.Light.prototype.updateWalls = function (walls) {
-  this.walls = walls;
+BasicGame.Light.prototype.updateWalls = function (level) {
+  this.walls = level.walls;
 };

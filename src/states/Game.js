@@ -73,6 +73,11 @@ BasicGame.Game.prototype.update = function() {
   // update The Eye
   this.eye.update();
 
+  if(this.level.isEnded == true){
+    this.loadLevel(2);
+    return;
+  }
+
   // show development information
   if(BasicGame.Game.developmentMode){
     if (this.game.time.fps !== 0) {
@@ -90,7 +95,6 @@ BasicGame.Game.prototype.quitGame = function(){
 BasicGame.Game.prototype.loadLevel = function(levelNumber){
   this.level.destroyCurrentLevel();
   this.level.createLevel(2);
-
 
   this.player.updateLevel(this.level);
   this.light.updateWalls(this.level);
