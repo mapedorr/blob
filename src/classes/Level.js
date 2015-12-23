@@ -9,9 +9,23 @@ BasicGame.Level = function (game) {
   this.endTimer = null;
   this.isEnded = null;
   this.initPlayerPos = {x: 0, y: 0};
+
+  // font attributes
+  this.fontSize = 32;
+  this.fontId = 'font';
 };
 
 BasicGame.Level.prototype.create = function () {
+  // create the bitmap for the countdown text
+  this.dialogTextBitmap = this.game.add.bitmapText(this.game.world.width/2,
+    this.game.world.height/2,
+    this.fontId,
+    '',
+    this.fontSize);
+  this.dialogTextBitmap.anchor.set(.5, .5);
+  this.dialogTextBitmap.align = "center";
+  this.dialogTextBitmap.tint = 0x212121;
+
   this.createLevel(1);
 };
 
@@ -21,6 +35,7 @@ BasicGame.Level.prototype.destroyCurrentLevel = function(){
     this.ground.destroy();
   }
   this.walls.destroy();
+  this.dialogTextBitmap.setText("");
 };
 
 BasicGame.Level.prototype.createLevel = function(num){
@@ -82,6 +97,9 @@ BasicGame.Level.prototype.createLevel = function(num){
 };
 
 BasicGame.Level.prototype.endLevel = function(){
+  var secondsToEnd = 10;
+  this.dialogTextBitmap.setText(secondsToEnd);
+
   // starts the timer that will end the level
   this.endTimer = this.game.time.create(true);
   this.endTimer.add(10000,
@@ -90,5 +108,15 @@ BasicGame.Level.prototype.endLevel = function(){
       this.isEnded = true;
     },
     this);
+
+  this.endTimer.repeat(1000,
+    9,
+    function(){
+      // show the countdown on the screen
+      secondsToEnd--;
+      this.dialogTextBitmap.setText(secondsToEnd);
+    },
+    this);
+
   this.endTimer.start();
 };
