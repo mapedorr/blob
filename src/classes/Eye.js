@@ -23,18 +23,18 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   //Add the sprite of the eye
   this.eye = this.game.add.sprite(this.game.world.width / 2, 64, 'eye',0);
 
-  //Set the pivot point of the light to the center of the texture
+  // set the pivot point of the light to the center of the texture
   this.eye.anchor.setTo(0.5, 0.5);
 
-  //Set the animations for THE EYE
+  // set the animations for THE EYE
   this.eye.animations.add('search', [0,1,2,3,3,3,2,1,0,4,5,6,6,6,5,4], 3, true);
   this.eye.animations.add('angry', [7], 1, false);
   this.eye.animations.add('tired', [8], 1, false);
   this.eye.animations.add('happy', [9], 1, false);
   this.eye.animations.add('irritated', [10], 1, false);
 
-  //Set a timer for changing the animations of THE EYE
-  this.eyeStateTimer = 0;
+  // set a timer for changing the animations of THE EYE
+  this.eyeStateTimer = 10000;
 
   //Create a bitmap texture for drawing lines
   this.bitmap = this.game.add.bitmapData(this.game.width, this.game.height);
@@ -69,27 +69,36 @@ BasicGame.Eye.prototype.update = function () {
   //If the ray intersects any walls before it intersects the eye then the wall
   //is in the way.
   this.enemies.forEach(function (target) {
-    // define the lines that connects the target to the eye
-    // this isn't drawn on screen.
-    var rays = [];
-    rays[0] = new Phaser.Line(target.x, target.y, this.eye.x, this.eye.y);
-    rays[1] = new Phaser.Line(target.x + target.width, target.y, this.eye.x, this.eye.y);
-    rays[3] = new Phaser.Line(target.x + target.width, target.y + target.height - 0.1, this.eye.x, this.eye.y);
-    rays[2] = new Phaser.Line(target.x, target.y + target.height - 0.1, this.eye.x, this.eye.y);
-
-    // check if any walls intersect the ray
-    var intersect = this.getWallIntersection(rays);
-
-    // check if the player is in the shadows
-    var playerInShadow = this.PlayerObj.isInShadow();
+    var attack = false;
 
     // check if the player is in the side of vision of the EYE
     var playerInSide = this.isPlayerInSide();
 
-    if (intersect || playerInShadow || !playerInSide){
-      // a wall is protecting the enemy or it is in shadows or is not on my side of vision
-      // ....lets calm down
-      this.calmDown();
+    if(playerInSide){
+      // define the lines that connects the target to the eye
+      // this isn't drawn on screen.
+      var rays = [];
+      rays[0] = new Phaser.Line(target.x, target.y, this.eye.x, this.eye.y);
+      rays[1] = new Phaser.Line(target.x + target.width, target.y, this.eye.x, this.eye.y);
+      rays[3] = new Phaser.Line(target.x + target.width, target.y + target.height - 0.1, this.eye.x, this.eye.y);
+      rays[2] = new Phaser.Line(target.x, target.y + target.height - 0.1, this.eye.x, this.eye.y);
+
+      // check if any walls intersect the ray
+      var wallIntersect = this.getWallIntersection(rays);
+
+      // check if the player is in the shadows
+      var playerInShadow = this.PlayerObj.isInShadow();
+
+      if(!wallIntersect && !playerInShadow){
+        attack = true;
+      }
+    }
+
+    if (attack == false){
+      // i can't see the player, lets calm down
+      // this.calmDown();
+
+      this.eye.animations.play('search');
 
       //- - - | DEVELOPMENT MODE | - - -
       if(BasicGame.Game.developmentMode === true){
@@ -175,7 +184,7 @@ BasicGame.Eye.prototype.isPlayerInSide = function(){
 
 BasicGame.Eye.prototype.calmDown = function(){
   this.lightningTimer = 0;
-  if(this.anger){
+  if(this.anger == true){
     this.angerTimer -= this.game.time.elapsed;
     if(this.angerTimer <= 0){
       this.angerTimer = 0;
@@ -193,13 +202,14 @@ BasicGame.Eye.prototype.calmDown = function(){
   }
 
   this.eyeStateTimer -= this.game.time.elapsed;
-  if (this.eyeStateTimer <= 8000 && this.eyeStateTimer > 0) {
+  if(this.eyeStateTimer <= 8000 && this.eyeStateTimer > 0) {
+    // after 2 seconds, search for the player
     this.eye.animations.play('search');
   }else if(this.eyeStateTimer <= 0){
     this.eye.animations.play('tired');
 
     if(!this.anger) {
-      //Init the timer that will make THE EYE shoot a platform
+      // init the timer that will make THE EYE shoot a platform
       this.angerTimer = 3000;
       this.anger = true;
     }
