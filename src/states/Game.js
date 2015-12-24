@@ -10,10 +10,10 @@ BasicGame.Game = function (game) {
   this.light = null;
   this.eye = null;
   this.lightning = null;
-
   this.showFPS = false;
-
   this.map = null;
+  this.darknessGroup = null;
+  this.darknessTween = null;
 };
 
 BasicGame.Game.developmentMode = false;
@@ -56,6 +56,21 @@ BasicGame.Game.prototype.create = function(){
   // create THE EYE
   this.eye.create(this.player, this.level, this.lightning);
 
+  // create the darkness
+  this.darknessGroup = this.add.group();
+  var darknessBitmap = new Phaser.BitmapData(this.game,
+    'darkness',
+    this.game.width,
+    this.game.height);
+  darknessBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
+  darknessBitmap.fillStyle = '#000';
+  darknessBitmap.fill();
+
+  var darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
+  darknessSprite.alpha = 0;
+
+  this.darknessGroup.addChild(darknessSprite);
+
   // show FPS
   if(BasicGame.Game.developmentMode){
     this.game.time.advancedTiming = true;
@@ -74,7 +89,26 @@ BasicGame.Game.prototype.update = function() {
   this.eye.update();
 
   if(this.level.isEnded == true){
-    this.loadLevel(2);
+    // start the Tween of darkness
+    // create the darkness tween
+    if(!this.darknessTween){
+      this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
+      this.darknessTween.to({alpha: 100},
+        5000,
+        null,
+        true);
+      this.darknessTween.onComplete.addOnce(function(target, tween){
+        this.game.world.bringToTop(this.game.world.getChildIndex(this.darknessGroup));
+        this.loadLevel(2);
+        tween.to({alpha: 0},
+          5000,
+          null,
+          true);
+        this.darknessTween.onComplete.addOnce(function(){
+          this.darknessTween = null;
+        }, this);
+      }, this);
+    }
     return;
   }
 
