@@ -14,6 +14,8 @@ BasicGame.Game = function (game) {
   this.map = null;
   this.darknessGroup = null;
   this.darknessTween = null;
+  this.countdownDuration = 10;
+  this.currentLevel = 1;
 };
 
 BasicGame.Game.developmentMode = false;
@@ -24,7 +26,7 @@ BasicGame.Game.prototype.preload = function(){
   this.game.world.setBounds(0, 0, this.game.width, this.game.height);
 
   // init the level
-  this.level = new BasicGame.Level(this.game);
+  this.level = new BasicGame.Level(this.game, this);
 
   // init the player
   this.player = new BasicGame.Player(this.game,this.input);
@@ -71,6 +73,9 @@ BasicGame.Game.prototype.create = function(){
 
   this.darknessGroup.addChild(darknessSprite);
 
+  // create the darkness tween
+  this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
+
   // show FPS
   if(BasicGame.Game.developmentMode){
     this.game.time.advancedTiming = true;
@@ -89,26 +94,20 @@ BasicGame.Game.prototype.update = function() {
   this.eye.update();
 
   if(this.level.isEnded == true){
-    // start the Tween of darkness
-    // create the darkness tween
-    if(!this.darknessTween){
-      this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-      this.darknessTween.to({alpha: 100},
-        5000,
-        null,
-        true);
-      this.darknessTween.onComplete.addOnce(function(target, tween){
-        this.game.world.bringToTop(this.game.world.getChildIndex(this.darknessGroup));
-        this.loadLevel(2);
-        tween.to({alpha: 0},
-          5000,
-          null,
-          true);
-        this.darknessTween.onComplete.addOnce(function(){
-          this.darknessTween = null;
-        }, this);
-      }, this);
+    if(this.darknessTween && this.darknessTween.isRunning){
+      return;
     }
+
+    this.loadLevel(++this.currentLevel);
+    this.game.world.bringToTop(this.darknessGroup);
+    this.darknessTween.stop();
+    this.darknessTween.to({alpha: 0},
+      500,
+      Phaser.Easing.Quadratic.Out,
+      true);
+    this.darknessTween.onComplete.addOnce(function(){
+      this.darknessTween = null;
+    }, this);
     return;
   }
 
@@ -126,9 +125,19 @@ BasicGame.Game.prototype.quitGame = function(){
   this.state.start('MainMenu');
 };
 
+BasicGame.Game.prototype.showDarkness = function(){
+  this.darknessTween = this.darknessTween || this.game.add.tween(this.darknessGroup.getChildAt(0));
+  this.darknessTween.to({alpha: 1},
+    3000,
+    Phaser.Easing.Quadratic.Out,
+    true);
+  this.darknessTween.onComplete.addOnce(function(){
+  }, this);
+};
+
 BasicGame.Game.prototype.loadLevel = function(levelNumber){
   this.level.destroyCurrentLevel();
-  this.level.createLevel(2);
+  this.level.createLevel(levelNumber);
 
   this.player.updateLevel(this.level);
   this.light.updateWalls(this.level);

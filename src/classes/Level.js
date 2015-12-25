@@ -1,7 +1,8 @@
 var BasicGame = BasicGame || {};
 
-BasicGame.Level = function (game) {
+BasicGame.Level = function (game, gameObj) {
   this.game = game;
+  this.gameObj = gameObj;
   this.levelMusic = null;
   this.walls = null;
   this.ground = null;
@@ -26,7 +27,7 @@ BasicGame.Level.prototype.create = function () {
   this.dialogTextBitmap.align = "center";
   this.dialogTextBitmap.tint = 0x212121;
 
-  this.createLevel(1);
+  this.createLevel(this.gameObj.currentLevel);
 };
 
 BasicGame.Level.prototype.destroyCurrentLevel = function(){
@@ -102,7 +103,7 @@ BasicGame.Level.prototype.endLevel = function(){
 
   // starts the timer that will end the level
   this.endTimer = this.game.time.create(true);
-  this.endTimer.add(10000,
+  this.endTimer.add(this.gameObj.countdownDuration * 1000,
     function(){
       // enable the flag that indicates the other objects the level is finished
       this.isEnded = true;
@@ -110,10 +111,13 @@ BasicGame.Level.prototype.endLevel = function(){
     this);
 
   this.endTimer.repeat(1000,
-    9,
+    this.gameObj.countdownDuration,
     function(){
       // show the countdown on the screen
       secondsToEnd--;
+      if(secondsToEnd == 4){
+        this.gameObj.showDarkness();
+      }
       this.dialogTextBitmap.setText(secondsToEnd);
     },
     this);

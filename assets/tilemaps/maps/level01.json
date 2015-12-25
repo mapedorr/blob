@@ -7,7 +7,8 @@
          "objects":[
                 {
                  "height":32,
-                 "name":"2",
+                 "id":1,
+                 "name":"floor",
                  "properties":
                     {
                      "gid":"p2"
@@ -33,10 +34,11 @@
          "objects":[
                 {
                  "height":32,
+                 "id":2,
                  "name":"1",
                  "properties":
                     {
-                     "gid":"p1"
+
                     },
                  "rotation":0,
                  "type":"",
@@ -59,6 +61,7 @@
          "objects":[
                 {
                  "height":16,
+                 "id":3,
                  "name":"1",
                  "properties":
                     {
@@ -80,11 +83,12 @@
         }, 
         {
          "draworder":"topdown",
-         "height":20,
+         "height":0,
          "name":"player_pos",
          "objects":[
                 {
                  "height":8,
+                 "id":4,
                  "name":"plyr",
                  "properties":
                     {
@@ -100,10 +104,11 @@
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
-         "width":32,
+         "width":0,
          "x":0,
          "y":0
         }],
+ "nextobjectid":5,
  "orientation":"orthogonal",
  "properties":
     {

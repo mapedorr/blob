@@ -13,7 +13,7 @@ BasicGame.Player = function (game, input) {
   this.ACCELERATION = 1500; // pixels/second/second
   this.DRAG = 1500; // pixels/second
   this.GRAVITY = 2600; // pixels/second/second
-  this.JUMP_SPEED = -1000; // pixels/second (negative y is up)
+  this.JUMP_SPEED = -850; // pixels/second (negative y is up)
   this.SLID_SPEED = 1;
 };
 

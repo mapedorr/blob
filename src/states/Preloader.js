@@ -47,8 +47,9 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.bitmapFont('font','assets/fonts/carrier_command.png','assets/fonts/carrier_command.xml');
 
   // load the map for the first level
-  this.game.load.tilemap('lvl01', 'assets/tilemaps/maps/level01.json', null, Phaser.Tilemap.TILED_JSON);
-  this.game.load.tilemap('lvl02', 'assets/tilemaps/maps/level02.json', null, Phaser.Tilemap.TILED_JSON);
+  for(var i = 1; i <= 3; i++){
+    this.game.load.tilemap('lvl0' + i, 'assets/tilemaps/maps/level0' + i + '.json', null, Phaser.Tilemap.TILED_JSON);
+  }
 };
 
 BasicGame.Preloader.prototype.create = function(){

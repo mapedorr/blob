@@ -11,6 +11,10 @@ BasicGame.Eye = function (game) {
   this.enemies = new Array();
   this.bitmap = null;
   this.anger = null;
+
+  // 20 seconds searching the player before going crazy
+  this.searchingTime = 10000;
+  this.originalSearchSpeed = 2;
 };
 
 BasicGame.Eye.prototype.preload = function () {};
@@ -27,14 +31,14 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.eye.anchor.setTo(0.5, 0.5);
 
   // set the animations for THE EYE
-  this.eye.animations.add('search', [0,1,2,3,3,3,2,1,0,4,5,6,6,6,5,4], 3, true);
+  this.eye.animations.add('search', [0,1,2,3,3,3,2,1,0,4,5,6,6,6,5,4], this.originalSearchSpeed, true);
   this.eye.animations.add('angry', [7], 1, false);
   this.eye.animations.add('tired', [8], 1, false);
   this.eye.animations.add('happy', [9], 1, false);
   this.eye.animations.add('irritated', [10], 1, false);
 
   // set a timer for changing the animations of THE EYE
-  this.eyeStateTimer = 10000;
+  this.eyeStateTimer = this.searchingTime;
 
   //Create a bitmap texture for drawing lines
   this.bitmap = this.game.add.bitmapData(this.game.width, this.game.height);
@@ -74,7 +78,7 @@ BasicGame.Eye.prototype.update = function () {
     // check if the player is in the side of vision of the EYE
     var playerInSide = this.isPlayerInSide();
 
-    if(playerInSide){
+    if(playerInSide == true){
       // define the lines that connects the target to the eye
       // this isn't drawn on screen.
       var rays = [];
@@ -96,9 +100,9 @@ BasicGame.Eye.prototype.update = function () {
 
     if (attack == false){
       // i can't see the player, lets calm down
-      // this.calmDown();
+      this.calmDown();
 
-      this.eye.animations.play('search');
+      // this.eye.animations.play('search');
 
       //- - - | DEVELOPMENT MODE | - - -
       if(BasicGame.Game.developmentMode === true){
@@ -190,19 +194,22 @@ BasicGame.Eye.prototype.calmDown = function(){
       this.angerTimer = 0;
       this.anger = false;
 
-      this.lightningTimer = 2000;
+      // this.lightningTimer = 2000;
 
       this.eye.animations.play('angry');
-      this.eyeStateTimer = 10000;
+      this.eyeStateTimer = this.searchingTime;
 
-      //Choose a platform for shooting it
-      var chosenPlatform = this.game.rnd.integerInRange(0, this.level.walls.length - 1);
-      this.lightning.shoot(this.level.walls.getAt(chosenPlatform));
+      // intensify search speed
+      this.eye.animations.getAnimation("search").speed += 2;
+
+      // choose a platform for shooting it
+      // var chosenPlatform = this.game.rnd.integerInRange(0, this.level.walls.length - 1);
+      // this.lightning.shoot(this.level.walls.getAt(chosenPlatform));
     }
   }
 
   this.eyeStateTimer -= this.game.time.elapsed;
-  if(this.eyeStateTimer <= 8000 && this.eyeStateTimer > 0) {
+  if(this.eyeStateTimer <= this.searchingTime - 2000 && this.eyeStateTimer > 0) {
     // after 2 seconds, search for the player
     this.eye.animations.play('search');
   }else if(this.eyeStateTimer <= 0){
@@ -210,7 +217,7 @@ BasicGame.Eye.prototype.calmDown = function(){
 
     if(!this.anger) {
       // init the timer that will make THE EYE shoot a platform
-      this.angerTimer = 3000;
+      this.angerTimer = 2000;
       this.anger = true;
     }
   }
@@ -226,7 +233,7 @@ BasicGame.Eye.prototype.shootPlayer = function(target){
     this.lightningTimer = 2000;
 
     this.eye.animations.play('angry');
-    this.eyeStateTimer = 10000;
+    this.eyeStateTimer = this.searchingTime;
 
     this.lightning.shoot(target);
   }
@@ -262,4 +269,7 @@ BasicGame.Eye.prototype.drawLinesToTarget = function(target){
 
 BasicGame.Eye.prototype.updateLevel = function (level) {
   this.level = level;
+  this.anger = false;
+  this.eyeStateTimer = this.searchingTime;
+  this.eye.animations.getAnimation("search").speed = this.originalSearchSpeed;
 };
