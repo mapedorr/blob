@@ -7,7 +7,6 @@
          "objects":[
                 {
                  "height":32,
-                 "id":1,
                  "name":"floor",
                  "properties":
                     {
@@ -34,7 +33,6 @@
          "objects":[
                 {
                  "height":32,
-                 "id":2,
                  "name":"1",
                  "properties":
                     {
@@ -43,8 +41,36 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":896,
+                 "width":256,
                  "x":0,
+                 "y":512
+                }, 
+                {
+                 "height":32,
+                 "name":"2",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":256,
+                 "x":352,
+                 "y":512
+                }, 
+                {
+                 "height":32,
+                 "name":"3",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":160,
+                 "x":704,
                  "y":512
                 }],
          "opacity":1,
@@ -61,7 +87,6 @@
          "objects":[
                 {
                  "height":16,
-                 "id":3,
                  "name":"1",
                  "properties":
                     {
@@ -88,7 +113,6 @@
          "objects":[
                 {
                  "height":8,
-                 "id":4,
                  "name":"plyr",
                  "properties":
                     {
@@ -108,7 +132,6 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":5,
  "orientation":"orthogonal",
  "properties":
     {

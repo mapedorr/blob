@@ -143,4 +143,6 @@ BasicGame.Game.prototype.loadLevel = function(levelNumber){
   this.light.updateWalls(this.level);
   this.eye.updateLevel(this.level);
   this.lightning.updateLevel(this.level);
+
+  this.game.world.bringToTop(this.light.lightBitmap);
 };

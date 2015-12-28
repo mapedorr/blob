@@ -32,7 +32,7 @@ BasicGame.Light.prototype.create = function (level) {
   this.bitmap = this.game.add.bitmapData(this.game.world.width, this.game.height);
   this.bitmap.context.fillStyle = 'rgb(255, 255, 255)';
   this.bitmap.context.strokeStyle = 'rgb(255, 255, 255)';
-  var lightBitmap = this.game.add.image(0, 0, this.bitmap);
+  this.lightBitmap = this.game.add.image(0, 0, this.bitmap);
 
   // This bitmap is drawn onto the screen using the MULTIPLY blend mode.
   // Since this bitmap is over the background, dark areas of the bitmap
@@ -41,7 +41,7 @@ BasicGame.Light.prototype.create = function (level) {
   // only supported in WebGL. If your browser doesn't support WebGL then
   // you'll see gray shadows and white light instead of colors and it
   // generally won't look nearly as cool. So use a browser with WebGL.
-  lightBitmap.blendMode = Phaser.blendModes.MULTIPLY;
+  this.lightBitmap.blendMode = Phaser.blendModes.MULTIPLY;
 
   // Create a bitmap for drawing rays
   this.rayBitmap = this.game.add.bitmapData(this.game.world.width, this.game.height);

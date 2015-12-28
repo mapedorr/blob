@@ -15,6 +15,8 @@ BasicGame.Player = function (game, input) {
   this.GRAVITY = 2600; // pixels/second/second
   this.JUMP_SPEED = -850; // pixels/second (negative y is up)
   this.SLID_SPEED = 1;
+
+  this.upPressedFlag = false;
 };
 
 BasicGame.Player.prototype.preload = function () {
@@ -103,19 +105,21 @@ BasicGame.Player.prototype.update = function () {
     this.player.body.velocity.y = this.SLID_SPEED;
   }
 
-  if (leftPressed) {
+  if(leftPressed){
     // If the LEFT key is down, set the player velocity to move left
     this.player.body.acceleration.x = -this.ACCELERATION;
-    if(!onTheGround && onRightWall && upPressed){
-      this.player.body.velocity.y = this.JUMP_SPEED;
+    if(!onTheGround && onLeftWall && upPressed){
+      this.player.body.acceleration.x = this.ACCELERATION * 8
+      this.player.body.velocity.y = this.JUMP_SPEED + 50;
     }
-  } else if (rightPressed) {
+  }else if (rightPressed){
     // If the RIGHT key is down, set the player velocity to move right
     this.player.body.acceleration.x = this.ACCELERATION;
-    if(!onTheGround && onLeftWall && upPressed){
-      this.player.body.velocity.y = this.JUMP_SPEED;
+    if(!onTheGround && onRightWall && upPressed){
+      this.player.body.acceleration.x = -this.ACCELERATION *8;
+      this.player.body.velocity.y = this.JUMP_SPEED + 50;
     }
-  } else {
+  }else{
     this.player.body.acceleration.x = 0;
   }
 
@@ -145,7 +149,13 @@ BasicGame.Player.prototype.rightInputIsActive = function () {
 // In this case, either holding the up arrow or tapping or clicking on the center
 // part of the screen.
 BasicGame.Player.prototype.upInputIsActive = function () {
-  return this.input.keyboard.isDown(Phaser.Keyboard.UP);
+  if(this.input.keyboard.isDown(Phaser.Keyboard.UP) && this.upPressedFlag == false){
+    this.upPressedFlag = true;
+    return true;
+  }else if(!this.input.keyboard.isDown(Phaser.Keyboard.UP) && this.upPressedFlag == true){
+    this.upPressedFlag = false;
+  }
+  return false;
 };
 
 //Function that checks if  the player is completely in shadows or not
