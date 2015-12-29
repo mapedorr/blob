@@ -16,6 +16,8 @@ BasicGame.Game = function (game) {
   this.darknessTween = null;
   this.countdownDuration = 10;
   this.currentLevel = 1;
+  this.inDarkness = true;
+  this.isLoadingLevel = true;
 };
 
 BasicGame.Game.developmentMode = false;
@@ -29,22 +31,26 @@ BasicGame.Game.prototype.preload = function(){
   this.level = new BasicGame.Level(this.game, this);
 
   // init the player
-  this.player = new BasicGame.Player(this.game,this.input);
+  this.player = new BasicGame.Player(this.game, this.input, this);
 
   // init a light
-  this.light = new BasicGame.Light(this.game);
+  this.light = new BasicGame.Light(this.game, this);
   BasicGame.light = this.light;
 
   // init THE EYE
-  this.eye = new BasicGame.Eye(this.game);
+  this.eye = new BasicGame.Eye(this.game, this);
 
   // init the lightning
-  this.lightning = new BasicGame.Lightning(this.game);
+  this.lightning = new BasicGame.Lightning(this.game, this);
 };
 
 BasicGame.Game.prototype.create = function(){
   // set stage background
   this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'sky');
+
+  // configure the camera for shaking
+  this.game.camera.setSize(this.game.world.width/2, this.game.world.height/2);
+  this.game.camera.setPosition(0, 0);
 
   // create the level
   this.level.create();
@@ -65,11 +71,11 @@ BasicGame.Game.prototype.create = function(){
     this.game.width,
     this.game.height);
   darknessBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
-  darknessBitmap.fillStyle = '#000';
-  darknessBitmap.fill();
+  darknessBitmap.ctx.fillStyle = '#000';
+  darknessBitmap.ctx.fill();
 
   var darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
-  darknessSprite.alpha = 0;
+  // darknessSprite.alpha = 0.8;
 
   this.darknessGroup.addChild(darknessSprite);
 
@@ -93,21 +99,20 @@ BasicGame.Game.prototype.update = function() {
   // update The Eye
   this.eye.update();
 
+  if(this.level.isReady == true){
+    this.level.isReady = false;
+    this.level.showDay();
+    return;
+  }
+
   if(this.level.isEnded == true){
-    if(this.darknessTween && this.darknessTween.isRunning){
+    if(this.inDarkness == false){
       return;
     }
 
+    this.isLoadingLevel = true;
     this.loadLevel(++this.currentLevel);
     this.game.world.bringToTop(this.darknessGroup);
-    this.darknessTween.stop();
-    this.darknessTween.to({alpha: 0},
-      500,
-      Phaser.Easing.Quadratic.Out,
-      true);
-    this.darknessTween.onComplete.addOnce(function(){
-      this.darknessTween = null;
-    }, this);
     return;
   }
 
@@ -126,13 +131,31 @@ BasicGame.Game.prototype.quitGame = function(){
 };
 
 BasicGame.Game.prototype.showDarkness = function(){
-  this.darknessTween = this.darknessTween || this.game.add.tween(this.darknessGroup.getChildAt(0));
+  this.game.world.bringToTop(this.darknessGroup);
+  this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
   this.darknessTween.to({alpha: 1},
     3000,
     Phaser.Easing.Quadratic.Out,
     true);
   this.darknessTween.onComplete.addOnce(function(){
+    this.inDarkness = true;
+    this.darknessTween = null;
   }, this);
+};
+
+BasicGame.Game.prototype.hideDarkness = function(){
+  this.inDarkness = false;
+  this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
+  this.darknessTween.to({alpha: 0},
+    700,
+    null,
+    true);
+  this.darknessTween.onComplete.addOnce(function(){
+    this.isLoadingLevel = false;
+    this.eye.eyeStateTimer = this.eye.searchingTime;
+    this.darknessTween = null;
+  }, this);
+
 };
 
 BasicGame.Game.prototype.loadLevel = function(levelNumber){
@@ -145,4 +168,15 @@ BasicGame.Game.prototype.loadLevel = function(levelNumber){
   this.lightning.updateLevel(this.level);
 
   this.game.world.bringToTop(this.light.lightBitmap);
+};
+
+BasicGame.Game.prototype.shakeCamera = function(){
+  // shake the camera by moving it up and down 5 times really fast
+  this.game.camera.y = 10;
+  this.shakeTween = this.shakeTween || this.game.add.tween(this.game.camera)
+  this.shakeTween.to({y: -10}, 40, Phaser.Easing.Sinusoidal.InOut, false, 0, 5, true).start();
+  this.shakeTween.onComplete.add(function(){
+    // set the camera position to its initial position
+    this.game.camera.setPosition(0, 0);
+  }, this);
 };

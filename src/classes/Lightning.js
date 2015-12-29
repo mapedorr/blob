@@ -1,7 +1,8 @@
 var BasicGame = BasicGame || {};
 
-BasicGame.Lightning = function (game) {
+BasicGame.Lightning = function (game, gameObj){
   this.game = game;
+  this.gameObj = gameObj;
   this.lightningBitmap = null;
   this.lightning = null;
   this.player = null;
@@ -66,11 +67,8 @@ BasicGame.Lightning.prototype.shoot = function (target) {
     .to({alpha: 0}, 250, Phaser.Easing.Cubic.In)
     .start();
 
-  // Shake the camera by moving it up and down 5 times really fast
-  this.game.camera.y = 0;
-  this.game.add.tween(this.game.camera)
-    .to({y: -10}, 40, Phaser.Easing.Sinusoidal.InOut, false, 0, 5, true)
-    .start();
+  // shake the world
+  this.gameObj.shakeCamera();
 };
 
 // This function creates a texture that looks like a lightning bolt

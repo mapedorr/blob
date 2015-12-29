@@ -1,8 +1,9 @@
 var BasicGame = BasicGame || {};
 
-BasicGame.Player = function (game, input) {
+BasicGame.Player = function (game, input, gameObj) {
   this.game = game;
   this.input = input;
+  this.gameObj = gameObj;
   this.player = null;
   this.level = null;
   this.bitmap = null;
@@ -76,7 +77,7 @@ BasicGame.Player.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.level.walls);
   this.game.physics.arcade.collide(this.player, this.level.ground);
 
-  if(!this.level.isEnded && this.level.pieces.children){
+  if(!this.gameObj.isLoadingLevel && this.level.pieces.children){
     this.game.physics.arcade.collide(this.player, this.level.pieces,
       function(player, piece){
         piece.destroy();
@@ -90,7 +91,7 @@ BasicGame.Player.prototype.update = function () {
       this);
   }
 
-  if(this.level.isEnded == true){
+  if(this.gameObj.isLoadingLevel == true){
     return;
   }
 

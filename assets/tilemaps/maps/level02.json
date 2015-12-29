@@ -163,7 +163,7 @@
  "orientation":"orthogonal",
  "properties":
     {
-
+     "day":"2"
     },
  "renderorder":"right-down",
  "tileheight":32,

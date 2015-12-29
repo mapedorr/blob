@@ -247,7 +247,7 @@
  "orientation":"orthogonal",
  "properties":
     {
-
+     "day":"5"
     },
  "renderorder":"right-down",
  "tileheight":32,

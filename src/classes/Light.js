@@ -1,7 +1,8 @@
 var BasicGame = BasicGame || {};
 
-BasicGame.Light = function (game) {
+BasicGame.Light = function (game, gameObj) {
   this.game = game;
+  this.gameObj = gameObj;
   this.lightGroup = null;
   this.light = null;
   this.bitmap = null;
@@ -54,7 +55,7 @@ BasicGame.Light.prototype.update = function () {
   // Move the light to the pointer/touch location
   this.rayBitmapImage.visible = BasicGame.Game.developmentMode || false;
 
-  if(this.level.isEnded == true){
+  if(this.gameObj.inDarkness == true){
     return;
   }
 

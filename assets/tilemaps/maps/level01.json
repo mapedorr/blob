@@ -135,7 +135,7 @@
  "orientation":"orthogonal",
  "properties":
     {
-
+     "day":"1"
     },
  "renderorder":"right-down",
  "tileheight":32,
