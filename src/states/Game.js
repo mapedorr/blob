@@ -14,10 +14,13 @@ BasicGame.Game = function (game) {
   this.map = null;
   this.darknessGroup = null;
   this.darknessTween = null;
+  this.brightnessTween = null;
   this.countdownDuration = 10;
   this.currentLevel = 1;
   this.inDarkness = true;
   this.isLoadingLevel = true;
+  this.lifes = 3;
+  this.lifesGroup = null;
 };
 
 BasicGame.Game.developmentMode = false;
@@ -58,6 +61,17 @@ BasicGame.Game.prototype.create = function(){
   // create the player
   this.player.create(this.level);
 
+  // create the group of sprites for lifes
+  this.lifesGroup = this.game.add.group();
+  for(var i=0; i<this.lifes; i++){
+    var lifeSprite = new Phaser.Sprite(this.game, 0, 0, "player");
+    lifeSprite.scale.set(0.5, 0.8);
+    lifeSprite.x = (i % 3) * (lifeSprite.width + 6);
+    this.lifesGroup.addChild(lifeSprite);
+  }
+  this.lifesGroup.x = 15;
+  this.lifesGroup.y = 0;
+
   // create the light
   this.light.create(this.level);
 
@@ -79,8 +93,39 @@ BasicGame.Game.prototype.create = function(){
 
   this.darknessGroup.addChild(darknessSprite);
 
-  // create the darkness tween
+  // create the darkness and brightness tweens
   this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
+  this.darknessTween.to({alpha: 1},
+    3000,
+    Phaser.Easing.Quadratic.Out,
+    false);
+  this.darknessTween.onComplete.add(function(){
+    this.inDarkness = true;
+  }, this);
+
+  this.brightnessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
+  this.brightnessTween.to({alpha: 0},
+    700,
+    null,
+    false);
+  this.brightnessTween.onComplete.add(function(){
+    this.isLoadingLevel = false;
+    this.eye.eyeStateTimer = this.eye.searchingTime;
+  }, this);
+
+  // create the tween for shaking the camera
+  this.shakeTween = this.game.add.tween(this.game.camera)
+  this.shakeTween.to({y: -5},
+    40,
+    Phaser.Easing.Sinusoidal.InOut,
+    false,
+    0,
+    4,
+    true);
+  this.shakeTween.onComplete.add(function(){
+    // set the camera position to its initial position
+    this.game.camera.setPosition(0, 0);
+  }, this);
 
   // show FPS
   if(BasicGame.Game.developmentMode){
@@ -98,6 +143,9 @@ BasicGame.Game.prototype.update = function() {
 
   // update The Eye
   this.eye.update();
+
+  // update the lightning
+  this.lightning.update();
 
   if(this.level.isReady == true){
     this.level.isReady = false;
@@ -132,30 +180,12 @@ BasicGame.Game.prototype.quitGame = function(){
 
 BasicGame.Game.prototype.showDarkness = function(){
   this.game.world.bringToTop(this.darknessGroup);
-  this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-  this.darknessTween.to({alpha: 1},
-    3000,
-    Phaser.Easing.Quadratic.Out,
-    true);
-  this.darknessTween.onComplete.addOnce(function(){
-    this.inDarkness = true;
-    this.darknessTween = null;
-  }, this);
+  this.darknessTween.start();
 };
 
 BasicGame.Game.prototype.hideDarkness = function(){
   this.inDarkness = false;
-  this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-  this.darknessTween.to({alpha: 0},
-    700,
-    null,
-    true);
-  this.darknessTween.onComplete.addOnce(function(){
-    this.isLoadingLevel = false;
-    this.eye.eyeStateTimer = this.eye.searchingTime;
-    this.darknessTween = null;
-  }, this);
-
+  this.brightnessTween.start();
 };
 
 BasicGame.Game.prototype.loadLevel = function(levelNumber){
@@ -172,11 +202,20 @@ BasicGame.Game.prototype.loadLevel = function(levelNumber){
 
 BasicGame.Game.prototype.shakeCamera = function(){
   // shake the camera by moving it up and down 5 times really fast
-  this.game.camera.y = 10;
-  this.shakeTween = this.shakeTween || this.game.add.tween(this.game.camera)
-  this.shakeTween.to({y: -10}, 40, Phaser.Easing.Sinusoidal.InOut, false, 0, 5, true).start();
-  this.shakeTween.onComplete.add(function(){
-    // set the camera position to its initial position
-    this.game.camera.setPosition(0, 0);
-  }, this);
+  this.game.camera.y = 5;
+  if(!this.shakeTween.isRunning){
+    this.shakeTween.start();
+  }
+};
+
+BasicGame.Game.prototype.subtractLife = function(){
+  // remove one life sprite
+  var lifeTween = this.game.add.tween(this.lifesGroup.getChildAt(--this.lifes));
+  lifeTween.to({alpha: 0},
+    700,
+    Phaser.Easing.Quadratic.Out,
+    true);
+  if(this.lifes <= 0){
+    // show the game over screen
+  }
 };

@@ -28,7 +28,7 @@ BasicGame.Level.prototype.create = function () {
     this.game.world.width,
     this.game.world.height);
   dayTextBitmap.ctx.rect(0, 0, this.game.world.width, this.game.world.height);
-  dayTextBitmap.ctx.fillStyle = '#FAFAFA';
+  dayTextBitmap.ctx.fillStyle = '#FFF';
   dayTextBitmap.ctx.fill();
 
   var dayTextSprite = new Phaser.Sprite(this.game, 0, 0, dayTextBitmap);

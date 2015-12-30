@@ -26,7 +26,8 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.lightning = lightning;
 
   //Add the sprite of the eye
-  this.eye = this.game.add.sprite(this.game.world.width / 2, 64, 'eye',0);
+  this.eye = this.game.add.sprite(this.game.world.width / 2, 64, 'eye', 0);
+  this.eye.originalX = this.eye.x;
 
   // set the pivot point of the light to the center of the texture
   this.eye.anchor.setTo(0.5, 0.5);
@@ -199,7 +200,8 @@ BasicGame.Eye.prototype.calmDown = function(){
       this.eyeStateTimer = this.searchingTime;
 
       // shake the world
-      this.gameObj.shakeCamera();
+      // this.gameObj.shakeCamera();
+      this.shake();
 
       // intensify search speed
       this.eye.animations.getAnimation("search").speed += 2;
@@ -280,4 +282,18 @@ BasicGame.Eye.prototype.updateLevel = function (level) {
 
   // restore the searching speed to its default
   this.eye.animations.getAnimation("search").speed = this.originalSearchSpeed;
+};
+
+BasicGame.Eye.prototype.shake = function(){
+  this.shakeTween = this.shakeTween || this.game.add.tween(this.eye)
+  this.shakeTween.to({x: this.eye.originalX + 10},
+    40,
+    Phaser.Easing.Sinusoidal.InOut,
+    false,
+    0,
+    4,
+    true).start();
+  this.shakeTween.onComplete.add(function(){
+    this.eye.x = this.eye.originalX;
+  }, this);
 };

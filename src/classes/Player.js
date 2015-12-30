@@ -78,7 +78,7 @@ BasicGame.Player.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.level.ground);
 
   if(!this.gameObj.isLoadingLevel && this.level.pieces.children){
-    this.game.physics.arcade.collide(this.player, this.level.pieces,
+    this.game.physics.arcade.overlap(this.player, this.level.pieces,
       function(player, piece){
         piece.destroy();
         this.collectedPieces++;

@@ -10,7 +10,7 @@ BasicGame.Lightning = function (game, gameObj){
   this.level = null;
 };
 
-BasicGame.Lightning.prototype.create = function(eye,player,level){
+BasicGame.Lightning.prototype.create = function(eye, player, level){
   this.player = player;
   this.eye = eye;
   this.level = level;
@@ -19,40 +19,56 @@ BasicGame.Lightning.prototype.create = function(eye,player,level){
   this.lightningBitmap = this.game.add.bitmapData(200, 10000);
 
   // Create a sprite to hold the lightning bolt texture
-  this.lightning = this.game.add.image(this.eye.x, this.eye.y, this.lightningBitmap);
-
-  // This adds what is called a "fragment shader" to the lightning sprite.
-  // See the fragment shader code below for more information.
-  // This is an WebGL feature. Because it runs in your web browser, you need
-  // a browser that support WebGL for this to work.
-  //  this.lightning.filters = [ this.game.add.filter('Glow') ];
-
-  // Set the anchor point of the sprite to center of the top edge
-  // This allows us to position the lightning by simply specifiying the
-  // x and y coordinate of where we want the lightning to appear from.
+  this.lightning = this.game.add.image(this.eye.x,
+    this.eye.y,
+    this.lightningBitmap);
   this.lightning.anchor.setTo(0.5, 0);
+
+  this.fakeThing = this.game.add.sprite(0, 0, "player");
+  this.fakeThing.anchor.setTo(0.5, 0.5);
+  this.fakeThing.width = this.fakeThing.height = 16;
+  this.fakeThing.alpha = 0;
+  
+  this.game.physics.arcade.enable(this.fakeThing);
+  this.fakeThing.body.immovable = true;
+  this.fakeThing.body.allowGravity = false;
 
   this.lightningTimer = 0;
 };
 
-BasicGame.Lightning.prototype.update = function () {};
+BasicGame.Lightning.prototype.update = function () {
+  // check if the ray hits the player
+  this.game.physics.arcade.overlap(this.player.player, this.fakeThing,
+    function(){
+      this.gameObj.subtractLife();
+      this.fakeThing.x = this.fakeThing.y = 0;
+    },
+    null,
+    this);
+};
 
 BasicGame.Lightning.prototype.shoot = function (target) {
+  this.fakeThing.x = this.fakeThing.y = 0;
+  var targetPos = {
+    x: target.x,
+    y: target.y
+  };
+
   // Rotate the lightning sprite so it goes in the
   // direction of the pointer
   this.lightning.rotation = this.game.math.angleBetween(
     this.lightning.x, this.lightning.y,
-    target.x + 16, target.y + 16
+    targetPos.x + 16, targetPos.y + 16
   ) - Math.PI / 2;
 
   // Calculate the distance from the lightning source to the pointer
   var distance = this.game.math.distance(
     this.lightning.x, this.lightning.y,
-    target.x + 16, target.y + 16
+    targetPos.x + 16, targetPos.y + 16
   );
 
   // Create the lightning texture
-  this.createLightningTexture(this.lightningBitmap.width / 2, 0, 20, 1, false, distance);
+  this.createLightningTexture(this.lightningBitmap.width / 2, 0, 20, 2, false, distance);
 
   // Make the lightning sprite visible
   this.lightning.alpha = 1;
@@ -69,6 +85,9 @@ BasicGame.Lightning.prototype.shoot = function (target) {
 
   // shake the world
   this.gameObj.shakeCamera();
+
+  this.fakeThing.x = targetPos.x + 16;
+  this.fakeThing.y = targetPos.y + 16;
 };
 
 // This function creates a texture that looks like a lightning bolt
@@ -127,20 +146,13 @@ BasicGame.Lightning.prototype.createLightningTexture = function (x, y, segments,
       if (!branch) x = width / 2;
     }
 
-    // Draw the line segment
+    // draw the line segment
     ctx.lineTo(x, y);
     ctx.stroke();
 
-    // Quit when we've reached the target
+    // quit when we've reached the target
     if (y >= distance) break;
 
-    // Draw a branch 20% of the time off the main bolt only
-    /*if (!branch) {
-     if (this.game.math.chanceRoll(20)) {
-     // Draws another, thinner, bolt starting from this position
-     this.createLightningTexture(x, y, 10, 1, true, distance);
-     }
-     }*/
   }
 
   // This just tells the engine it should update the texture cache
