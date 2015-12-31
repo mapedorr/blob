@@ -160,6 +160,7 @@ BasicGame.Game.prototype.update = function() {
 
     this.isLoadingLevel = true;
     this.loadLevel(++this.currentLevel);
+    this.game.world.bringToTop(this.lifesGroup);
     this.game.world.bringToTop(this.darknessGroup);
     return;
   }
