@@ -89,8 +89,8 @@ BasicGame.Intro.prototype.create = function(){
 
 
 BasicGame.Intro.prototype.updateDialog = function(){
-  if(this.dialogNumber <= this.dialogs["en"].length -1){
-    var currentDialogLine = this.dialogs["en"][this.dialogNumber].text;
+  if(this.dialogNumber <= this.dialogs[BasicGame.language].length -1){
+    var currentDialogLine = this.dialogs[BasicGame.language][this.dialogNumber].text;
     var character = currentDialogLine.charAt(this.dialogTextPos);
 
     switch(character){

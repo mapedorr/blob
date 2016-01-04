@@ -1,4 +1,6 @@
-var BasicGame = BasicGame || {};
+var BasicGame = BasicGame || {
+  language: "en"
+};
 
 BasicGame.Boot = function (game) {
 };

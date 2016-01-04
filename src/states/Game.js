@@ -218,5 +218,6 @@ BasicGame.Game.prototype.subtractLife = function(){
     true);
   if(this.lifes <= 0){
     // show the game over screen
+    this.state.start('GameOver');
   }
 };
