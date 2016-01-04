@@ -34,7 +34,7 @@ BasicGame.MainMenu.prototype.create = function(){
   
   // create the text for "play"
   this.playBitmap = this.add.bitmapText(this.game.world.width / 3,
-    this.game.world.height/2 + 100,
+    this.game.world.height / 2 + 100,
     this.fontId,
     "Play\n\n(Left)",
     32,
@@ -45,7 +45,7 @@ BasicGame.MainMenu.prototype.create = function(){
 
   // create the text for "jugar"
   this.jugarBitmap = this.add.bitmapText(this.game.world.width / 3 * 2,
-    this.game.world.height/2 + 100,
+    this.game.world.height / 2 + 100,
     this.fontId,
     "Jugar\n\n(Right)",
     32,

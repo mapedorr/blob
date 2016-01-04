@@ -50,7 +50,7 @@ BasicGame.Player.prototype.create = function (level) {
   this.game.input.keyboard.addKeyCapture([
     Phaser.Keyboard.LEFT,
     Phaser.Keyboard.RIGHT,
-    Phaser.Keyboard.UP,
+    Phaser.Keyboard.S,
     Phaser.Keyboard.DOWN
   ]);
 
@@ -150,10 +150,10 @@ BasicGame.Player.prototype.rightInputIsActive = function () {
 // In this case, either holding the up arrow or tapping or clicking on the center
 // part of the screen.
 BasicGame.Player.prototype.upInputIsActive = function () {
-  if(this.input.keyboard.isDown(Phaser.Keyboard.UP) && this.upPressedFlag == false){
+  if(this.input.keyboard.isDown(Phaser.Keyboard.S) && this.upPressedFlag == false){
     this.upPressedFlag = true;
     return true;
-  }else if(!this.input.keyboard.isDown(Phaser.Keyboard.UP) && this.upPressedFlag == true){
+  }else if(!this.input.keyboard.isDown(Phaser.Keyboard.S) && this.upPressedFlag == true){
     this.upPressedFlag = false;
   }
   return false;
