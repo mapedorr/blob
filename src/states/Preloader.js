@@ -29,9 +29,6 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.spritesheet('playButton','assets/sprites/play_button.png',400,128);
   //  this.load.audio('mainMenuMusic',['assets/music/main_menu.ogg'],true);
 
-  //  ---| The assets for the Intro
-  
-
   //  ---| The assets for the Game
   this.load.image('light', 'assets/images/light.png');
   this.load.image('sky', 'assets/images/sky.png');
@@ -40,10 +37,6 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.spritesheet('player','assets/sprites/player.png',32,32);
   this.load.spritesheet('eye','assets/sprites/eye.png',192,96);
 
-  //  this.load.audio('level001Music',['assets/music/level001.ogg'],true);
-  //this.load.bitmapFont('font','assets/fonts/coco.png','assets/fonts/coco.xml');
-  //this.load.bitmapFont('font','assets/fonts/pera.png','assets/fonts/pera.xml');
-  
   this.load.bitmapFont('font','assets/fonts/carrier_command.png','assets/fonts/carrier_command.xml');
 
   // load the map for the first level
