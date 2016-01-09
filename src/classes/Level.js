@@ -123,8 +123,8 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.game.world.bringToTop(this.levelTextGroup);
 
   // show the days of the level
-  this.countdownTextBitmap.setText(this.dayText[BasicGame.language] + " " +
-    this.map.properties.day + "...");
+  this.countdownTextBitmap.setText(this.dayText[BasicGame.language] + ' ' +
+    this.map.properties.day || '???' + '...');
 
   // set the level as not ended
   this.isEnded = false;

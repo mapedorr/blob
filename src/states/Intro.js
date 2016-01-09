@@ -6,88 +6,84 @@ var BasicGame = BasicGame || {};
 
 BasicGame.Intro = function (game) {
   this.background = null;
-  this.fontId = 'font';
+  this.skipKey = Phaser.Keyboard.SPACEBAR;
   
+  this.fontId = 'font';
+  this.textColors = {
+    'H': 0xF2C249,
+    'B': 0x2a84c1
+  };
   this.dialogs = {
     "es": [
-      {text:"B: Cre...creo que aqui no puede verme"},
-      {text:"O: No podras esconderte para siempre!. Este lugar cambia\n\n" +
-            "   a diario...\n\n" +
-            "   Se que hay cosas que no querras que vea, cosas que\n\n" +
-            "   tendras que guardar. Y, si no vas por ellas antes de\n\n" +
-            "   que yo las encuentre, sera peor tu castigo!.-"},
-      {text:"B: Mierda! como lo supo?. No puedo dejar que se apodere\n\n" +
-            "   de mis cosas..."},
-      {text:"B: Creo que...conozco una manera\n\n" +
-            "   Si, ya esta:\n\n" +
-            "     > Flecha arriba para saltar.\n\n" +
-            "     > Flechas izquierda y derecha para moverme.\n\n" +
-            "     > No podra verme en las sombras.\n\n" +
-            "     > Debo coger mis cosas antes que las vea."},
-      {text:"B: Basta con que aguante unos cuantos dias.\n\n" +
-            "   Luego desaparecera."}
+      {
+        character: 'H',
+        text: 'Tienes que calmarte, todo estara bien.'
+      },
+      {
+        character: 'B',
+        text: 'Como puedes decir eso? No puedo hacerlo!'
+      },
+      {
+        character: 'H',
+        text: 'Descansa, ya veras como en unos dias dejara de acecharte.'
+      },
+      {
+        character: 'B',
+        text: 'Creo que no sere capaz...'
+      }
     ],
     "en": [
-      {text:"B: I...I think here she can't see me"},
-      {text:"O: You can't hide forever!. This place changes\n\n" +
-            "   every day...\n\n" +
-            "   I know there are things you don't want me\n\n" +
-            "   to see, things you would try to hide. And, if\n\n" +
-            "   you do not go for them before me, your\n\n" +
-            "   punishment will be worse!.-"},
-      {text:"B: How does she knows?. I can't let her take\n\n" +
-            "   my things..."},
-      {text:"B: Maybe...there is a way\n\n" +
-            "   Yes! I know::\n\n" +
-            "     > Up arrow to jump.\n\n" +
-            "     > Left and right arrows to move.\n\n" +
-            "     > The shadows will be my allies.\n\n" +
-            "     > I have to pick up my things before she."},
-      {text:"B: I just need to hang on for some days.\n\n" +
-            "   Then, she will dissapear."},
+      {
+        character: 'H',
+        text: 'Calm down yourself, all its going to be fine.'
+      },
+      {
+        character: 'B',
+        text: "How can you say that? I can't do that!"
+      },
+      {
+        character: 'H',
+        text: 'Take a rest, it will stop bothering you in a couple of days.'
+      },
+      {
+        character: 'B',
+        text: 'Creo que no sere capaz...'
+      }
     ]
   };
-
   this.textBitmapsGroup = null;
   this.dialogTextBitmap = null;
+  this.dialogNumber = 0;
+  this.dialogTween = null;
 
   this.skipGroup = null;
   this.skipBitmap = null;
   this.skipText = {
-    "es": "Saltar (S)",
-    "en": "Skip (S)"
+    "es": "Saltar (Barra espaciadora)",
+    "en": "Skip (Spacebar)"
   };
   this.sPressedFlag = false;
-  
-  this.dialogNumber = 1;
-  this.dialogTextPos = 0;
 
-  this.fullDialog = '';
-
-  //Variables related with the game start behaviour
-  this.toGameTimer = null;
-  this.disappearingDialog = false;
-
-  this.otherColorDialogBitmap = null;
-  this.otherColorFullDialog = '';
+  this.goingToGame = false;
 };
 
 BasicGame.Intro.prototype.create = function(){
   this.game.stage.backgroundColor = 0x3D4C53;
 
-  // create the group and text for the dialog
+  // create the group and text for the dialog and the Skip
   this.textBitmapsGroup = this.game.add.group();
+
   this.dialogTextBitmap = this.add.bitmapText(this.game.world.width / 2,
     this.game.world.height / 2,
     this.fontId,
-    this.dialogs[BasicGame.language][0].text,
+    '???',
     14,
     this.textBitmapsGroup);
   this.dialogTextBitmap.align = "left";
-  this.dialogTextBitmap.tint = 0xF2C249;
   this.dialogTextBitmap.anchor.set(.5, .5);
+  this.dialogTextBitmap.alpha = 0;
 
-  // create the group and the text for the skip
+  // create the group and the text for Skip
   this.skipGroup = this.game.add.group();
   this.skipBitmap = this.add.bitmapText(this.game.world.width - 20,
     this.game.world.height - 20,
@@ -99,86 +95,60 @@ BasicGame.Intro.prototype.create = function(){
   this.skipBitmap.tint = 0xFFFFFF;
   this.skipBitmap.anchor.set(1, 1);
 
+  // add the keyboard listener for Skip
   this.game.input.keyboard.addKeyCapture([
-    Phaser.Keyboard.S
+    this.skipKey
   ]);
 
-  // this.time.events.loop(50, this.updateDialog, this);
+  // create the tween to use in the dialog
+  this.dialogTween = this.game.add.tween(this.dialogTextBitmap);
+  this.dialogTween.to({alpha: 1},
+    300,
+    Phaser.Easing.Quadratic.Out,
+    false);
+
+  // show the first dialog
+  this.updateDialog();
 };
 
 BasicGame.Intro.prototype.update = function(){
-  if(this.input.keyboard.isDown(Phaser.Keyboard.S)
-      && this.sPressedFlag == false){
-    this.sPressedFlag = true;
-    this.updateDialog();
-  }else if(!this.input.keyboard.isDown(Phaser.Keyboard.S) && this.sPressedFlag == true){
-    this.sPressedFlag = false;
+  if(this.goingToGame === true){
+    return;
   }
 
-  if(this.toGameTimer && !this.disappearingDialog){
-    this.toGameTimer -= this.game.time.elapsed;
-    if (this.toGameTimer <= 0) {
-      //Put this flag on true to omit some code
-      this.disappearingDialog = true;
-      //Tween the dialog bitmap to alpha = 0, then, start the game.
-      this.game.add.tween(this.textBitmapsGroup).to({alpha:0}, 1000, null, true)
-        .onComplete.add(function(){
-          this.state.start('Game');
-        },this);
-    }
+  if(this.input.keyboard.isDown(this.skipKey)
+      && this.sPressedFlag == false){
+    this.sPressedFlag = true;
+    this.dialogTween.onComplete.dispatch(this.dialogTween.target, this.dialogTween);
+    // this.dialogTextBitmap.alpha = 1;
+    this.updateDialog();
+  }else if(!this.input.keyboard.isDown(this.skipKey) && this.sPressedFlag == true){
+    this.sPressedFlag = false;
   }
 };
 
 BasicGame.Intro.prototype.updateDialog = function(){
-  if(this.dialogNumber <= this.dialogs[BasicGame.language].length -1){
+  if(this.dialogNumber <= this.dialogs[BasicGame.language].length - 1){
+    // there are still dialogs to be shown
     var currentDialogLine = this.dialogs[BasicGame.language][this.dialogNumber].text;
-    var character = currentDialogLine.charAt(0);
+    var character = this.dialogs[BasicGame.language][this.dialogNumber].character;
 
-    switch(character){
-      case '*':
-        break;
-      case 'O':
-        this.dialogTextBitmap.tint = 0xE64A45;
-        // this.otherColorFullDialog = '';
-        // this.otherColorDialogBitmap = this.game.add.bitmapText(20,
-        //   this.dialogTextBitmap.textHeight + 35,
-        //   this.fontId,
-        //   '',
-        //   this.fontSize);
-        // this.otherColorDialogBitmap.tint = 0xE64A45;
-        // this.textBitmapsGroup.add(this.otherColorDialogBitmap);
-        break;
-      case '-':
-        this.otherColorFullDialog = '';
-        this.otherColorDialogBitmap = null;
-        break;
-      default:
-        this.dialogTextBitmap.tint = 0xF2C249;
-        // this.fullDialog += character;
-        // if(this.otherColorDialogBitmap){
-        //   this.otherColorFullDialog += character;
-        // }
-    }
+    this.dialogTextBitmap.tint = this.textColors[character];
+    this.dialogTextBitmap.setText(character + ': ' + currentDialogLine);
 
-    this.dialogTextBitmap.setText(currentDialogLine);
+    this.dialogTextBitmap.alpha = 0;
+    this.dialogTween.start();
 
-    // if(this.otherColorDialogBitmap){
-    //   this.otherColorDialogBitmap.setText(this.otherColorFullDialog);
-    // }
-
-    // this.dialogTextPos++;
-
-    // if(this.dialogTextPos > currentDialogLine.length){
-      this.dialogNumber++;
-      // this.dialogTextPos = 0;
-      // this.fullDialog += "\n\n";
-
-      // if(this.otherColorDialogBitmap){
-      //   this.otherColorFullDialog += "\n\n";
-      // }
-    // }
-  }else if(!this.toGameTimer && !this.disappearingDialog){
-    //All the dialogs showed...lets play...
-    this.toGameTimer = 500;//3 seconds
+    this.dialogNumber++;
+  }else{
+    // tween the dialog bitmap to alpha = 0, then, start the game.
+    this.goingToGame = true;
+    this.game.add.tween(this.textBitmapsGroup).to({alpha: 0},
+      500,
+      Phaser.Easing.Quadratic.In,
+      true)
+      .onComplete.add(function(){
+        this.state.start('Game');
+      },this);
   }
 };

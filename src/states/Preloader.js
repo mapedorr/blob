@@ -26,7 +26,8 @@ BasicGame.Preloader.prototype.preload = function(){
 
   //  ---| The assets for the Main menu
   this.load.image('mainMenuBackground', 'assets/images/main_menu_background.png');
-  this.load.spritesheet('playButton','assets/sprites/play_button.png',400,128);
+  this.load.spritesheet('playButton','assets/sprites/play_button.png', 400, 256);
+  this.load.spritesheet('jugarButton','assets/sprites/jugar_button.png', 400, 256);
   //  this.load.audio('mainMenuMusic',['assets/music/main_menu.ogg'],true);
 
   //  ---| The assets for the Game

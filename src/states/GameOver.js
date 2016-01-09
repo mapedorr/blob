@@ -32,7 +32,7 @@ BasicGame.GameOver.prototype.create = function(){
     this.gameOverGroup);
   this.dialogTextBitmap.align = "center";
   this.dialogTextBitmap.anchor.set(.5, .5);
-  this.dialogTextBitmap.tint = 0xF2F0E6;
+  this.dialogTextBitmap.tint = 0xE64A45;
 
   // create the group and text for the phrase
   this.phraseGroup = this.game.add.group();
@@ -44,7 +44,7 @@ BasicGame.GameOver.prototype.create = function(){
     this.phraseGroup);
   this.phraseBitmap.align = "center";
   this.phraseBitmap.anchor.set(.5, .5);
-  this.phraseBitmap.tint = 0xF2C249;
+  this.phraseBitmap.tint = 0x2a84c1;
 };
 
 BasicGame.GameOver.prototype.update = function(){};

@@ -9,13 +9,18 @@ BasicGame.Player = function (game, input, gameObj) {
   this.bitmap = null;
   this.collectedPieces = 0;
 
-  // Define movement constants
+  // define movement constants
   this.MAX_SPEED = 300; // pixels/second
   this.ACCELERATION = 1500; // pixels/second/second
   this.DRAG = 1500; // pixels/second
   this.GRAVITY = 2600; // pixels/second/second
   this.JUMP_SPEED = -850; // pixels/second (negative y is up)
   this.SLID_SPEED = 1;
+
+  // define gameplay keys
+  this.leftKey = Phaser.Keyboard.LEFT;
+  this.rightKey = Phaser.Keyboard.RIGHT;
+  this.jumpKey = Phaser.Keyboard.SPACEBAR;
 
   this.upPressedFlag = false;
 };
@@ -48,10 +53,9 @@ BasicGame.Player.prototype.create = function (level) {
   //This is only necessary because this is an HTML5 game. Games on other
   //platforms may not need code like this.
   this.game.input.keyboard.addKeyCapture([
-    Phaser.Keyboard.LEFT,
-    Phaser.Keyboard.RIGHT,
-    Phaser.Keyboard.S,
-    Phaser.Keyboard.DOWN
+    this.leftKey,
+    this.rightKey,
+    this.jumpKey
   ]);
 
   //Make the player collide with world bounds
@@ -136,24 +140,24 @@ BasicGame.Player.prototype.update = function () {
 // In this case, either holding the right arrow or tapping or clicking on the left
 // side of the screen.
 BasicGame.Player.prototype.leftInputIsActive = function () {
-  return this.input.keyboard.isDown(Phaser.Keyboard.LEFT);
+  return this.input.keyboard.isDown(this.leftKey);
 };
 
 // This function should return true when the player activates the "go right" control
 // In this case, either holding the right arrow or tapping or clicking on the right
 // side of the screen.
 BasicGame.Player.prototype.rightInputIsActive = function () {
-  return this.input.keyboard.isDown(Phaser.Keyboard.RIGHT);
+  return this.input.keyboard.isDown(this.rightKey);
 };
 
 // This function should return true when the player activates the "jump" control
 // In this case, either holding the up arrow or tapping or clicking on the center
 // part of the screen.
 BasicGame.Player.prototype.upInputIsActive = function () {
-  if(this.input.keyboard.isDown(Phaser.Keyboard.S) && this.upPressedFlag == false){
+  if(this.input.keyboard.isDown(this.jumpKey) && this.upPressedFlag == false){
     this.upPressedFlag = true;
     return true;
-  }else if(!this.input.keyboard.isDown(Phaser.Keyboard.S) && this.upPressedFlag == true){
+  }else if(!this.input.keyboard.isDown(this.jumpKey) && this.upPressedFlag == true){
     this.upPressedFlag = false;
   }
   return false;
