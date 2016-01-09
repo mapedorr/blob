@@ -145,7 +145,7 @@ BasicGame.Intro.prototype.updateDialog = function(){
     this.goingToGame = true;
     this.game.add.tween(this.textBitmapsGroup).to({alpha: 0},
       500,
-      Phaser.Easing.Quadratic.In,
+      Phaser.Easing.Quadratic.Out,
       true)
       .onComplete.add(function(){
         this.state.start('Game');

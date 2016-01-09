@@ -19,7 +19,7 @@ BasicGame.Game = function (game) {
   this.currentLevel = 1;
   this.inDarkness = true;
   this.isLoadingLevel = true;
-  this.lifes = 3;
+  this.lifes = 1;
   this.lifesGroup = null;
 };
 
@@ -217,7 +217,13 @@ BasicGame.Game.prototype.subtractLife = function(){
     Phaser.Easing.Quadratic.Out,
     true);
   if(this.lifes <= 0){
+    // notify to the EYE the player has died
+    this.eye.rejoice();
+
+    // notify the PLAYER that is time to show the animation for dead
+    this.player.dieWithDignity();
+
     // show the game over screen
-    this.state.start('GameOver');
+    // this.state.start('GameOver');
   }
 };

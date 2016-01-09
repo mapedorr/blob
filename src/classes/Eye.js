@@ -28,6 +28,7 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   //Add the sprite of the eye
   this.eye = this.game.add.sprite(this.game.world.width / 2, 64, 'eye', 0);
   this.eye.originalX = this.eye.x;
+  this.eye.originalY = this.eye.y;
 
   // set the pivot point of the light to the center of the texture
   this.eye.anchor.setTo(0.5, 0.5);
@@ -68,6 +69,11 @@ BasicGame.Eye.prototype.update = function () {
   if(this.gameObj.isLoadingLevel == true){
     // the EYE will start the level as irritated (sleeping)
     this.eye.animations.play('irritated');
+    return;
+  }
+
+  if(this.eye.animations.currentAnim.name === 'happy'){
+    // the player is dead, I'm the happiest EYE in the hole universe
     return;
   }
 
@@ -295,5 +301,20 @@ BasicGame.Eye.prototype.shake = function(){
     true).start();
   this.shakeTween.onComplete.add(function(){
     this.eye.x = this.eye.originalX;
+  }, this);
+};
+
+BasicGame.Eye.prototype.rejoice = function(){
+  this.eye.animations.play('happy');
+  this.shakeTween = this.shakeTween || this.game.add.tween(this.eye)
+  this.shakeTween.to({y: this.eye.originalY + 10},
+    150,
+    Phaser.Easing.Sinusoidal.InOut,
+    false,
+    0,
+    10,
+    true).start();
+  this.shakeTween.onComplete.add(function(){
+    this.eye.y = this.eye.originalY;
   }, this);
 };

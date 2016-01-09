@@ -23,6 +23,7 @@ BasicGame.Player = function (game, input, gameObj) {
   this.jumpKey = Phaser.Keyboard.SPACEBAR;
 
   this.upPressedFlag = false;
+  this.dead = false;
 };
 
 BasicGame.Player.prototype.preload = function () {
@@ -36,6 +37,10 @@ BasicGame.Player.prototype.create = function (level) {
   this.player = this.game.add.sprite(this.level.initPlayerPos.x,
     this.level.initPlayerPos.y,
     'player');
+
+  // configure the player animations
+  this.player.animations.add('normal', [0], 1, false);
+  // this.player.animations.add('dying', [1], 1, false);
 
   //Enable physics on the player
   this.game.physics.arcade.enable(this.player);
@@ -78,8 +83,12 @@ BasicGame.Player.prototype.update = function () {
   }
 
   // check collisions
-  this.game.physics.arcade.collide(this.player, this.level.walls);
   this.game.physics.arcade.collide(this.player, this.level.ground);
+  this.game.physics.arcade.collide(this.player, this.level.walls);
+
+  if(this.dead === true){
+    return;
+  }
 
   if(!this.gameObj.isLoadingLevel && this.level.pieces.children){
     this.game.physics.arcade.overlap(this.player, this.level.pieces,
@@ -248,4 +257,11 @@ BasicGame.Player.prototype.updateLevel = function (level) {
   this.level = level;
   this.player.position.set(this.level.initPlayerPos.x,
     this.level.initPlayerPos.y);
+};
+
+BasicGame.Player.prototype.dieWithDignity = function(){
+  this.dead = true;
+
+  // play the dead animation
+  console.log("I'm going to play the DEAD animation");
 };
