@@ -35,13 +35,13 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('sky', 'assets/images/sky.png');
   this.load.image('platform', 'assets/images/platform.png');
   this.load.image('piece', 'assets/images/piece.png');
-  this.load.spritesheet('player','assets/sprites/player.png',32,32);
-  this.load.spritesheet('eye','assets/sprites/eye.png',192,96);
+  this.load.spritesheet('player','assets/sprites/player_v02.png', 32, 32);
+  this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);
 
   this.load.bitmapFont('font','assets/fonts/carrier_command.png','assets/fonts/carrier_command.xml');
 
   // load the map for the first level
-  for(var i = 1; i <= 3; i++){
+  for(var i = 1; i <= 4; i++){
     this.game.load.tilemap('lvl0' + i, 'assets/tilemaps/maps/level0' + i + '.json', null, Phaser.Tilemap.TILED_JSON);
   }
 };

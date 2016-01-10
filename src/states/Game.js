@@ -16,14 +16,15 @@ BasicGame.Game = function (game) {
   this.darknessTween = null;
   this.brightnessTween = null;
   this.countdownDuration = 10;
-  this.currentLevel = 1;
   this.inDarkness = true;
   this.isLoadingLevel = true;
-  this.lifes = 1;
+  this.lifes = 3;
   this.lifesGroup = null;
 };
 
 BasicGame.Game.developmentMode = false;
+BasicGame.currentLevel = 1;
+
 BasicGame.Game.prototype.preload = function(){
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -101,6 +102,10 @@ BasicGame.Game.prototype.create = function(){
     false);
   this.darknessTween.onComplete.add(function(){
     this.inDarkness = true;
+    if(this.lifes <= 0){
+      // show the game over screen
+      this.state.start('GameOver');
+    }
   }, this);
 
   this.brightnessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
@@ -159,7 +164,7 @@ BasicGame.Game.prototype.update = function() {
     }
 
     this.isLoadingLevel = true;
-    this.loadLevel(++this.currentLevel);
+    this.loadLevel(++BasicGame.currentLevel);
     this.game.world.bringToTop(this.lifesGroup);
     this.game.world.bringToTop(this.darknessGroup);
     return;
@@ -223,7 +228,7 @@ BasicGame.Game.prototype.subtractLife = function(){
     // notify the PLAYER that is time to show the animation for dead
     this.player.dieWithDignity();
 
-    // show the game over screen
-    // this.state.start('GameOver');
+    // start the darkness
+    this.showDarkness();
   }
 };

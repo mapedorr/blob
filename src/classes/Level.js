@@ -54,7 +54,7 @@ BasicGame.Level.prototype.create = function () {
   this.countdownTextBitmap.align = "center";
   this.countdownTextBitmap.tint = 0x212121;
 
-  this.createLevel(this.gameObj.currentLevel);
+  this.createLevel(BasicGame.currentLevel);
 };
 
 BasicGame.Level.prototype.destroyCurrentLevel = function(){

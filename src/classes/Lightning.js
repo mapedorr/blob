@@ -38,6 +38,7 @@ BasicGame.Lightning.prototype.create = function(eye, player, level){
 
 BasicGame.Lightning.prototype.update = function () {
   // check if the ray hits the player
+  console.log("this.player.player", this.player.player);
   this.game.physics.arcade.overlap(this.player.player, this.fakeThing,
     function(){
       this.gameObj.subtractLife();

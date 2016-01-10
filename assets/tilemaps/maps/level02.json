@@ -7,6 +7,7 @@
          "objects":[
                 {
                  "height":32,
+                 "id":1,
                  "name":"floor",
                  "properties":
                     {
@@ -33,6 +34,7 @@
          "objects":[
                 {
                  "height":32,
+                 "id":2,
                  "name":"3",
                  "properties":
                     {
@@ -47,6 +49,7 @@
                 }, 
                 {
                  "height":32,
+                 "id":3,
                  "name":"5",
                  "properties":
                     {
@@ -61,6 +64,7 @@
                 }, 
                 {
                  "height":32,
+                 "id":4,
                  "name":"4",
                  "properties":
                     {
@@ -75,6 +79,7 @@
                 }, 
                 {
                  "height":544,
+                 "id":5,
                  "name":"2",
                  "properties":
                     {
@@ -101,6 +106,7 @@
          "objects":[
                 {
                  "height":16,
+                 "id":6,
                  "name":"1",
                  "properties":
                     {
@@ -115,7 +121,8 @@
                 }, 
                 {
                  "height":16,
-                 "name":"2",
+                 "id":7,
+                 "name":"3",
                  "properties":
                     {
 
@@ -126,6 +133,21 @@
                  "width":16,
                  "x":48,
                  "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":9,
+                 "name":"2",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":48,
+                 "y":336
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -141,6 +163,7 @@
          "objects":[
                 {
                  "height":8,
+                 "id":8,
                  "name":"plyr",
                  "properties":
                     {
@@ -160,6 +183,7 @@
          "x":0,
          "y":0
         }],
+ "nextobjectid":10,
  "orientation":"orthogonal",
  "properties":
     {

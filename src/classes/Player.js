@@ -40,7 +40,7 @@ BasicGame.Player.prototype.create = function (level) {
 
   // configure the player animations
   this.player.animations.add('normal', [0], 1, false);
-  // this.player.animations.add('dying', [1], 1, false);
+  this.player.animations.add('dying', [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,28,30,31,32,33,34,35,36], 40, false);
 
   //Enable physics on the player
   this.game.physics.arcade.enable(this.player);
@@ -87,6 +87,7 @@ BasicGame.Player.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.level.walls);
 
   if(this.dead === true){
+    this.player.body.acceleration.x = 0;
     return;
   }
 
@@ -263,5 +264,5 @@ BasicGame.Player.prototype.dieWithDignity = function(){
   this.dead = true;
 
   // play the dead animation
-  console.log("I'm going to play the DEAD animation");
+  this.player.animations.play('dying');
 };
