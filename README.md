@@ -8,7 +8,7 @@ Made with Phaser and based on the mechanics explanined in http://gamemechanicexp
 Controls
 ===
 
-Use the arrow keys for moving LEFT, RIGHT and JUMP.
-Press D for show, or hide, the development tools.
+Use the arrow keys for moving LEFT, RIGHT.
+SPACEBAR to Jump.
 
 
