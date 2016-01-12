@@ -211,6 +211,7 @@ BasicGame.Game.prototype.loadLevel = function(levelNumber){
   this.lightning.updateLevel(this.level);
 
   this.game.world.bringToTop(this.light.lightBitmap);
+  this.game.world.bringToTop(this.level.pieces);
 };
 
 BasicGame.Game.prototype.shakeCamera = function(){
