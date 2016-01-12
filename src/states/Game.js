@@ -86,6 +86,9 @@ BasicGame.Game.prototype.create = function(){
   // create THE EYE
   this.eye.create(this.player, this.level, this.lightning);
 
+  // bring to top the pieces
+  this.game.world.bringToTop(this.level.pieces);
+
   // create the darkness
   this.darknessGroup = this.add.group();
   var darknessBitmap = new Phaser.BitmapData(this.game,
@@ -97,7 +100,6 @@ BasicGame.Game.prototype.create = function(){
   darknessBitmap.ctx.fill();
 
   var darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
-  // darknessSprite.alpha = 0.8;
 
   this.darknessGroup.addChild(darknessSprite);
 
