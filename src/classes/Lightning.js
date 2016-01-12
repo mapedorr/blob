@@ -38,14 +38,15 @@ BasicGame.Lightning.prototype.create = function(eye, player, level){
 
 BasicGame.Lightning.prototype.update = function () {
   // check if the ray hits the player
-  console.log("this.player.player", this.player.player);
-  this.game.physics.arcade.overlap(this.player.player, this.fakeThing,
-    function(){
-      this.gameObj.subtractLife();
-      this.fakeThing.x = this.fakeThing.y = 0;
-    },
-    null,
-    this);
+  if(this.player.player && this.fakeThing){
+    this.game.physics.arcade.overlap(this.player.player, this.fakeThing,
+      function(){
+        this.gameObj.subtractLife();
+        this.fakeThing.x = this.fakeThing.y = 0;
+      },
+      null,
+      this);
+  }
 };
 
 BasicGame.Lightning.prototype.shoot = function (target) {

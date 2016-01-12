@@ -15,7 +15,7 @@ BasicGame.Level = function (game, gameObj) {
   this.isReady = false;
   this.isShowingDays = false;
   this.dayText = {
-    "es": "Dia",
+    "es": "Día",
     "en": "Day"
   };
 

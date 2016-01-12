@@ -17,25 +17,25 @@ BasicGame.Intro = function (game) {
     "es": [
       {
         character: 'H',
-        text: 'Tienes que calmarte, todo estara bien.'
+        text: 'Tienes que calmarte, todo estará bien.'
       },
       {
         character: 'B',
-        text: 'Como puedes decir eso? No puedo hacerlo!'
+        text: '¿Cómo puedes decir eso? No puedo hacerlo!'
       },
       {
         character: 'H',
-        text: 'Descansa, ya veras como en unos dias dejara de acecharte.'
+        text: 'Descansa, ya verás cómo en unos días dejará de acecharte.'
       },
       {
         character: 'B',
-        text: 'Creo que no sere capaz...'
+        text: 'Creo que no seré capaz...'
       }
     ],
     "en": [
       {
         character: 'H',
-        text: 'Calm down yourself, all its going to be fine.'
+        text: 'Calm down, all its going to be fine.'
       },
       {
         character: 'B',
@@ -43,11 +43,11 @@ BasicGame.Intro = function (game) {
       },
       {
         character: 'H',
-        text: 'Take a rest, it will stop bothering you in a couple of days.'
+        text: 'Have a rest, it will stop haunting you in a few days.'
       },
       {
         character: 'B',
-        text: 'Creo que no sere capaz...'
+        text: "I think I won't be able to handle this..."
       }
     ]
   };

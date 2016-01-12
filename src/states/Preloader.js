@@ -38,7 +38,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.spritesheet('player','assets/sprites/player_v02.png', 32, 32);
   this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);
 
-  this.load.bitmapFont('font','assets/fonts/carrier_command.png','assets/fonts/carrier_command.xml');
+  this.load.bitmapFont('font','assets/fonts/PressStart2P_0.png','assets/fonts/PressStart2P.xml');
 
   // load the map for the first level
   for(var i = 1; i <= 4; i++){

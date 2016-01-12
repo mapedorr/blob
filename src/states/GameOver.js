@@ -17,8 +17,8 @@ BasicGame.GameOver = function(game){
   this.sPressedFlag = false;
 
   this.phraseText = {
-    "es": "B: No puedo mas con esto",
-    "en": "B: I can't handle this"
+    "es": "B: No puedo más con esto.",
+    "en": "B: I can't handle this."
   };
 
   this.tryAgainText = {

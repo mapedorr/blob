@@ -10,15 +10,15 @@ BasicGame.Game = function (game) {
   this.light = null;
   this.eye = null;
   this.lightning = null;
-  this.showFPS = false;
+  this.showFPS = null;
   this.map = null;
   this.darknessGroup = null;
   this.darknessTween = null;
   this.brightnessTween = null;
-  this.countdownDuration = 10;
-  this.inDarkness = true;
-  this.isLoadingLevel = true;
-  this.lifes = 3;
+  this.countdownDuration = null;
+  this.inDarkness = null;
+  this.isLoadingLevel = null;
+  this.lifes = null;
   this.lifesGroup = null;
 };
 
@@ -49,6 +49,13 @@ BasicGame.Game.prototype.preload = function(){
 };
 
 BasicGame.Game.prototype.create = function(){
+  // define properties
+  this.lifes = 3;
+  this.showFPS = false;
+  this.countdownDuration = 10;
+  this.inDarkness = true;
+  this.isLoadingLevel = true;
+
   // set stage background
   this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'sky');
 
