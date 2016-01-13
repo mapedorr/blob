@@ -71,6 +71,5 @@ BasicGame.MainMenu.prototype.update = function(){
 };
 
 BasicGame.MainMenu.prototype.showIntro = function(){
-  // go to the game
   this.state.start('Intro');
 };
