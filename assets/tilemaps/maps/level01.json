@@ -73,9 +73,24 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":128,
+                 "width":256,
                  "x":672,
                  "y":512
+                }, 
+                {
+                 "height":480,
+                 "id":11,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":928,
+                 "y":0
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -138,11 +153,11 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":11,
+ "nextobjectid":13,
  "orientation":"orthogonal",
  "properties":
     {
-     "day":"1"
+
     },
  "renderorder":"right-down",
  "tileheight":32,

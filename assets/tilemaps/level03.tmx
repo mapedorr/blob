@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="34">
- <properties>
-  <property name="day" value="3"/>
- </properties>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="24">
  <objectgroup name="floor">
   <object id="1" name="floor" x="0" y="608" width="1024" height="32">
    <properties>
@@ -11,33 +8,19 @@
   </object>
  </objectgroup>
  <objectgroup name="platforms">
-  <object id="2" name="2" x="128" y="128" width="96" height="32"/>
-  <object id="3" name="4" x="128" y="320" width="96" height="32"/>
-  <object id="4" name="3" x="32" y="224" width="64" height="32"/>
-  <object id="5" name="1" x="224" y="0" width="32" height="160"/>
-  <object id="11" name="5" x="32" y="416" width="64" height="32"/>
-  <object id="12" name="6" x="128" y="512" width="96" height="32"/>
-  <object id="13" name="8" x="320" y="512" width="128" height="32"/>
-  <object id="16" name="9" x="416" y="352" width="32" height="160"/>
-  <object id="18" name="11" x="576" y="352" width="32" height="160"/>
-  <object id="19" name="12" x="576" y="512" width="128" height="32"/>
-  <object id="23" name="14" x="800" y="512" width="96" height="32"/>
-  <object id="24" name="15" x="928" y="416" width="96" height="32"/>
-  <object id="25" name="16" x="800" y="288" width="96" height="32"/>
-  <object id="26" name="17" x="928" y="128" width="96" height="32"/>
-  <object id="27" name="18" x="800" y="0" width="32" height="160"/>
+  <object id="2" x="0" y="480" width="160" height="32"/>
+  <object id="3" x="0" y="192" width="416" height="32"/>
+  <object id="10" x="576" y="416" width="128" height="32"/>
+  <object id="12" x="576" y="192" width="448" height="32"/>
+  <object id="20" x="288" y="416" width="128" height="32"/>
+  <object id="21" x="864" y="480" width="160" height="32"/>
  </objectgroup>
  <objectgroup name="pieces">
-  <object id="6" name="1" x="848" y="272" width="16" height="16"/>
-  <object id="7" name="3" x="848" y="496" width="16" height="16"/>
-  <object id="9" name="2" x="976" y="400" width="16" height="16"/>
-  <object id="29" name="4" x="624" y="496" width="16" height="16"/>
-  <object id="30" name="5" x="400" y="496" width="16" height="16"/>
-  <object id="31" name="6" x="176" y="496" width="16" height="16"/>
-  <object id="32" name="7" x="176" y="304" width="16" height="16"/>
-  <object id="33" name="8" x="176" y="112" width="16" height="16"/>
+  <object id="5" x="400" y="400" width="16" height="16"/>
+  <object id="11" x="592" y="400" width="16" height="16"/>
+  <object id="22" x="1008" y="464" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="player_pos">
-  <object id="8" name="plyr" x="992" y="96" width="32" height="8"/>
+  <object id="6" name="plyr" x="0" y="416" width="32" height="8"/>
  </objectgroup>
 </map>

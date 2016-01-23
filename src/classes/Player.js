@@ -99,6 +99,7 @@ BasicGame.Player.prototype.update = function () {
         if(!this.level.pieces.children || !this.level.pieces.children.length){
           // the level has been finished
           this.level.endLevel();
+          return;
         }
       },
       null,

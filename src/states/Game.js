@@ -20,6 +20,7 @@ BasicGame.Game = function (game) {
   this.isLoadingLevel = null;
   this.lifes = null;
   this.lifesGroup = null;
+  this.days = [1, 2, 3, 5, 8, 13, 21, 34];
 };
 
 BasicGame.Game.developmentMode = false;

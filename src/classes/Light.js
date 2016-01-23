@@ -10,11 +10,13 @@ BasicGame.Light = function (game, gameObj) {
   this.rayBitmapImage = null;
   this.walls = null;
   this.level = null;
+  this.shadowsDrawn = null;
 };
 
 BasicGame.Light.prototype.create = function (level) {
   this.level = level;
   this.walls = this.level.walls;
+  this.shadowsDrawn = false;
 
   var light = null;
 
@@ -50,8 +52,7 @@ BasicGame.Light.prototype.create = function (level) {
   this.rayBitmapImage.visible = false;
 };
 
-
-BasicGame.Light.prototype.update = function () {
+BasicGame.Light.prototype.drawShadows = function () {
   // Move the light to the pointer/touch location
   this.rayBitmapImage.visible = BasicGame.Game.developmentMode || false;
 
@@ -257,6 +258,15 @@ BasicGame.Light.prototype.update = function () {
   if(BasicGame.Game.developmentMode){
     this.rayBitmap.dirty = true;
   }
+
+  this.shadowsDrawn = true;
+};
+
+BasicGame.Light.prototype.update = function(){
+  if(this.shadowsDrawn === false){
+    this.drawShadows();
+  }
+  // draw shadows if light is moving in the level
 };
 
 // Given a ray, this function iterates through all of the walls and
@@ -302,4 +312,5 @@ BasicGame.Light.prototype.destroyCurrentWalls = function (walls) {
 
 BasicGame.Light.prototype.updateWalls = function (level) {
   this.walls = level.walls;
+  this.shadowsDrawn = false;
 };

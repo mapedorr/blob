@@ -1,5 +1,5 @@
 var BasicGame = BasicGame || {
-  language: null
+  language: "en"
 };
 
 BasicGame.Boot = function (game) {
@@ -16,7 +16,7 @@ BasicGame.Boot.prototype.create = function () {
   this.input.maxPointers = 1;
 
   //  Phaser will automatically pause if the browser tab the game is in loses focus. You can disable that here:
-  this.stage.disableVisibilityChange = true;
+  // this.stage.disableVisibilityChange = true;
 
   //If the parent container of the game is the browser window (ie. document.body), rather than a div, this should set to true.
   this.scale.parentIsWindow = true;
