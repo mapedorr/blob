@@ -137,7 +137,7 @@ BasicGame.Level.prototype.endLevel = function(){
   this.levelTextGroup.getChildAt(0).alpha = 0;
   this.levelTextGroup.alpha = 1;
 
-  var secondsToEnd = 10;
+  var secondsToEnd = this.gameObj.countdownDuration;
   this.countdownTextBitmap.setText(secondsToEnd);
 
   // create the timer

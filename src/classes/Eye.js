@@ -242,7 +242,7 @@ BasicGame.Eye.prototype.calmDown = function(){
       this.shake();
 
       // intensify search speed
-      this.eye.animations.getAnimation("search").speed += 2;
+      this.eye.animations.getAnimation("search").speed += 1;
 
       // choose a platform for shooting it
       // this.lightningTimer = 2000;

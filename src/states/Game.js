@@ -24,7 +24,7 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = 1;
+BasicGame.currentLevel = 7;
 
 BasicGame.Game.prototype.preload = function(){
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -53,7 +53,7 @@ BasicGame.Game.prototype.create = function(){
   // define properties
   this.lifes = 3;
   this.showFPS = false;
-  this.countdownDuration = 10;
+  this.countdownDuration = 5;
   this.inDarkness = true;
   this.isLoadingLevel = true;
 

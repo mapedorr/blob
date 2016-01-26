@@ -41,7 +41,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.bitmapFont('font','assets/fonts/PressStart2P_0.png','assets/fonts/PressStart2P.xml');
 
   // load the map for the first level
-  for(var i = 1; i <= 6; i++){
+  for(var i = 1; i <= 7; i++){
     this.game.load.tilemap('lvl0' + i, 'assets/tilemaps/maps/level0' + i + '.json', null, Phaser.Tilemap.TILED_JSON);
   }
 };
