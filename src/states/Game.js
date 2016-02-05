@@ -20,11 +20,11 @@ BasicGame.Game = function (game) {
   this.isLoadingLevel = null;
   this.lifes = null;
   this.lifesGroup = null;
-  this.days = [1, 2, 3, 5, 8, 13, 21, 34];
+  this.days = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 300, 365, 480];
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = 7;
+BasicGame.currentLevel = 9;
 
 BasicGame.Game.prototype.preload = function(){
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
