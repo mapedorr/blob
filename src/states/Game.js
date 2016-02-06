@@ -24,7 +24,7 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = 9;
+BasicGame.currentLevel = 11;
 
 BasicGame.Game.prototype.preload = function(){
   this.game.physics.startSystem(Phaser.Physics.ARCADE);

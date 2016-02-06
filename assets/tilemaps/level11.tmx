@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="48">
+ <objectgroup name="floor">
+  <object id="1" name="floor" x="0" y="608" width="1024" height="32">
+   <properties>
+    <property name="gid" value="p2"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="platforms">
+  <object id="2" x="64" y="544" width="64" height="32"/>
+  <object id="4" x="64" y="160" width="32" height="64"/>
+  <object id="5" x="64" y="320" width="32" height="64"/>
+  <object id="16" x="416" y="448" width="32" height="160"/>
+  <object id="18" x="64" y="0" width="32" height="64"/>
+  <object id="19" x="0" y="96" width="32" height="512"/>
+  <object id="26" x="576" y="544" width="96" height="32"/>
+  <object id="28" x="768" y="352" width="32" height="32"/>
+  <object id="30" x="736" y="0" width="32" height="576"/>
+  <object id="32" x="256" y="544" width="96" height="32"/>
+  <object id="33" x="928" y="256" width="32" height="32"/>
+  <object id="35" x="928" y="448" width="32" height="32"/>
+  <object id="37" x="768" y="160" width="32" height="32"/>
+  <object id="38" x="64" y="480" width="32" height="64"/>
+  <object id="40" x="928" y="64" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup name="pieces">
+  <object id="12" x="816" y="368" width="16" height="16"/>
+  <object id="21" x="432" y="400" width="16" height="16"/>
+  <object id="22" x="48" y="592" width="16" height="16"/>
+  <object id="24" x="816" y="176" width="16" height="16"/>
+  <object id="41" x="912" y="272" width="16" height="16"/>
+  <object id="42" x="1008" y="80" width="16" height="16"/>
+  <object id="45" x="912" y="80" width="16" height="16"/>
+  <object id="46" x="912" y="464" width="16" height="16"/>
+  <object id="47" x="48" y="48" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="player_pos">
+  <object id="13" name="plyr" x="0" y="64" width="32" height="8"/>
+ </objectgroup>
+</map>
