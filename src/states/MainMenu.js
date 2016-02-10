@@ -68,6 +68,10 @@ BasicGame.MainMenu.prototype.update = function(){
     BasicGame.language = "es";
     this.showIntroTimer.start();
   }
+
+  // if(BasicGame.language){
+  //   this.showIntroTimer.start();
+  // }
 };
 
 BasicGame.MainMenu.prototype.showIntro = function(){
