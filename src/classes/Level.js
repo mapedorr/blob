@@ -106,7 +106,7 @@ BasicGame.Level.prototype.createLevel = function(num){
     _me.map.createFromObjects("pieces", object.name, 'piece', null, true, false, _me.pieces, Phaser.Sprite, false);
   });
 
-  this.pieces.enableBody = true;
+  // this.pieces.enableBody = true;
   this.game.physics.arcade.enable(this.pieces);
   this.pieces.forEach(function(pieceSprite){
     pieceSprite.anchor.set(.5, .5);

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="62">
+ <objectgroup name="floor">
+  <object id="1" name="floor" x="608" y="608" width="128" height="32">
+   <properties>
+    <property name="gid" value="p2"/>
+   </properties>
+  </object>
+  <object id="52" name="floor" x="896" y="608" width="128" height="32">
+   <properties>
+    <property name="gid" value="p2"/>
+   </properties>
+  </object>
+  <object id="54" name="floor" x="320" y="608" width="128" height="32">
+   <properties>
+    <property name="gid" value="p2"/>
+   </properties>
+  </object>
+  <object id="55" name="floor" x="0" y="608" width="160" height="32">
+   <properties>
+    <property name="gid" value="p2"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="platforms">
+  <object id="53" x="608" y="384" width="96" height="32"/>
+  <object id="59" x="416" y="384" width="96" height="32"/>
+  <object id="60" x="160" y="384" width="96" height="32"/>
+  <object id="61" x="832" y="384" width="192" height="32"/>
+ </objectgroup>
+ <objectgroup name="pieces">
+  <object id="42" x="720" y="592" width="16" height="16"/>
+  <object id="57" x="432" y="592" width="16" height="16"/>
+  <object id="58" x="144" y="592" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="player_pos">
+  <object id="13" name="plyr" x="992" y="576" width="32" height="8"/>
+ </objectgroup>
+</map>

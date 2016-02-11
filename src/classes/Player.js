@@ -40,7 +40,7 @@ BasicGame.Player.prototype.create = function (level) {
 
   // configure the player animations
   this.player.animations.add('normal', [0], 1, false);
-  this.player.animations.add('dying', null, 60, false);
+  this.player.animations.add('dying', null, 70, false);
 
   //Enable physics on the player
   this.game.physics.arcade.enable(this.player);
@@ -86,8 +86,17 @@ BasicGame.Player.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.level.ground);
   this.game.physics.arcade.collide(this.player, this.level.walls);
 
+  if(this.player.body.onFloor() === true){
+    this.player.body.collideWorldBounds = false;
+    this.gameObj.subtractAllLifes();
+  }
+
   if(this.dead === true){
     this.player.body.acceleration.x = 0;
+    return;
+  }
+
+  if(this.gameObj.isLoadingLevel === true){
     return;
   }
 
@@ -104,10 +113,6 @@ BasicGame.Player.prototype.update = function () {
       },
       null,
       this);
-  }
-
-  if(this.gameObj.isLoadingLevel == true){
-    return;
   }
 
   var leftPressed = this.leftInputIsActive() == true;

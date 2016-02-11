@@ -24,7 +24,7 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = 11;
+BasicGame.currentLevel = 17;
 
 BasicGame.Game.prototype.preload = function(){
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -106,10 +106,10 @@ BasicGame.Game.prototype.create = function(){
 
   // create the darkness and brightness tweens
   this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-  this.darknessTween.to({alpha: 1},
-    3000,
-    Phaser.Easing.Quadratic.Out,
-    false);
+  // this.darknessTween.to({alpha: 1},
+  //   3000,
+  //   Phaser.Easing.Quadratic.Out,
+  //   false);
   this.darknessTween.onComplete.add(function(){
     this.inDarkness = true;
     if(this.lifes <= 0){
@@ -194,9 +194,13 @@ BasicGame.Game.prototype.quitGame = function(){
   this.state.start('MainMenu');
 };
 
-BasicGame.Game.prototype.showDarkness = function(){
+BasicGame.Game.prototype.showDarkness = function(durationInMS){
   this.game.world.bringToTop(this.darknessGroup);
-  this.darknessTween.start();
+  this.darknessTween.to({alpha: 1},
+    durationInMS || 3000,
+    Phaser.Easing.Quadratic.Out,
+    true);
+  // this.darknessTween.start();
 };
 
 BasicGame.Game.prototype.hideDarkness = function(){
@@ -227,6 +231,10 @@ BasicGame.Game.prototype.shakeCamera = function(){
 
 BasicGame.Game.prototype.subtractLife = function(){
   // remove one life sprite
+  if(this.lifes <= 0){
+    return;
+  }
+
   var lifeTween = this.game.add.tween(this.lifesGroup.getChildAt(--this.lifes));
   lifeTween.to({alpha: 0},
     700,
@@ -239,7 +247,34 @@ BasicGame.Game.prototype.subtractLife = function(){
     // notify the PLAYER that is time to show the animation for dead
     this.player.dieWithDignity();
 
+    // create the timer
+    var gameOverTimer = this.game.time.create(true);
+
+    // set the timer to stop showing the day
+    gameOverTimer.add(1000,
+      function(){
+        this.state.start('GameOver');
+      },
+      this);
+
+    gameOverTimer.start();
+
     // start the darkness
-    this.showDarkness();
+    // this.showDarkness(700);
+
   }
+};
+
+
+BasicGame.Game.prototype.subtractAllLifes = function(){
+  this.lifes = 0;
+
+  var lifeTween = this.game.add.tween(this.lifesGroup);
+  lifeTween.to({alpha: 0},
+    700,
+    Phaser.Easing.Quadratic.Out,
+    true);
+
+  // start the darkness
+  this.showDarkness(500);
 };
