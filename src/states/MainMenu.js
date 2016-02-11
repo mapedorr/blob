@@ -50,17 +50,15 @@ BasicGame.MainMenu.prototype.create = function(){
 BasicGame.MainMenu.prototype.update = function(){
   if(this.input.keyboard.isDown(Phaser.Keyboard.LEFT)){
     this.playButton.frame = 1;
+    this.showIntroTimer.start();
   }else if(this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
     this.jugarButton.frame = 1;
     BasicGame.language = "es";
-  }
-
-  if(BasicGame.language){
     this.showIntroTimer.start();
   }
 };
 
 BasicGame.MainMenu.prototype.showIntro = function(){
   // go to the game
-  this.state.start('Game');
+  this.state.start('Intro');
 };
