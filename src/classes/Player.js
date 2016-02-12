@@ -87,6 +87,7 @@ BasicGame.Player.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.level.walls);
 
   if(this.player.body.onFloor() === true){
+    this.dead = true;
     this.player.body.collideWorldBounds = false;
     this.gameObj.subtractAllLifes();
   }

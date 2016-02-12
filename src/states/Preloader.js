@@ -32,7 +32,7 @@ BasicGame.Preloader.prototype.preload = function(){
 
   //  ---| The assets for the Game
   this.load.image('light', 'assets/images/light.png');
-  this.load.image('sky', 'assets/images/sky.png');
+  this.load.image('sky', 'assets/images/sky03.png');
   this.load.image('platform', 'assets/images/platform.png');
   this.load.image('piece', 'assets/images/piece.png');
   this.load.spritesheet('player','assets/sprites/player.png', 32, 32);
@@ -41,7 +41,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.bitmapFont('font','assets/fonts/PressStart2P_0.png','assets/fonts/PressStart2P.xml');
 
   // load the map for the first level
-  for(var i = 1; i <= 17; i++){
+  for(var i = 1; i <= 19; i++){
     if(i < 10) this.game.load.tilemap('lvl0' + i, 'assets/tilemaps/maps/level0' + i + '.json', null, Phaser.Tilemap.TILED_JSON)
     else this.game.load.tilemap('lvl' + i, 'assets/tilemaps/maps/level' + i + '.json', null, Phaser.Tilemap.TILED_JSON)
   }

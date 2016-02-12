@@ -123,8 +123,9 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.game.world.bringToTop(this.levelTextGroup);
 
   // show the days of the level
-  this.countdownTextBitmap.setText(this.dayText[BasicGame.language] + ' ' +
-    this.gameObj.days[BasicGame.currentLevel - 1] || '???' + '...');
+  // var texte = this.gameObj.days[BasicGame.currentLevel - 1] || '???';
+  var texte = this.gameObj.days[this.gameObj.days.length - BasicGame.currentLevel - 2] || '???';
+  this.countdownTextBitmap.setText(this.dayText[BasicGame.language] + ' ' + texte);
 
   // set the level as not ended
   this.isEnded = false;
@@ -134,35 +135,36 @@ BasicGame.Level.prototype.createLevel = function(num){
 };
 
 BasicGame.Level.prototype.endLevel = function(){
-  this.levelTextGroup.getChildAt(0).alpha = 0;
-  this.levelTextGroup.alpha = 1;
+  // this.levelTextGroup.getChildAt(0).alpha = 0;
+  // this.levelTextGroup.alpha = 1;
 
   var secondsToEnd = this.gameObj.countdownDuration;
-  this.countdownTextBitmap.setText(secondsToEnd);
+  // this.countdownTextBitmap.setText(secondsToEnd);
 
   // create the timer
   this.endTimer = this.game.time.create(true);
 
   // starts the timer that will end the level
-  this.endTimer.add(this.gameObj.countdownDuration * 1000,
+  this.endTimer.add(secondsToEnd * 1000,
     function(){
       // enable the flag that indicates the other objects the level is finished
       this.isEnded = true;
     },
     this);
 
-  this.endTimer.repeat(1000,
-    this.gameObj.countdownDuration,
-    function(){
-      // show the countdown on the screen
-      if(--secondsToEnd == 3){
-        this.gameObj.showDarkness();
-      }
-      this.countdownTextBitmap.setText(secondsToEnd);
-    },
-    this);
+  // this.endTimer.repeat(1000,
+  //   this.gameObj.countdownDuration,
+  //   function(){
+  //     // show the countdown on the screen
+  //     if(--secondsToEnd == 3){
+  //       this.gameObj.showDarkness();
+  //     }
+  //     this.countdownTextBitmap.setText(secondsToEnd);
+  //   },
+  //   this);
 
   this.endTimer.start();
+  this.gameObj.showDarkness();
 };
 
 BasicGame.Level.prototype.showDay = function(){

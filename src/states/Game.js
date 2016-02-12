@@ -24,7 +24,7 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = 17;
+BasicGame.currentLevel = 1;
 
 BasicGame.Game.prototype.preload = function(){
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -53,7 +53,7 @@ BasicGame.Game.prototype.create = function(){
   // define properties
   this.lifes = 3;
   this.showFPS = false;
-  this.countdownDuration = 5;
+  this.countdownDuration = 0.7;
   this.inDarkness = true;
   this.isLoadingLevel = true;
 
@@ -197,7 +197,7 @@ BasicGame.Game.prototype.quitGame = function(){
 BasicGame.Game.prototype.showDarkness = function(durationInMS){
   this.game.world.bringToTop(this.darknessGroup);
   this.darknessTween.to({alpha: 1},
-    durationInMS || 3000,
+    durationInMS || this.countdownDuration * 1000,
     Phaser.Easing.Quadratic.Out,
     true);
   // this.darknessTween.start();
