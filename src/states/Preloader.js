@@ -32,7 +32,10 @@ BasicGame.Preloader.prototype.preload = function(){
 
   //  ---| The assets for the Game
   this.load.image('light', 'assets/images/light.png');
-  this.load.image('sky', 'assets/images/sky03.png');
+  this.load.image('view_zone', 'assets/images/view_zone.png');
+  this.load.image('sky01', 'assets/images/sky01.png');
+  this.load.image('sky02', 'assets/images/sky02.png');
+  this.load.image('sky03', 'assets/images/sky03.png');
   this.load.image('platform', 'assets/images/platform.png');
   this.load.image('piece', 'assets/images/piece.png');
   this.load.spritesheet('player','assets/sprites/player.png', 32, 32);

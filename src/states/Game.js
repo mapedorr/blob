@@ -58,7 +58,7 @@ BasicGame.Game.prototype.create = function(){
   this.isLoadingLevel = true;
 
   // set stage background
-  this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'sky');
+  this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, this.getSkyName());
 
   // configure the camera for shaking
   this.game.camera.setSize(this.game.world.width/2, this.game.world.height/2);
@@ -209,6 +209,9 @@ BasicGame.Game.prototype.hideDarkness = function(){
 };
 
 BasicGame.Game.prototype.loadLevel = function(levelNumber){
+  if (this.background.key != this.getSkyName()) {
+    this.background.loadTexture(this.getSkyName());
+  }
   this.level.destroyCurrentLevel();
   this.level.createLevel(levelNumber);
 
@@ -277,4 +280,14 @@ BasicGame.Game.prototype.subtractAllLifes = function(){
 
   // start the darkness
   this.showDarkness(500);
+};
+
+BasicGame.Game.prototype.getSkyName = function(){
+  if(BasicGame.currentLevel <= 10){
+    return 'sky01';
+  } else if (BasicGame.currentLevel <= 20) {
+    return 'sky02';
+  } else {
+    return 'sky03';
+  }
 };

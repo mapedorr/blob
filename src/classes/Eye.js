@@ -60,7 +60,7 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.anger = false;
 
   // create the view zones
-  this.viewZoneSprite = this.game.add.sprite(this.eye.position.x - this.zoneSize / 2, 0, 'sky', 0);
+  this.viewZoneSprite = this.game.add.sprite(this.eye.position.x - this.zoneSize / 2, 0, 'view_zone', 0);
   this.viewZoneSprite.tint = 0x274245;
   this.viewZoneSprite.alpha = 0.1;
   this.viewZoneSprite.width = this.zoneSize;
