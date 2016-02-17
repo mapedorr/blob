@@ -7,7 +7,8 @@
          "objects":[
                 {
                  "height":32,
-                 "name":"floor",
+                 "id":1,
+                 "name":"",
                  "properties":
                     {
                      "gid":"p2"
@@ -33,6 +34,7 @@
          "objects":[
                 {
                  "height":96,
+                 "id":2,
                  "name":"",
                  "properties":
                     {
@@ -47,6 +49,7 @@
                 }, 
                 {
                  "height":96,
+                 "id":3,
                  "name":"",
                  "properties":
                     {
@@ -61,6 +64,7 @@
                 }, 
                 {
                  "height":32,
+                 "id":4,
                  "name":"",
                  "properties":
                     {
@@ -75,6 +79,7 @@
                 }, 
                 {
                  "height":32,
+                 "id":5,
                  "name":"",
                  "properties":
                     {
@@ -101,6 +106,7 @@
          "objects":[
                 {
                  "height":16,
+                 "id":6,
                  "name":"",
                  "properties":
                     {
@@ -115,6 +121,7 @@
                 }, 
                 {
                  "height":16,
+                 "id":7,
                  "name":"",
                  "properties":
                     {
@@ -129,6 +136,7 @@
                 }, 
                 {
                  "height":16,
+                 "id":8,
                  "name":"",
                  "properties":
                     {
@@ -143,6 +151,7 @@
                 }, 
                 {
                  "height":16,
+                 "id":9,
                  "name":"",
                  "properties":
                     {
@@ -157,6 +166,7 @@
                 }, 
                 {
                  "height":16,
+                 "id":10,
                  "name":"",
                  "properties":
                     {
@@ -171,6 +181,7 @@
                 }, 
                 {
                  "height":16,
+                 "id":11,
                  "name":"",
                  "properties":
                     {
@@ -185,6 +196,7 @@
                 }, 
                 {
                  "height":16,
+                 "id":12,
                  "name":"",
                  "properties":
                     {
@@ -211,6 +223,7 @@
          "objects":[
                 {
                  "height":8,
+                 "id":13,
                  "name":"plyr",
                  "properties":
                     {
@@ -230,6 +243,7 @@
          "x":0,
          "y":0
         }],
+ "nextobjectid":14,
  "orientation":"orthogonal",
  "properties":
     {

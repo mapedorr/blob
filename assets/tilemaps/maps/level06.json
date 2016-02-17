@@ -7,7 +7,8 @@
          "objects":[
                 {
                  "height":32,
-                 "name":"floor",
+                 "id":1,
+                 "name":"",
                  "properties":
                     {
                      "gid":"p2"
@@ -33,6 +34,7 @@
          "objects":[
                 {
                  "height":224,
+                 "id":2,
                  "name":"",
                  "properties":
                     {
@@ -47,6 +49,7 @@
                 }, 
                 {
                  "height":32,
+                 "id":3,
                  "name":"",
                  "properties":
                     {
@@ -61,6 +64,7 @@
                 }, 
                 {
                  "height":32,
+                 "id":4,
                  "name":"",
                  "properties":
                     {
@@ -75,6 +79,7 @@
                 }, 
                 {
                  "height":96,
+                 "id":5,
                  "name":"",
                  "properties":
                     {
@@ -89,6 +94,7 @@
                 }, 
                 {
                  "height":32,
+                 "id":6,
                  "name":"",
                  "properties":
                     {
@@ -103,6 +109,7 @@
                 }, 
                 {
                  "height":32,
+                 "id":7,
                  "name":"",
                  "properties":
                     {
@@ -117,6 +124,7 @@
                 }, 
                 {
                  "height":192,
+                 "id":8,
                  "name":"",
                  "properties":
                     {
@@ -131,6 +139,7 @@
                 }, 
                 {
                  "height":32,
+                 "id":9,
                  "name":"",
                  "properties":
                     {
@@ -145,6 +154,7 @@
                 }, 
                 {
                  "height":32,
+                 "id":10,
                  "name":"",
                  "properties":
                     {
@@ -171,6 +181,7 @@
          "objects":[
                 {
                  "height":16,
+                 "id":11,
                  "name":"",
                  "properties":
                     {
@@ -185,6 +196,7 @@
                 }, 
                 {
                  "height":16,
+                 "id":12,
                  "name":"",
                  "properties":
                     {
@@ -199,6 +211,7 @@
                 }, 
                 {
                  "height":16,
+                 "id":13,
                  "name":"",
                  "properties":
                     {
@@ -213,6 +226,7 @@
                 }, 
                 {
                  "height":16,
+                 "id":14,
                  "name":"",
                  "properties":
                     {
@@ -239,6 +253,7 @@
          "objects":[
                 {
                  "height":8,
+                 "id":15,
                  "name":"plyr",
                  "properties":
                     {
@@ -258,6 +273,7 @@
          "x":0,
          "y":0
         }],
+ "nextobjectid":16,
  "orientation":"orthogonal",
  "properties":
     {
