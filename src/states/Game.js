@@ -24,7 +24,7 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = 23;
+BasicGame.currentLevel = 26;
 
 BasicGame.Game.prototype.preload = function(){
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -69,6 +69,9 @@ BasicGame.Game.prototype.create = function(){
 
   // create the player
   this.player.create(this.level);
+
+  this.game.world.bringToTop(this.level.spikes);
+  this.game.world.bringToTop(this.level.walls);
 
   // create the group of sprites for lifes
   this.lifesGroup = this.game.add.group();
@@ -269,7 +272,7 @@ BasicGame.Game.prototype.subtractLife = function(){
 };
 
 
-BasicGame.Game.prototype.subtractAllLifes = function(){
+BasicGame.Game.prototype.subtractAllLifes = function(destroyPlayer){
   this.lifes = 0;
 
   var lifeTween = this.game.add.tween(this.lifesGroup);
@@ -278,8 +281,24 @@ BasicGame.Game.prototype.subtractAllLifes = function(){
     Phaser.Easing.Quadratic.Out,
     true);
 
-  // start the darkness
-  this.showDarkness(500);
+  if(destroyPlayer){
+    this.player.dieWithDignity();
+
+    // create the timer
+    var gameOverTimer = this.game.time.create(true);
+
+    // set the timer to stop showing the day
+    gameOverTimer.add(1000,
+      function(){
+        this.state.start('GameOver');
+      },
+      this);
+
+    gameOverTimer.start();
+  } else {
+    // start the darkness
+    this.showDarkness(500);
+  }
 };
 
 BasicGame.Game.prototype.getSkyName = function(){

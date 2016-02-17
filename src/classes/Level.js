@@ -75,9 +75,9 @@ BasicGame.Level.prototype.createLevel = function(num){
   if(this.map.objects.floor){
     this.ground = this.game.add.group();
 
-    this.map.objects.floor.forEach(function(object, index){
-      _me.map.createFromObjects("floor", object.name, 'platform', null, true, false, _me.ground, Phaser.Sprite, false);
-    });
+    // this.map.objects.floor.forEach(function(object, index){
+      _me.map.createFromObjects("floor", "", 'platform', 0, true, false, _me.ground, Phaser.Sprite, false);
+    // });
 
     this.ground.enableBody = true;
     this.game.physics.arcade.enable(this.ground);
@@ -89,22 +89,35 @@ BasicGame.Level.prototype.createLevel = function(num){
 
   // create the walls of the level
   this.walls = this.game.add.group();
-  this.map.objects.platforms.forEach(function(object, index){
-    _me.map.createFromObjects("platforms", object.name, 'platform', null, true, false, _me.walls, Phaser.Sprite, false);
-  });
+  // console.log("1. ", this.map.objects.platforms.length);
+  // this.map.objects.platforms.forEach(function(object, index){
+    _me.map.createFromObjects("platforms", "", 'platform', 0, true, false, _me.walls, Phaser.Sprite, false);
+  // });
+
+  this.spikes = this.game.add.group();
 
   this.walls.enableBody = true;
   this.game.physics.arcade.enable(this.walls);
   this.walls.forEach(function(platformSprite){
+    if(platformSprite.spikes === 'true'){
+      platformSprite.frame = 1;
+      var spikes = _me.game.add.tileSprite(platformSprite.x, platformSprite.y,
+        platformSprite.width, 32, "spike", 0, _me.spikes);
+      _me.game.physics.arcade.enable(spikes);
+      spikes.body.immovable = true;
+      spikes.body.allowGravity = false;
+      platformSprite.spikeRef = spikes;
+      platformSprite.spikesHidden = true;
+    }
     platformSprite.body.immovable = true;
     platformSprite.body.allowGravity = false;
   });
 
   // create the pieces of the level
   this.pieces = this.game.add.group();
-  this.map.objects.pieces.forEach(function(object, index){
-    _me.map.createFromObjects("pieces", object.name, 'piece', null, true, false, _me.pieces, Phaser.Sprite, false);
-  });
+  // this.map.objects.pieces.forEach(function(object, index){
+    _me.map.createFromObjects("pieces", "", 'piece', null, true, false, _me.pieces, Phaser.Sprite, false);
+  // });
 
   // this.pieces.enableBody = true;
   this.game.physics.arcade.enable(this.pieces);

@@ -84,7 +84,26 @@ BasicGame.Player.prototype.update = function () {
 
   // check collisions
   this.game.physics.arcade.collide(this.player, this.level.ground);
-  this.game.physics.arcade.collide(this.player, this.level.walls);
+  this.game.physics.arcade.collide(this.player, this.level.walls,
+    function(player, wall){
+      if(wall.spikes === 'true' && wall.spikesHidden == true){
+        var _me = this;
+        wall.spikesHidden = false;
+        
+        // create the tween to show the spikes
+        this.game.add.tween(wall.spikeRef)
+        .to({y: wall.spikeRef.y - 32},
+          100,
+          null,
+          true,
+          300);
+
+      }
+    }, null, this);
+  this.game.physics.arcade.overlap(this.player, this.level.spikes,
+    function(player, spike){
+      this.gameObj.subtractAllLifes(true);
+    }, null, this);
 
   if(this.player.body.onFloor() === true){
     this.dead = true;
