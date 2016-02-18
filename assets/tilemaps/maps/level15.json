@@ -8,10 +8,10 @@
                 {
                  "height":32,
                  "id":1,
-                 "name":"floor",
+                 "name":"",
                  "properties":
                     {
-                     "gid":"p2"
+
                     },
                  "rotation":0,
                  "type":"",
@@ -23,10 +23,10 @@
                 {
                  "height":32,
                  "id":52,
-                 "name":"floor",
+                 "name":"",
                  "properties":
                     {
-                     "gid":"p2"
+
                     },
                  "rotation":0,
                  "type":"",
@@ -38,10 +38,10 @@
                 {
                  "height":32,
                  "id":54,
-                 "name":"floor",
+                 "name":"",
                  "properties":
                     {
-                     "gid":"p2"
+
                     },
                  "rotation":0,
                  "type":"",
@@ -53,10 +53,10 @@
                 {
                  "height":32,
                  "id":55,
-                 "name":"floor",
+                 "name":"",
                  "properties":
                     {
-                     "gid":"p2"
+
                     },
                  "rotation":0,
                  "type":"",

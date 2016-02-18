@@ -20,7 +20,7 @@
                 {
                  "height":128,
                  "id":2,
-                 "name":"3",
+                 "name":"",
                  "properties":
                     {
 
@@ -50,7 +50,7 @@
                 {
                  "height":128,
                  "id":5,
-                 "name":"5",
+                 "name":"",
                  "properties":
                     {
 
@@ -65,7 +65,7 @@
                 {
                  "height":32,
                  "id":6,
-                 "name":"7",
+                 "name":"",
                  "properties":
                     {
                      "gid":"p1"
@@ -80,7 +80,7 @@
                 {
                  "height":96,
                  "id":7,
-                 "name":"4",
+                 "name":"",
                  "properties":
                     {
 
@@ -95,7 +95,7 @@
                 {
                  "height":32,
                  "id":8,
-                 "name":"1",
+                 "name":"",
                  "properties":
                     {
 
@@ -110,7 +110,7 @@
                 {
                  "height":32,
                  "id":9,
-                 "name":"9",
+                 "name":"",
                  "properties":
                     {
 
@@ -155,7 +155,7 @@
                 {
                  "height":96,
                  "id":27,
-                 "name":"4",
+                 "name":"",
                  "properties":
                     {
 
@@ -287,7 +287,7 @@
                 {
                  "height":16,
                  "id":12,
-                 "name":"1",
+                 "name":"",
                  "properties":
                     {
 
@@ -302,7 +302,7 @@
                 {
                  "height":16,
                  "id":13,
-                 "name":"2",
+                 "name":"",
                  "properties":
                     {
 
@@ -317,7 +317,7 @@
                 {
                  "height":16,
                  "id":19,
-                 "name":"3",
+                 "name":"",
                  "properties":
                     {
 
@@ -332,7 +332,7 @@
                 {
                  "height":16,
                  "id":20,
-                 "name":"4",
+                 "name":"",
                  "properties":
                     {
 
@@ -347,7 +347,7 @@
                 {
                  "height":16,
                  "id":28,
-                 "name":"2",
+                 "name":"",
                  "properties":
                     {
 

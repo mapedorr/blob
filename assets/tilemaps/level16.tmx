@@ -1,16 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="68">
  <objectgroup name="floor">
-  <object id="52" name="floor" x="960" y="608" width="64" height="32">
-   <properties>
-    <property name="gid" value="p2"/>
-   </properties>
-  </object>
-  <object id="55" name="floor" x="0" y="608" width="160" height="32">
-   <properties>
-    <property name="gid" value="p2"/>
-   </properties>
-  </object>
+  <object id="52" x="960" y="608" width="64" height="32"/>
+  <object id="55" x="0" y="608" width="160" height="32"/>
  </objectgroup>
  <objectgroup name="platforms">
   <object id="59" x="352" y="416" width="64" height="32"/>

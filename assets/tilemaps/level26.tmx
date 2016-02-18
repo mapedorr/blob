@@ -34,9 +34,9 @@
  </objectgroup>
  <objectgroup name="pieces">
   <object id="6" x="944" y="464" width="16" height="16"/>
-  <object id="7" name="asd" x="112" y="560" width="16" height="16"/>
+  <object id="7" x="112" y="560" width="16" height="16"/>
   <object id="9" x="752" y="496" width="16" height="16"/>
-  <object id="34" name="sdfs" x="368" y="496" width="16" height="16"/>
+  <object id="34" x="368" y="496" width="16" height="16"/>
   <object id="35" x="560" y="560" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="player_pos">

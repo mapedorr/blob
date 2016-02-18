@@ -40,7 +40,7 @@
   <object id="13" name="2" x="400" y="432" width="16" height="16"/>
   <object id="19" name="3" x="848" y="432" width="16" height="16"/>
   <object id="20" name="4" x="176" y="432" width="16" height="16"/>
-  <object id="28" name="2" x="1008" y="528" width="16" height="16"/>
+  <object id="28" x="1008" y="528" width="16" height="16"/>
   <object id="34" x="1008" y="336" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="player_pos">

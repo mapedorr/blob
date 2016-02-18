@@ -9,7 +9,7 @@
   <object id="66" x="960" y="608" width="64" height="32"/>
  </objectgroup>
  <objectgroup name="platforms">
-  <object id="8" name="1" x="64" y="128" width="32" height="448"/>
+  <object id="8" x="64" y="128" width="32" height="448"/>
   <object id="35" x="320" y="288" width="32" height="288"/>
   <object id="37" x="416" y="384" width="64" height="32"/>
   <object id="39" x="576" y="480" width="32" height="64"/>
@@ -26,20 +26,20 @@
   <object id="63" x="576" y="320" width="128" height="32"/>
  </objectgroup>
  <objectgroup name="pieces">
-  <object id="17" name="1" x="112" y="272" width="16" height="16"/>
-  <object id="18" name="1" x="112" y="464" width="16" height="16"/>
-  <object id="49" name="1" x="336" y="208" width="16" height="16"/>
-  <object id="50" name="1" x="432" y="496" width="16" height="16"/>
-  <object id="54" name="1" x="592" y="464" width="16" height="16"/>
-  <object id="55" name="1" x="624" y="496" width="16" height="16"/>
-  <object id="56" name="1" x="656" y="528" width="16" height="16"/>
-  <object id="57" name="1" x="784" y="528" width="16" height="16"/>
-  <object id="58" name="1" x="816" y="496" width="16" height="16"/>
-  <object id="59" name="1" x="848" y="464" width="16" height="16"/>
-  <object id="60" name="1" x="880" y="304" width="16" height="16"/>
-  <object id="64" name="1" x="816" y="272" width="16" height="16"/>
-  <object id="65" name="1" x="912" y="368" width="16" height="16"/>
-  <object id="67" name="1" x="1008" y="592" width="16" height="16"/>
+  <object id="17" x="112" y="272" width="16" height="16"/>
+  <object id="18" x="112" y="464" width="16" height="16"/>
+  <object id="49" x="336" y="208" width="16" height="16"/>
+  <object id="50" x="432" y="496" width="16" height="16"/>
+  <object id="54" x="592" y="464" width="16" height="16"/>
+  <object id="55" x="624" y="496" width="16" height="16"/>
+  <object id="56" x="656" y="528" width="16" height="16"/>
+  <object id="57" x="784" y="528" width="16" height="16"/>
+  <object id="58" x="816" y="496" width="16" height="16"/>
+  <object id="59" x="848" y="464" width="16" height="16"/>
+  <object id="60" x="880" y="304" width="16" height="16"/>
+  <object id="64" x="816" y="272" width="16" height="16"/>
+  <object id="65" x="912" y="368" width="16" height="16"/>
+  <object id="67" x="1008" y="592" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="player_pos">
   <object id="14" name="plyr" x="0" y="576" width="32" height="8"/>

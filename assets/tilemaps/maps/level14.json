@@ -8,10 +8,10 @@
                 {
                  "height":32,
                  "id":1,
-                 "name":"floor",
+                 "name":"",
                  "properties":
                     {
-                     "gid":"p2"
+
                     },
                  "rotation":0,
                  "type":"",
@@ -23,10 +23,10 @@
                 {
                  "height":32,
                  "id":52,
-                 "name":"floor",
+                 "name":"",
                  "properties":
                     {
-                     "gid":"p2"
+
                     },
                  "rotation":0,
                  "type":"",
@@ -87,7 +87,7 @@
                  "visible":true,
                  "width":16,
                  "x":496,
-                 "y":496
+                 "y":464
                 }],
          "opacity":1,
          "type":"objectgroup",

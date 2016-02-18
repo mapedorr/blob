@@ -8,10 +8,10 @@
                 {
                  "height":32,
                  "id":1,
-                 "name":"floor",
+                 "name":"",
                  "properties":
                     {
-                     "gid":"p2"
+
                     },
                  "rotation":0,
                  "type":"",
