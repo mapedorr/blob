@@ -265,9 +265,6 @@ BasicGame.Game.prototype.subtractLife = function(){
 
     gameOverTimer.start();
 
-    // start the darkness
-    // this.showDarkness(700);
-
   }
 };
 

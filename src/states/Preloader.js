@@ -37,8 +37,9 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('sky02', 'assets/images/sky02.png');
   this.load.image('sky03', 'assets/images/sky03.png');
   this.load.image('piece', 'assets/images/piece.png');
+  this.load.image('platform', 'assets/images/platform.png');
+  this.load.image('spike-platform', 'assets/images/spike-platform.png');
   this.load.image('spike', 'assets/images/spike.png');
-  this.load.spritesheet('platform', 'assets/sprites/platform.png', 32, 32);
   this.load.spritesheet('player','assets/sprites/player.png', 32, 32);
   this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="40">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="42">
  <properties>
   <property name="day" value="2"/>
  </properties>
@@ -13,18 +13,18 @@
  <objectgroup name="platforms">
   <object id="2" x="544" y="576" width="32" height="32">
    <properties>
-    <property name="spikes" value="true"/>
+    <property name="spike-platform" value="1"/>
    </properties>
   </object>
   <object id="3" x="352" y="512" width="32" height="32">
    <properties>
-    <property name="spikes" value="true"/>
+    <property name="spike-platform" value="1"/>
    </properties>
   </object>
   <object id="4" x="96" y="576" width="32" height="32"/>
   <object id="16" x="736" y="512" width="32" height="32">
    <properties>
-    <property name="spikes" value="true"/>
+    <property name="spike-platform" value="1"/>
    </properties>
   </object>
   <object id="19" x="928" y="480" width="32" height="64"/>

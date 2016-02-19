@@ -83,32 +83,39 @@ BasicGame.Player.prototype.update = function () {
   }
 
   // check collisions
-  this.game.physics.arcade.collide(this.player, this.level.ground);
-  this.game.physics.arcade.collide(this.player, this.level.walls,
-    function(player, wall){
-      if(wall.spikes === 'true' && wall.spikesHidden == true){
-        var _me = this;
-        wall.spikesHidden = false;
-        
-        // create the tween to show the spikes
-        this.game.add.tween(wall.spikeRef)
-        .to({y: wall.spikeRef.y - 32},
-          100,
-          null,
-          true,
-          300);
+  if(this.level.hasFloor === true){
+    this.game.physics.arcade.collide(this.player, this.level.ground);
+  }
 
+  this.game.physics.arcade.overlap(this.player, this.level.pieces,
+    function(player, piece){
+      piece.destroy();
+      this.collectedPieces++;
+      if(!this.level.pieces.children || !this.level.pieces.children.length){
+        // the level has been finished
+        this.level.endLevel();
+        return;
       }
-    }, null, this);
-  this.game.physics.arcade.overlap(this.player, this.level.spikes,
-    function(player, spike){
-      this.gameObj.subtractAllLifes(true);
-    }, null, this);
+    },
+    null,
+    this);
 
-  if(this.player.body.onFloor() === true){
-    this.dead = true;
-    this.player.body.collideWorldBounds = false;
-    this.gameObj.subtractAllLifes();
+  if(this.level.hasSpikes === true){
+    this.game.physics.arcade.collide(this.player, this.level.walls,
+      function(player, spikePlatform){
+        if(spikePlatform.spikeRef && spikePlatform.spikeRef.isHidden === true){
+          spikePlatform.spikeRef.showTween.start();
+        }
+      }, null, this);
+  } else {
+    this.game.physics.arcade.collide(this.player, this.level.walls);
+  }
+
+  if(this.level.spikes.openedSpikes > 0){
+    this.game.physics.arcade.overlap(this.player, this.level.spikes,
+      function(player, spike){
+        this.gameObj.subtractAllLifes(true);
+      }, null, this);
   }
 
   if(this.dead === true){
@@ -120,19 +127,10 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  if(!this.gameObj.isLoadingLevel && this.level.pieces.children){
-    this.game.physics.arcade.overlap(this.player, this.level.pieces,
-      function(player, piece){
-        piece.destroy();
-        this.collectedPieces++;
-        if(!this.level.pieces.children || !this.level.pieces.children.length){
-          // the level has been finished
-          this.level.endLevel();
-          return;
-        }
-      },
-      null,
-      this);
+  if(this.player.body.onFloor() === true){
+    this.dead = true;
+    this.player.body.collideWorldBounds = false;
+    this.gameObj.subtractAllLifes();
   }
 
   var leftPressed = this.leftInputIsActive() == true;

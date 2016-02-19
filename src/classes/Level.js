@@ -22,6 +22,8 @@ BasicGame.Level = function (game, gameObj) {
   // font attributes
   this.fontSize = 32;
   this.fontId = 'font';
+  this.hasFloor = false;
+  this.hasSpikes = false;
 };
 
 BasicGame.Level.prototype.create = function () {
@@ -63,21 +65,33 @@ BasicGame.Level.prototype.destroyCurrentLevel = function(){
     this.ground.destroy();
   }
   this.walls.destroy();
+  if(this.spikes){
+    this.spikes.forEach(function(spikeSprite){
+      spikeSprite.showTween.stop();
+      spikeSprite.hideTween.stop();
+    });
+    this.spikes.destroy();
+  }
+  if(this.pieces){
+    this.pieces.destroy();
+  }
   this.countdownTextBitmap.setText("");
 };
 
 BasicGame.Level.prototype.createLevel = function(num){
-  var _me = this;
-
+  var _self = this;
   this.map = this.game.add.tilemap('lvl' + ((num < 10) ? '0' + num : num));
 
+  this.hasSpikes = false;
+
   // create the floor of the level
+  this.hasFloor = false;
   if(this.map.objects.floor){
+    this.hasFloor = true;
     this.ground = this.game.add.group();
 
-    // this.map.objects.floor.forEach(function(object, index){
-      _me.map.createFromObjects("floor", "", 'platform', 0, true, false, _me.ground, Phaser.Sprite, false);
-    // });
+    this.map.createFromObjects("floor", "", 'platform', 0, true, false,
+      this.ground, Phaser.Sprite, false);
 
     this.ground.enableBody = true;
     this.game.physics.arcade.enable(this.ground);
@@ -89,37 +103,77 @@ BasicGame.Level.prototype.createLevel = function(num){
 
   // create the walls of the level
   this.walls = this.game.add.group();
-  // console.log("1. ", this.map.objects.platforms.length);
-  // this.map.objects.platforms.forEach(function(object, index){
-    _me.map.createFromObjects("platforms", "", 'platform', 0, true, false, _me.walls, Phaser.Sprite, false);
-  // });
-
-  this.spikes = this.game.add.group();
+  this.map.createFromObjects("platforms", "", 'platform', 0, true, false,
+    this.walls, Phaser.Sprite, false);
 
   this.walls.enableBody = true;
   this.game.physics.arcade.enable(this.walls);
   this.walls.forEach(function(platformSprite){
-    if(platformSprite.spikes === 'true'){
-      platformSprite.frame = 1;
-      var spikes = _me.game.add.tileSprite(platformSprite.x, platformSprite.y,
-        platformSprite.width, 32, "spike", 0, _me.spikes);
-      _me.game.physics.arcade.enable(spikes);
-      spikes.body.immovable = true;
-      spikes.body.allowGravity = false;
-      platformSprite.spikeRef = spikes;
-      platformSprite.spikesHidden = true;
+    if(platformSprite["spike-platform"] === "1"){
+      _self.hasSpikes = true;
+      platformSprite.loadTexture("spike-platform");
     }
     platformSprite.body.immovable = true;
     platformSprite.body.allowGravity = false;
   });
 
+  if(this.hasSpikes === true){
+    // create the spikes of the level
+    this.spikes = this.game.add.group();
+    this.spikes.openedSpikes = 0;
+
+    this.walls.forEach(function(platformSprite){
+      if(platformSprite["spike-platform"] == "1"){
+        // add the spikes to the platform
+        var spikeSprite = _self.game.add.tileSprite(platformSprite.x,
+          platformSprite.y,
+          platformSprite.width, 32, "spike", 0, _self.spikes);
+        spikeSprite.isHidden = true;
+        spikeSprite.oriY = spikeSprite.y;
+
+        // create the tweens for showing and hiding the spikes
+        var showSpikeTween = _self.game.add.tween(spikeSprite)
+          .to({y: spikeSprite.oriY - 32},
+            100,
+            null,
+            false,
+            300);
+        showSpikeTween.onComplete.add(function(){
+          this.isHidden = false;
+          this.hideTween.start();
+          this.parent.openedSpikes++;
+        }, spikeSprite);
+
+        var hideSpikeTween = _self.game.add.tween(spikeSprite)
+          .to({y: spikeSprite.oriY},
+            300,
+            null,
+            false,
+            1000);
+        hideSpikeTween.onComplete.add(function(){
+          this.isHidden = true;
+          this.parent.openedSpikes--;
+        }, spikeSprite);
+
+        spikeSprite.showTween = showSpikeTween;
+        spikeSprite.hideTween = hideSpikeTween;
+
+        // set physics properties for the spikes
+        _self.game.physics.arcade.enable(spikeSprite);
+        spikeSprite.body.immovable = true;
+        spikeSprite.body.allowGravity = false;
+
+        // add a reference to the spikes in the platform to they belong which
+        platformSprite.spikeRef = spikeSprite;
+      }
+    });
+  }
+
   // create the pieces of the level
   this.pieces = this.game.add.group();
-  // this.map.objects.pieces.forEach(function(object, index){
-    _me.map.createFromObjects("pieces", "", 'piece', null, true, false, _me.pieces, Phaser.Sprite, false);
-  // });
+  this.map.createFromObjects("pieces", "", 'piece', null, true, false,
+    this.pieces, Phaser.Sprite, false);
 
-  // this.pieces.enableBody = true;
   this.game.physics.arcade.enable(this.pieces);
   this.pieces.forEach(function(pieceSprite){
     pieceSprite.anchor.set(.5, .5);
