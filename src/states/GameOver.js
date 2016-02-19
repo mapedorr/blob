@@ -73,6 +73,7 @@ BasicGame.GameOver.prototype.create = function(){
 BasicGame.GameOver.prototype.update = function(){
   if(this.input.keyboard.isDown(this.tryAgainKey)
       && this.sPressedFlag == false){
+    BasicGame.isRetrying = true;
     this.state.start('Game');
   }else if(!this.input.keyboard.isDown(this.tryAgainKey) && this.sPressedFlag == true){
     this.sPressedFlag = false;

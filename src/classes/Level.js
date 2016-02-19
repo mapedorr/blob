@@ -205,6 +205,7 @@ BasicGame.Level.prototype.endLevel = function(){
   // this.levelTextGroup.getChildAt(0).alpha = 0;
   // this.levelTextGroup.alpha = 1;
 
+  BasicGame.isRetrying = false;
   var secondsToEnd = this.gameObj.countdownDuration;
   // this.countdownTextBitmap.setText(secondsToEnd);
 

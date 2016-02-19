@@ -24,7 +24,8 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = 25;
+BasicGame.currentLevel = 1;
+BasicGame.isRetrying = false;
 
 BasicGame.Game.prototype.preload = function(){
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -70,8 +71,10 @@ BasicGame.Game.prototype.create = function(){
   // create the player
   this.player.create(this.level);
 
-  this.game.world.bringToTop(this.level.spikes);
-  this.game.world.bringToTop(this.level.walls);
+  if(this.level.spikes){
+   this.game.world.bringToTop(this.level.spikes);
+    this.game.world.bringToTop(this.level.walls);
+  }
 
   // create the group of sprites for lifes
   this.lifesGroup = this.game.add.group();
@@ -167,7 +170,13 @@ BasicGame.Game.prototype.update = function() {
 
   if(this.level.isReady == true){
     this.level.isReady = false;
-    this.level.showDay();
+    if(BasicGame.isRetrying === false){
+     this.level.showDay();
+    }
+    else {
+      this.level.levelTextGroup.alpha = 0;
+      this.hideDarkness();
+    }
     return;
   }
 

@@ -107,15 +107,15 @@ BasicGame.Player.prototype.update = function () {
           spikePlatform.spikeRef.showTween.start();
         }
       }, null, this);
+
+    if(this.level.spikes.openedSpikes > 0){
+      this.game.physics.arcade.overlap(this.player, this.level.spikes,
+        function(player, spike){
+          this.gameObj.subtractAllLifes(true);
+        }, null, this);
+    }
   } else {
     this.game.physics.arcade.collide(this.player, this.level.walls);
-  }
-
-  if(this.level.spikes.openedSpikes > 0){
-    this.game.physics.arcade.overlap(this.player, this.level.spikes,
-      function(player, spike){
-        this.gameObj.subtractAllLifes(true);
-      }, null, this);
   }
 
   if(this.dead === true){
