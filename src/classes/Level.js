@@ -191,7 +191,7 @@ BasicGame.Level.prototype.createLevel = function(num){
 
   // show the days of the level
   // var texte = this.gameObj.days[BasicGame.currentLevel - 1] || '???';
-  var texte = this.gameObj.days[this.gameObj.days.length - BasicGame.currentLevel - 2] || '???';
+  var texte = this.gameObj.days[this.gameObj.days.length - BasicGame.currentLevel] || '???';
   this.countdownTextBitmap.setText(this.dayText[BasicGame.language] + ' ' + texte);
 
   // set the level as not ended

@@ -24,7 +24,7 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = 1;
+BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 1;
 BasicGame.isRetrying = false;
 
 BasicGame.Game.prototype.preload = function(){
@@ -234,6 +234,8 @@ BasicGame.Game.prototype.loadLevel = function(levelNumber){
 
   this.game.world.bringToTop(this.light.lightBitmap);
   this.game.world.bringToTop(this.level.pieces);
+
+  localStorage.setItem("oh-my-blob", levelNumber);
 };
 
 BasicGame.Game.prototype.shakeCamera = function(){
