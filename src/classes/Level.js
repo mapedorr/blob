@@ -109,31 +109,36 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.walls.enableBody = true;
   this.game.physics.arcade.enable(this.walls);
   this.walls.forEach(function(platformSprite){
-    if(platformSprite["spike-platform"] === "1"){
-      _self.hasSpikes = true;
-      platformSprite.loadTexture("spike-platform");
-    }
+    // if(platformSprite["spike-platform"] === "1"){
+    //   _self.hasSpikes = true;
+    //   platformSprite.loadTexture("spike-platform");
+    // }
     platformSprite.body.immovable = true;
     platformSprite.body.allowGravity = false;
   });
 
-  if(this.hasSpikes === true){
+  if(this.map.objects.floor){
+    this.hasSpikes = true;
+
     // create the spikes of the level
     this.spikes = this.game.add.group();
     this.spikes.openedSpikes = 0;
 
+    this.map.createFromObjects("spikes", "", 'spike-platform', 0, true, false,
+      this.walls, Phaser.Sprite, false);
     this.walls.forEach(function(platformSprite){
       if(platformSprite["spike-platform"] == "1"){
         // add the spikes to the platform
         var spikeSprite = _self.game.add.tileSprite(platformSprite.x,
-          platformSprite.y,
-          platformSprite.width, 32, "spike", 0, _self.spikes);
+          platformSprite.y + 5,
+          platformSprite.width, 16, "spike", 0, _self.spikes);
         spikeSprite.isHidden = true;
         spikeSprite.oriY = spikeSprite.y;
+        spikeSprite.desY = platformSprite.y -16;
 
         // create the tweens for showing and hiding the spikes
         var showSpikeTween = _self.game.add.tween(spikeSprite)
-          .to({y: spikeSprite.oriY - 32},
+          .to({y: spikeSprite.desY},
             100,
             null,
             false,
@@ -147,7 +152,7 @@ BasicGame.Level.prototype.createLevel = function(num){
         var hideSpikeTween = _self.game.add.tween(spikeSprite)
           .to({y: spikeSprite.oriY},
             300,
-            null,
+            Phaser.Easing.Exponential.Out,
             false,
             1000);
         hideSpikeTween.onComplete.add(function(){
@@ -165,6 +170,8 @@ BasicGame.Level.prototype.createLevel = function(num){
 
         // add a reference to the spikes in the platform to they belong which
         platformSprite.spikeRef = spikeSprite;
+        platformSprite.body.immovable = true;
+        platformSprite.body.allowGravity = false;
       }
     });
   }

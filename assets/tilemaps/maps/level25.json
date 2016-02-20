@@ -151,71 +151,84 @@
                  "width":32,
                  "x":544,
                  "y":160
-                }, 
-                {
-                 "height":32,
-                 "id":62,
-                 "name":"",
-                 "properties":
-                    {
-                     "spike-platform":"1"
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":96,
-                 "x":352,
-                 "y":448
-                }, 
-                {
-                 "height":32,
-                 "id":63,
-                 "name":"",
-                 "properties":
-                    {
-                     "spike-platform":"1"
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":96,
-                 "x":128,
-                 "y":448
-                }, 
-                {
-                 "height":32,
-                 "id":64,
-                 "name":"",
-                 "properties":
-                    {
-                     "spike-platform":"1"
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":96,
-                 "x":800,
-                 "y":448
-                }, 
-                {
-                 "height":32,
-                 "id":65,
-                 "name":"",
-                 "properties":
-                    {
-                     "spike-platform":"1"
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":96,
-                 "x":576,
-                 "y":448
                 }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
          "width":0,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "color":"#ffa0a4",
+         "draworder":"topdown",
+         "height":20,
+         "name":"spikes",
+         "objects":[
+                {
+                 "height":32,
+                 "id":67,
+                 "name":"",
+                 "properties":
+                    {
+                     "spike-platform":"1"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":96,
+                 "x":584,
+                 "y":448
+                }, 
+                {
+                 "height":32,
+                 "id":68,
+                 "name":"",
+                 "properties":
+                    {
+                     "spike-platform":"1"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":96,
+                 "x":360,
+                 "y":448
+                }, 
+                {
+                 "height":32,
+                 "id":69,
+                 "name":"",
+                 "properties":
+                    {
+                     "spike-platform":"1"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":96,
+                 "x":136,
+                 "y":448
+                }, 
+                {
+                 "height":32,
+                 "id":70,
+                 "name":"",
+                 "properties":
+                    {
+                     "spike-platform":"1"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":96,
+                 "x":808,
+                 "y":448
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":32,
          "x":0,
          "y":0
         }, 
@@ -348,7 +361,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":67,
+ "nextobjectid":71,
  "orientation":"orthogonal",
  "properties":
     {
