@@ -111,7 +111,9 @@ BasicGame.Player.prototype.update = function () {
     if(this.level.spikes.openedSpikes > 0){
       this.game.physics.arcade.overlap(this.player, this.level.spikes,
         function(player, spike){
-          this.gameObj.subtractAllLifes(true);
+          if(this.dead === false){
+            this.gameObj.subtractAllLifes(true);
+          }
         }, null, this);
     }
   } else {

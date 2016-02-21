@@ -82,8 +82,6 @@ BasicGame.Level.prototype.createLevel = function(num){
   var _self = this;
   this.map = this.game.add.tilemap('lvl' + ((num < 10) ? '0' + num : num));
 
-  this.hasSpikes = false;
-
   // create the floor of the level
   this.hasFloor = false;
   if(this.map.objects.floor){
@@ -109,18 +107,15 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.walls.enableBody = true;
   this.game.physics.arcade.enable(this.walls);
   this.walls.forEach(function(platformSprite){
-    // if(platformSprite["spike-platform"] === "1"){
-    //   _self.hasSpikes = true;
-    //   platformSprite.loadTexture("spike-platform");
-    // }
     platformSprite.body.immovable = true;
     platformSprite.body.allowGravity = false;
   });
 
+  // create the spikes (and platform) of the level
+  this.hasSpikes = false;
   if(this.map.objects.floor){
     this.hasSpikes = true;
 
-    // create the spikes of the level
     this.spikes = this.game.add.group();
     this.spikes.openedSpikes = 0;
 
@@ -128,48 +123,16 @@ BasicGame.Level.prototype.createLevel = function(num){
       this.walls, Phaser.Sprite, false);
     this.walls.forEach(function(platformSprite){
       if(platformSprite["spike-platform"] == "1"){
-        // add the spikes to the platform
-        var spikeSprite = _self.game.add.tileSprite(platformSprite.x,
-          platformSprite.y + 5,
-          platformSprite.width, 16, "spike", 0, _self.spikes);
-        spikeSprite.isHidden = true;
-        spikeSprite.oriY = spikeSprite.y;
-        spikeSprite.desY = platformSprite.y -16;
-
-        // create the tweens for showing and hiding the spikes
-        var showSpikeTween = _self.game.add.tween(spikeSprite)
-          .to({y: spikeSprite.desY},
-            100,
-            null,
-            false,
-            300);
-        showSpikeTween.onComplete.add(function(){
-          this.isHidden = false;
-          this.hideTween.start();
-          this.parent.openedSpikes++;
-        }, spikeSprite);
-
-        var hideSpikeTween = _self.game.add.tween(spikeSprite)
-          .to({y: spikeSprite.oriY},
-            300,
-            Phaser.Easing.Exponential.Out,
-            false,
-            1000);
-        hideSpikeTween.onComplete.add(function(){
-          this.isHidden = true;
-          this.parent.openedSpikes--;
-        }, spikeSprite);
-
-        spikeSprite.showTween = showSpikeTween;
-        spikeSprite.hideTween = hideSpikeTween;
-
-        // set physics properties for the spikes
-        _self.game.physics.arcade.enable(spikeSprite);
-        spikeSprite.body.immovable = true;
-        spikeSprite.body.allowGravity = false;
+        var createdSpike = null;
+        if (platformSprite["spike-side"]) {
+          createdSpike = _self.addSideSpike(platformSprite, platformSprite["spike-side"]);
+        }
+        else {
+          createdSpike = _self.addTopSpike(platformSprite);
+        }
 
         // add a reference to the spikes in the platform to they belong which
-        platformSprite.spikeRef = spikeSprite;
+        platformSprite.spikeRef = createdSpike;
         platformSprite.body.immovable = true;
         platformSprite.body.allowGravity = false;
       }
@@ -267,4 +230,107 @@ BasicGame.Level.prototype.showDay = function(){
     this);
 
   dayTimer.start();
+};
+
+BasicGame.Level.prototype.addTopSpike = function(platformSprite){
+  // add the spikes to the platform
+  var spikeSprite = this.game.add.tileSprite(platformSprite.x,
+    platformSprite.y + 5,
+    platformSprite.width, 16, "spike", 0, this.spikes);
+  spikeSprite.isHidden = true;
+  spikeSprite.oriY = spikeSprite.y;
+  spikeSprite.desY = platformSprite.y -16;
+
+  // create the tweens for showing and hiding the spikes
+  var showSpikeTween = this.game.add.tween(spikeSprite)
+    .to({y: spikeSprite.desY},
+      100,
+      null,
+      false,
+      300);
+  showSpikeTween.onComplete.add(function(){
+    this.isHidden = false;
+    this.hideTween.start();
+    this.parent.openedSpikes++;
+  }, spikeSprite);
+
+  var hideSpikeTween = this.game.add.tween(spikeSprite)
+    .to({y: spikeSprite.oriY},
+      300,
+      Phaser.Easing.Exponential.Out,
+      false,
+      1000);
+  hideSpikeTween.onComplete.add(function(){
+    this.isHidden = true;
+    this.parent.openedSpikes--;
+  }, spikeSprite);
+
+  spikeSprite.showTween = showSpikeTween;
+  spikeSprite.hideTween = hideSpikeTween;
+
+  // set physics properties for the spikes
+  this.game.physics.arcade.enable(spikeSprite);
+  spikeSprite.body.immovable = true;
+  spikeSprite.body.allowGravity = false;
+
+  return spikeSprite;
+};
+
+BasicGame.Level.prototype.addSideSpike = function(platformSprite, side){
+  // add the spikes to the platform
+  var spikeSprite = null;
+  if (side === 'r') {
+    spikeSprite = this.game.add.tileSprite(platformSprite.right - 21,
+      platformSprite.y,
+      16, platformSprite.height,
+      "spike-r", 0, this.spikes);
+    spikeSprite.isHidden = true;
+    spikeSprite.oriX = spikeSprite.x;
+    spikeSprite.desX = platformSprite.right;
+  }
+  else if(side === 'l') {
+    spikeSprite = this.game.add.tileSprite(platformSprite.x + 5,
+      platformSprite.top,
+      16, platformSprite.height,
+      "spike-l", 0, this.spikes);
+    spikeSprite.isHidden = true;
+    spikeSprite.oriX = spikeSprite.x;
+    spikeSprite.desX = platformSprite.x - 16;
+  } else {
+    return null;
+  }
+
+  // create the tweens for showing and hiding the spikes
+  var showSpikeTween = this.game.add.tween(spikeSprite)
+    .to({x: spikeSprite.desX},
+      100,
+      null,
+      false,
+      500);
+  showSpikeTween.onComplete.add(function(){
+    this.isHidden = false;
+    this.hideTween.start();
+    this.parent.openedSpikes++;
+  }, spikeSprite);
+
+  var hideSpikeTween = this.game.add.tween(spikeSprite)
+    .to({x: spikeSprite.oriX},
+      300,
+      Phaser.Easing.Exponential.Out,
+      false,
+      1000);
+  hideSpikeTween.onComplete.add(function(){
+    this.isHidden = true;
+    this.parent.openedSpikes--;
+  }, spikeSprite);
+
+  spikeSprite.showTween = showSpikeTween;
+  spikeSprite.hideTween = hideSpikeTween;
+
+  // set physics properties for the spikes
+  this.game.physics.arcade.enable(spikeSprite);
+  spikeSprite.body.immovable = true;
+  spikeSprite.body.allowGravity = false;
+
+  return spikeSprite;
 };

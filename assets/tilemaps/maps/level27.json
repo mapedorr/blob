@@ -192,7 +192,7 @@
         {
          "color":"#ffa0a4",
          "draworder":"topdown",
-         "height":20,
+         "height":0,
          "name":"spikes",
          "objects":[
                 {
@@ -291,7 +291,8 @@
                  "name":"",
                  "properties":
                     {
-                     "spike-platform":"1"
+                     "spike-platform":"1",
+                     "spike-side":"l"
                     },
                  "rotation":0,
                  "type":"",
@@ -306,7 +307,8 @@
                  "name":"",
                  "properties":
                     {
-                     "spike-platform":"1"
+                     "spike-platform":"1",
+                     "spike-side":"r"
                     },
                  "rotation":0,
                  "type":"",
@@ -351,7 +353,8 @@
                  "name":"",
                  "properties":
                     {
-                     "spike-platform":"1"
+                     "spike-platform":"1",
+                     "spike-side":"r"
                     },
                  "rotation":0,
                  "type":"",
@@ -366,7 +369,8 @@
                  "name":"",
                  "properties":
                     {
-                     "spike-platform":"1"
+                     "spike-platform":"1",
+                     "spike-side":"r"
                     },
                  "rotation":0,
                  "type":"",
@@ -381,7 +385,8 @@
                  "name":"",
                  "properties":
                     {
-                     "spike-platform":"1"
+                     "spike-platform":"1",
+                     "spike-side":"r"
                     },
                  "rotation":0,
                  "type":"",
@@ -396,7 +401,8 @@
                  "name":"",
                  "properties":
                     {
-                     "spike-platform":"1"
+                     "spike-platform":"1",
+                     "spike-side":"r"
                     },
                  "rotation":0,
                  "type":"",
@@ -453,7 +459,7 @@
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
-         "width":32,
+         "width":0,
          "x":0,
          "y":0
         }, 
