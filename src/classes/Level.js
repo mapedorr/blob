@@ -11,7 +11,8 @@ BasicGame.Level = function (game, gameObj) {
   this.isEnded = null;
   this.initPlayerPos = {x: 0, y: 0};
   this.daysShown = false;
-  this.countdownTextBitmap = null;
+  this.dayNumberTextBitmap = null;
+  this.dayPhraseTextBitmap = null;
   this.isReady = false;
   this.isShowingDays = false;
   this.dayText = {
@@ -45,16 +46,27 @@ BasicGame.Level.prototype.create = function () {
 
   this.levelTextGroup.addChild(dayTextSprite);
 
-  // create the bitmap for the countdown text
-  this.countdownTextBitmap = this.game.add.bitmapText(this.game.world.width/2,
+  // create the bitmap for the day number
+  this.dayNumberTextBitmap = this.game.add.bitmapText(this.game.world.width/2,
     this.game.world.height/2,
     this.fontId,
     '',
     this.fontSize,
     this.levelTextGroup);
-  this.countdownTextBitmap.anchor.set(.5, .5);
-  this.countdownTextBitmap.align = "center";
-  this.countdownTextBitmap.tint = 0x212121;
+  this.dayNumberTextBitmap.anchor.set(.5, .5);
+  this.dayNumberTextBitmap.align = "center";
+  this.dayNumberTextBitmap.tint = 0x212121;
+
+  // create the bitmap for the day phrase
+  this.dayPhraseTextBitmap = this.game.add.bitmapText(this.game.world.width/2,
+    this.game.world.height/2 + 40,
+    this.fontId,
+    '',
+    this.fontSize / 2,
+    this.levelTextGroup);
+  this.dayPhraseTextBitmap.anchor.set(.5, .5);
+  this.dayPhraseTextBitmap.align = "center";
+  this.dayPhraseTextBitmap.tint = 0x515151;
 
   this.createLevel(BasicGame.currentLevel);
 };
@@ -65,7 +77,7 @@ BasicGame.Level.prototype.destroyCurrentLevel = function(){
     this.ground.destroy();
   }
   this.walls.destroy();
-  if(this.spikes){
+  if(this.hasSpikes){
     this.spikes.forEach(function(spikeSprite){
       spikeSprite.showTween.stop();
       spikeSprite.hideTween.stop();
@@ -75,7 +87,8 @@ BasicGame.Level.prototype.destroyCurrentLevel = function(){
   if(this.pieces){
     this.pieces.destroy();
   }
-  this.countdownTextBitmap.setText("");
+  this.dayNumberTextBitmap.setText("");
+  this.dayPhraseTextBitmap.setText("");
 };
 
 BasicGame.Level.prototype.createLevel = function(num){
@@ -113,7 +126,7 @@ BasicGame.Level.prototype.createLevel = function(num){
 
   // create the spikes (and platform) of the level
   this.hasSpikes = false;
-  if(this.map.objects.floor){
+  if(this.map.objects.spikes){
     this.hasSpikes = true;
 
     this.spikes = this.game.add.group();
@@ -160,9 +173,11 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.game.world.bringToTop(this.levelTextGroup);
 
   // show the days of the level
-  // var texte = this.gameObj.days[BasicGame.currentLevel - 1] || '???';
-  var texte = this.gameObj.days[this.gameObj.days.length - BasicGame.currentLevel] || '???';
-  this.countdownTextBitmap.setText(this.dayText[BasicGame.language] + ' ' + texte);
+  var dayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
+  this.dayNumberTextBitmap.setText(this.dayText[BasicGame.language] + ' ' + dayObj.number);
+  if(dayObj.text){
+    this.dayPhraseTextBitmap.setText(dayObj.text[BasicGame.language]);
+  }
 
   // set the level as not ended
   this.isEnded = false;
@@ -172,12 +187,8 @@ BasicGame.Level.prototype.createLevel = function(num){
 };
 
 BasicGame.Level.prototype.endLevel = function(){
-  // this.levelTextGroup.getChildAt(0).alpha = 0;
-  // this.levelTextGroup.alpha = 1;
-
   BasicGame.isRetrying = false;
   var secondsToEnd = this.gameObj.countdownDuration;
-  // this.countdownTextBitmap.setText(secondsToEnd);
 
   // create the timer
   this.endTimer = this.game.time.create(true);
@@ -189,17 +200,6 @@ BasicGame.Level.prototype.endLevel = function(){
       this.isEnded = true;
     },
     this);
-
-  // this.endTimer.repeat(1000,
-  //   this.gameObj.countdownDuration,
-  //   function(){
-  //     // show the countdown on the screen
-  //     if(--secondsToEnd == 3){
-  //       this.gameObj.showDarkness();
-  //     }
-  //     this.countdownTextBitmap.setText(secondsToEnd);
-  //   },
-  //   this);
 
   this.endTimer.start();
   this.gameObj.showDarkness();

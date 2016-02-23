@@ -5,6 +5,7 @@
 var BasicGame = BasicGame || {};
 
 BasicGame.Game = function (game) {
+  this.days = null;
   this.player = null;
   this.level = null;
   this.light = null;
@@ -20,14 +21,16 @@ BasicGame.Game = function (game) {
   this.isLoadingLevel = null;
   this.lifes = null;
   this.lifesGroup = null;
-  this.days = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 300, 365, 480];
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 27;
+BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 10;
 BasicGame.isRetrying = false;
 
 BasicGame.Game.prototype.preload = function(){
+  // create the days object
+  this.days = new BasicGame.Days();
+
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
   // define the size of the world

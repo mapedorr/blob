@@ -207,22 +207,6 @@ BasicGame.Eye.prototype.isPlayerInsideViewZone = function(){
       this.viewZoneSprite);
   }
   return false;
-
-  if(this.eye.animations.currentFrame.index == 0){
-    // "I can see everything!"
-    return true;
-  }else if(this.eye.animations.currentFrame.index <= 3){
-    // the player have to be on the left side of the screen
-    if(this.PlayerObj.player.x <= this.game.world.width / 2){
-      return true;
-    }
-  }else if(this.eye.animations.currentFrame.index >= 4){
-    // the player have to be on the right side of the screen
-    if(this.PlayerObj.player.x >= this.game.world.width / 2){
-      return true;
-    }
-  }
-  return false;
 };
 
 BasicGame.Eye.prototype.calmDown = function(){
