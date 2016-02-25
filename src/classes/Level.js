@@ -58,13 +58,14 @@ BasicGame.Level.prototype.create = function () {
   this.dayNumberTextBitmap.tint = 0x212121;
 
   // create the bitmap for the day phrase
-  this.dayPhraseTextBitmap = this.game.add.bitmapText(this.game.world.width/2,
+  this.dayPhraseTextBitmap = this.game.add.bitmapText(0,
     this.game.world.height/2 + 40,
     this.fontId,
     '',
     this.fontSize / 2,
     this.levelTextGroup);
-  this.dayPhraseTextBitmap.anchor.set(.5, .5);
+  this.dayPhraseTextBitmap.maxWidth = this.game.world.width;
+  this.dayPhraseTextBitmap.width = this.game.world.width;
   this.dayPhraseTextBitmap.align = "center";
   this.dayPhraseTextBitmap.tint = 0x515151;
 
@@ -177,6 +178,7 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.dayNumberTextBitmap.setText(this.dayText[BasicGame.language] + ' ' + dayObj.number);
   if(dayObj.text){
     this.dayPhraseTextBitmap.setText(dayObj.text[BasicGame.language]);
+    this.dayPhraseTextBitmap.x = this.game.world.width/2 - this.dayPhraseTextBitmap.width/2;
   }
 
   // set the level as not ended
