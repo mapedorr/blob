@@ -24,7 +24,7 @@ BasicGame.Lightning.prototype.create = function(eye, player, level){
     this.lightningBitmap);
   this.lightning.anchor.setTo(0.5, 0);
 
-  this.fakeThing = this.game.add.sprite(0, 0, "player");
+  this.fakeThing = this.game.add.sprite(-10, -10, "player");
   this.fakeThing.anchor.setTo(0.5, 0.5);
   this.fakeThing.width = this.fakeThing.height = 16;
   this.fakeThing.alpha = 0;
@@ -42,7 +42,7 @@ BasicGame.Lightning.prototype.update = function () {
     this.game.physics.arcade.overlap(this.player.player, this.fakeThing,
       function(){
         this.gameObj.subtractLife();
-        this.fakeThing.x = this.fakeThing.y = 0;
+        this.fakeThing.x = this.fakeThing.y = -10;
       },
       null,
       this);

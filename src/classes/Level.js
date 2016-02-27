@@ -139,10 +139,10 @@ BasicGame.Level.prototype.createLevel = function(num){
       if(platformSprite["spike-platform"] == "1"){
         var createdSpike = null;
         if (platformSprite["spike-side"]) {
-          createdSpike = _self.addSideSpike(platformSprite, platformSprite["spike-side"]);
+          createdSpike = _self.addHeightSpike(platformSprite, platformSprite["spike-side"]);
         }
         else {
-          createdSpike = _self.addTopSpike(platformSprite);
+          createdSpike = _self.addWidthSpike(platformSprite, platformSprite["spike-down"]);
         }
 
         // add a reference to the spikes in the platform to they belong which
@@ -236,41 +236,56 @@ BasicGame.Level.prototype.showDay = function(){
   dayTimer.start();
 };
 
-BasicGame.Level.prototype.addTopSpike = function(platformSprite){
+BasicGame.Level.prototype.addWidthSpike = function(platformSprite, inBottom){
   // add the spikes to the platform
-  var spikeSprite = this.game.add.tileSprite(platformSprite.x,
-    platformSprite.y + 5,
-    platformSprite.width, 16, "spike", 0, this.spikes);
-  spikeSprite.isHidden = true;
-  spikeSprite.oriY = spikeSprite.y;
-  spikeSprite.desY = platformSprite.y -16;
+  var spikeSprite = null;
 
-  // create the tweens for showing and hiding the spikes
-  var showSpikeTween = this.game.add.tween(spikeSprite)
-    .to({y: spikeSprite.desY},
-      100,
-      null,
-      false,
-      300);
-  showSpikeTween.onComplete.add(function(){
-    this.isHidden = false;
-    this.hideTween.start();
-    this.parent.openedSpikes++;
-  }, spikeSprite);
+  if(!inBottom){
+    spikeSprite = this.game.add.tileSprite(platformSprite.x,
+      platformSprite.y + 5,
+      platformSprite.width, 16, "spike", 0, this.spikes);
+    spikeSprite.isHidden = true;
+    spikeSprite.oriY = spikeSprite.y;
+    spikeSprite.desY = platformSprite.y -16;
+    this.spikes.openedSpikes++;
+  }
+  else {
+    spikeSprite = this.game.add.tileSprite(platformSprite.x,
+      platformSprite.bottom,
+      platformSprite.width, 16, "spike-d", 0, this.spikes);
+    spikeSprite.isHidden = false;
+    // spikeSprite.oriY = spikeSprite.y;
+    // spikeSprite.desY = platformSprite.y -16;
+  }
 
-  var hideSpikeTween = this.game.add.tween(spikeSprite)
-    .to({y: spikeSprite.oriY},
-      300,
-      Phaser.Easing.Exponential.Out,
-      false,
-      1000);
-  hideSpikeTween.onComplete.add(function(){
-    this.isHidden = true;
-    this.parent.openedSpikes--;
-  }, spikeSprite);
+  if(!inBottom){
+    // create the tweens for showing and hiding the spikes
+    var showSpikeTween = this.game.add.tween(spikeSprite)
+      .to({y: spikeSprite.desY},
+        100,
+        null,
+        false,
+        300);
+    showSpikeTween.onComplete.add(function(){
+      this.isHidden = false;
+      this.hideTween.start();
+      this.parent.openedSpikes++;
+    }, spikeSprite);
 
-  spikeSprite.showTween = showSpikeTween;
-  spikeSprite.hideTween = hideSpikeTween;
+    var hideSpikeTween = this.game.add.tween(spikeSprite)
+      .to({y: spikeSprite.oriY},
+        300,
+        Phaser.Easing.Exponential.Out,
+        false,
+        1000);
+    hideSpikeTween.onComplete.add(function(){
+      this.isHidden = true;
+      this.parent.openedSpikes--;
+    }, spikeSprite);
+
+    spikeSprite.showTween = showSpikeTween;
+    spikeSprite.hideTween = hideSpikeTween;
+  }
 
   // set physics properties for the spikes
   this.game.physics.arcade.enable(spikeSprite);
@@ -280,7 +295,7 @@ BasicGame.Level.prototype.addTopSpike = function(platformSprite){
   return spikeSprite;
 };
 
-BasicGame.Level.prototype.addSideSpike = function(platformSprite, side){
+BasicGame.Level.prototype.addHeightSpike = function(platformSprite, side){
   // add the spikes to the platform
   var spikeSprite = null;
   if (side === 'r') {

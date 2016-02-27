@@ -24,7 +24,7 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 29;
+BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 4;
 BasicGame.isRetrying = false;
 
 BasicGame.Game.prototype.preload = function(){
@@ -62,7 +62,8 @@ BasicGame.Game.prototype.create = function(){
   this.isLoadingLevel = true;
 
   // set stage background
-  this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, this.getSkyName());
+  this.background = this.game.add.tileSprite(0, 0,
+    this.game.world.width, this.game.world.height, this.getSkyName());
 
   // configure the camera for shaking
   this.game.camera.setSize(this.game.world.width/2, this.game.world.height/2);
@@ -115,10 +116,10 @@ BasicGame.Game.prototype.create = function(){
 
   // create the darkness and brightness tweens
   this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-  // this.darknessTween.to({alpha: 1},
-  //   3000,
-  //   Phaser.Easing.Quadratic.Out,
-  //   false);
+  this.darknessTween.to({alpha: 1},
+    this.countdownDuration * 1000,
+    Phaser.Easing.Quadratic.Out,
+    false);
   this.darknessTween.onComplete.add(function(){
     this.inDarkness = true;
     if(this.lifes <= 0){
@@ -133,8 +134,9 @@ BasicGame.Game.prototype.create = function(){
     null,
     false);
   this.brightnessTween.onComplete.add(function(){
-    this.isLoadingLevel = false;
     this.eye.eyeStateTimer = this.eye.searchingTime;
+    this.player.player.body.enable = true;
+    this.isLoadingLevel = false;
   }, this);
 
   // create the tween for shaking the camera
@@ -211,11 +213,12 @@ BasicGame.Game.prototype.quitGame = function(){
 
 BasicGame.Game.prototype.showDarkness = function(durationInMS){
   this.game.world.bringToTop(this.darknessGroup);
-  this.darknessTween.to({alpha: 1},
-    durationInMS || this.countdownDuration * 1000,
-    Phaser.Easing.Quadratic.Out,
-    true);
-  // this.darknessTween.start();
+  // this.darknessTween.to({alpha: 1},
+  //   durationInMS || this.countdownDuration * 1000,
+  //   Phaser.Easing.Quadratic.Out,
+  //   true);
+  this.darknessTween.updateTweenData("duration", durationInMS || this.countdownDuration * 1000);
+  this.darknessTween.start();
 };
 
 BasicGame.Game.prototype.hideDarkness = function(){

@@ -12,7 +12,7 @@ BasicGame.Player = function (game, input, gameObj) {
   // define movement constants
   this.MAX_SPEED = 300; // pixels/second
   this.ACCELERATION = 1500; // pixels/second/second
-  this.DRAG = 1500; // pixels/second
+  this.DRAG = 2500; // pixels/second
   this.GRAVITY = 2600; // pixels/second/second
   this.JUMP_SPEED = -850; // pixels/second (negative y is up)
   this.SLID_SPEED = 1;
@@ -112,7 +112,10 @@ BasicGame.Player.prototype.update = function () {
       this.game.physics.arcade.overlap(this.player, this.level.spikes,
         function(player, spike){
           if(this.dead === false){
+            this.player.body.allowGravity = false;
+            this.player.body.velocity.y = 0;
             this.gameObj.subtractAllLifes(true);
+            console.log("whaka");
           }
         }, null, this);
     }
@@ -125,14 +128,14 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  if(this.gameObj.isLoadingLevel === true){
-    return;
-  }
-
   if(this.player.body.onFloor() === true){
     this.dead = true;
     this.player.body.collideWorldBounds = false;
     this.gameObj.subtractAllLifes();
+  }
+
+  if(this.gameObj.isLoadingLevel === true){
+    return;
   }
 
   var leftPressed = this.leftInputIsActive() == true;
@@ -281,6 +284,7 @@ BasicGame.Player.prototype.drawLinesToLight = function(lightImage){
 };
 
 BasicGame.Player.prototype.updateLevel = function (level) {
+  this.player.body.enable = false;
   this.level = level;
   this.player.position.set(this.level.initPlayerPos.x,
     this.level.initPlayerPos.y);

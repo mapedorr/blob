@@ -42,6 +42,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('spike', 'assets/images/spike.png');
   this.load.image('spike-r', 'assets/images/spike-r.png');
   this.load.image('spike-l', 'assets/images/spike-l.png');
+  this.load.image('spike-d', 'assets/images/spike-d.png');
   this.load.spritesheet('player','assets/sprites/player.png', 32, 32);
   this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);
 
