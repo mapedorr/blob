@@ -158,11 +158,13 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.map.createFromObjects("pieces", "", 'piece', null, true, false,
     this.pieces, Phaser.Sprite, false);
 
-  this.game.physics.arcade.enable(this.pieces);
   this.pieces.forEach(function(pieceSprite){
     pieceSprite.anchor.set(.5, .5);
-    pieceSprite.body.immovable = false;
+    _self.game.physics.arcade.enableBody(pieceSprite);
     pieceSprite.body.allowGravity = false;
+    pieceSprite.body.immovable = false;
+    pieceSprite.body.moves = false;
+    pieceSprite.mass = 0;
   });
 
   // get the player initial position
