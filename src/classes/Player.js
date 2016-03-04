@@ -115,7 +115,6 @@ BasicGame.Player.prototype.update = function () {
             this.player.body.allowGravity = false;
             this.player.body.velocity.y = 0;
             this.gameObj.subtractAllLifes(true);
-            console.log("whaka");
           }
         }, null, this);
     }
