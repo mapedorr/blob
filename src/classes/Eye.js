@@ -12,6 +12,9 @@ BasicGame.Eye = function (game, gameObj) {
   this.bitmap = null;
   this.anger = null;
 
+  this.shooting = null;
+  this.searching = null;
+
   // 20 seconds searching the player before going crazy
   this.searchingTime = 19000;
   this.originalSearchSpeed = 2;
@@ -27,6 +30,8 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.PlayerObj = playerObj;
   this.level = level;
   this.lightning = lightning;
+  this.shooting = false;
+  this.searching = false;
 
   // add the sprite of the eye
   this.eye = this.game.add.sprite(this.game.world.width / 2, 64, 'eye', 0);
@@ -89,7 +94,7 @@ BasicGame.Eye.prototype.update = function () {
     this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
   }
 
-  this.viewZoneSprite.visible = false;
+  this.viewZoneSprite.visible = this.searching;
 
   if(this.gameObj.isLoadingLevel == true){
     // the EYE will start the level as irritated (sleeping)
@@ -108,12 +113,8 @@ BasicGame.Eye.prototype.update = function () {
   // is in the way.
   var attack = false;
 
-  if(this.eye.animations.currentAnim.name === 'search'){
-    this.viewZoneSprite.visible = true;
-  }
-
   // check if the player is in the side of vision of the EYE
-  if(this.isPlayerInsideViewZone() === true){
+  if(this.searching === true && this.isPlayerInsideViewZone() === true){
     // define the lines that connects the target to the eye
     // this isn't drawn on screen.
     var rays = [];
@@ -123,81 +124,32 @@ BasicGame.Eye.prototype.update = function () {
     rays[2] = new Phaser.Line(this.PlayerObj.player.x, this.PlayerObj.player.y + this.PlayerObj.player.height - 0.1, this.eye.x, this.eye.y);
 
     // check if any walls intersect the ray
-    var wallIntersect = this.getWallIntersection(rays);
+    // var wallIntersect = this.getWallIntersection(rays);
 
     // check if the player is in the shadows
     var playerInShadow = this.PlayerObj.isInShadow();
 
-    if(!wallIntersect && !playerInShadow){
+    // if(!wallIntersect && !playerInShadow){
+    if(!playerInShadow){
       attack = true;
     }
   }
 
-  if (attack == false){
+  if (this.searching === true && attack === false){
     // i can't see the player, lets calm down
-    this.calmDown();
+    // this.calmDown();
 
     //- - - | DEVELOPMENT MODE | - - -
     if(BasicGame.Game.developmentMode === true){
       this.PlayerObj.player.tint = 0xffffff;
     }
-  } else {
+  } else if (attack === true) {
     //I see the player...I've to KILL IT
     this.shootPlayer(this.PlayerObj.player);
-
-    //- - - | DEVELOPMENT MODE | - - -
-    if(BasicGame.Game.developmentMode === true) {
-      this.PlayerObj.player.tint = 0x00ff00;
-    }
   }
 
   // This just tells the engine it should update the texture cache
   this.bitmap.dirty = true;
-};
-
-// Given a ray, this function iterates through all of the walls and
-// returns the closest wall intersection from the start of the ray
-// or null if the ray does not intersect any walls.
-BasicGame.Eye.prototype.getWallIntersection = function (rays) {
-  //Check intersections for each ray
-  //If at least one ray has no intersection with a wall, then THE EYE can see his enemy.
-  var hiddenRays = 0;
-  rays.forEach(function(ray){
-    var intersect = null;
-
-    // For each of the walls...
-    this.level.walls.forEach(function (wall) {
-      if(intersect){
-        return;
-      }
-
-      // Create an array of lines that represent the four edges of each wall
-      var lines = [
-        new Phaser.Line(wall.x, wall.y, wall.x + wall.width, wall.y),
-        new Phaser.Line(wall.x, wall.y, wall.x, wall.y + wall.height),
-        new Phaser.Line(wall.x + wall.width, wall.y,wall.x + wall.width, wall.y + wall.height),
-        new Phaser.Line(wall.x, wall.y + wall.height,wall.x + wall.width, wall.y + wall.height)
-      ];
-
-      // Test each of the edges in this wall against the ray.
-      // If the ray intersects any of the edges then the wall must be in the way.
-      for (var i = 0; i < lines.length; i++) {
-        intersect = Phaser.Line.intersects(ray, lines[i]);
-        if (intersect) {
-          break;
-        }
-      }
-    }, this);
-
-    if(intersect){
-      //This edge is hidden. :D
-      hiddenRays++;
-    }
-
-  },this);
-
-  return hiddenRays == 4;
-
 };
 
 BasicGame.Eye.prototype.isPlayerInsideViewZone = function(){
@@ -210,6 +162,10 @@ BasicGame.Eye.prototype.isPlayerInsideViewZone = function(){
 };
 
 BasicGame.Eye.prototype.calmDown = function(){
+  if (this.shooting === true) {
+    return;
+  }
+
   this.lightningTimer = 0;
   if(this.anger == true){
     this.angerTimer -= this.game.time.elapsed;
@@ -256,23 +212,65 @@ BasicGame.Eye.prototype.calmDown = function(){
 };
 
 BasicGame.Eye.prototype.shootPlayer = function(target){
-  //I see the player. I'm not anger any more. I'M GOING TO KILL IT.
-  this.anger = false;
-
-  this.lightningTimer -= this.game.time.elapsed;
-  if (this.lightningTimer <= 0) {
-    //Take 2 seconds to shoot again. I do not want to warm up.
-    this.lightningTimer = 2000;
-
-    this.eye.animations.play('angry');
-    this.eyeStateTimer = this.searchingTime;
-
-    this.lightning.shoot(target);
-  }
-
   //- - - | DEVELOPMENT MODE | - - -
   if(BasicGame.Game.developmentMode === true) {
     this.drawLinesToTarget(target);
+    this.PlayerObj.player.tint = 0x00ff00;
+  }
+
+  if (this.shooting === false) {
+    this.shooting = true;
+    this.searching = false;
+    this.eye.animations.play('angry');
+    this.lightning.shoot(target);
+
+    // init the timer that will make the EYE calm down again and restart the
+    // search
+    var calmDownTimer = this.game.time.create(true);
+    calmDownTimer.add(4000,
+      function(){
+        this.shooting = false;
+        this.initSearch();
+      },
+      this);
+
+    calmDownTimer.start();
+  }
+
+  //I see the player. I'm not anger any more. I'M GOING TO KILL IT.
+  // this.anger = false;
+
+  // this.lightningTimer -= this.game.time.elapsed;
+  // if (this.lightningTimer <= 0) {
+  //   this.angerTimer = 2000;
+  //   this.eyeStateTimer = this.searchingTime;
+  // }
+};
+
+BasicGame.Eye.prototype.initSearch = function(){
+  if (this.searching === false) {
+    this.searching = true;
+    this.eye.animations.play('search');
+    this.viewZoneSprite.x = this.viewZoneSprite.positions['0'];
+
+    // init the timer that will make the EYE increase the search speed
+    var intensifiesTimer = this.game.time.create(true);
+    intensifiesTimer.add(8000,
+      function(){
+        this.searching = false;
+        this.eye.animations.play('angry');
+
+        // shake the world
+        this.shake();
+
+        // intensify search speed
+        this.eye.animations.getAnimation("search").speed += 1;
+      },
+      this);
+
+    intensifiesTimer.start();
+
+    // this.eyeStateTimer = this.searchingTime;
   }
 };
 
@@ -318,6 +316,7 @@ BasicGame.Eye.prototype.shake = function(){
     true).start();
   this.shakeTween.onComplete.add(function(){
     this.eye.x = this.eye.originalX;
+    this.initSearch();
   }, this);
 };
 
@@ -335,3 +334,49 @@ BasicGame.Eye.prototype.rejoice = function(){
     this.eye.y = this.eye.originalY;
   }, this);
 };
+
+
+// Given a ray, this function iterates through all of the walls and
+// returns the closest wall intersection from the start of the ray
+// or null if the ray does not intersect any walls.
+// BasicGame.Eye.prototype.getWallIntersection = function (rays) {
+//   //Check intersections for each ray
+//   //If at least one ray has no intersection with a wall, then THE EYE can see his enemy.
+//   var hiddenRays = 0;
+//   rays.forEach(function(ray){
+//     var intersect = null;
+
+//     // For each of the walls...
+//     this.level.walls.forEach(function (wall) {
+//       if(intersect){
+//         return;
+//       }
+
+//       // Create an array of lines that represent the four edges of each wall
+//       var lines = [
+//         new Phaser.Line(wall.x, wall.y, wall.x + wall.width, wall.y),
+//         new Phaser.Line(wall.x, wall.y, wall.x, wall.y + wall.height),
+//         new Phaser.Line(wall.x + wall.width, wall.y,wall.x + wall.width, wall.y + wall.height),
+//         new Phaser.Line(wall.x, wall.y + wall.height,wall.x + wall.width, wall.y + wall.height)
+//       ];
+
+//       // Test each of the edges in this wall against the ray.
+//       // If the ray intersects any of the edges then the wall must be in the way.
+//       for (var i = 0; i < lines.length; i++) {
+//         intersect = Phaser.Line.intersects(ray, lines[i]);
+//         if (intersect) {
+//           break;
+//         }
+//       }
+//     }, this);
+
+//     if(intersect){
+//       //This edge is hidden. :D
+//       hiddenRays++;
+//     }
+
+//   },this);
+
+//   return hiddenRays == 4;
+
+// };
