@@ -212,10 +212,27 @@ BasicGame.Player.prototype.isInShadow = function () {
   }
 
   var raysToLight = [];
-  raysToLight.push(new Phaser.Line(this.player.x, this.player.y, lightImage.x, lightImage.y));
-  raysToLight.push(new Phaser.Line(this.player.x + this.player.width, this.player.y, lightImage.x, lightImage.y));
-  raysToLight.push(new Phaser.Line(this.player.x + this.player.width, this.player.y + this.player.height - 0.1, lightImage.x, lightImage.y));
-  raysToLight.push(new Phaser.Line(this.player.x, this.player.y + this.player.height - 0.1, lightImage.x, lightImage.y));
+  
+  // top left corner
+  raysToLight.push(new Phaser.Line(this.player.x + 2,
+    this.player.y + 2,
+    lightImage.x, lightImage.y));
+
+  // top right corner
+  raysToLight.push(new Phaser.Line(this.player.x + this.player.width - 2,
+    this.player.y + 2,
+    lightImage.x, lightImage.y));
+
+  // bottom right corner
+  raysToLight.push(new Phaser.Line(this.player.x + this.player.width - 2,
+    this.player.y + this.player.height - 2,
+    lightImage.x, lightImage.y));
+
+  // bottom left corner
+  raysToLight.push(new Phaser.Line(this.player.x + 2,
+    this.player.y + this.player.height - 2,
+    lightImage.x,
+    lightImage.y));
 
   // Test if any walls intersect the ray
   return this.allRaysIntersectWall(raysToLight);

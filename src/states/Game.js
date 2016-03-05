@@ -24,7 +24,7 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 1;
+BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 14;
 BasicGame.isRetrying = false;
 
 BasicGame.Game.prototype.preload = function(){
