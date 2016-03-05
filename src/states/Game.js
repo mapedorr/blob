@@ -24,7 +24,7 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 12;
+BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 1;
 BasicGame.isRetrying = false;
 
 BasicGame.Game.prototype.preload = function(){
@@ -135,8 +135,7 @@ BasicGame.Game.prototype.create = function(){
     false);
   this.brightnessTween.onComplete.add(function(){
     // this.eye.eyeStateTimer = this.eye.searchingTime;
-
-    this.eye.initSearch();
+    this.eye.initSearch(true);
     this.player.player.body.enable = true;
     this.isLoadingLevel = false;
   }, this);
@@ -192,6 +191,7 @@ BasicGame.Game.prototype.update = function() {
       return;
     }
 
+    this.eye.destroyTimers();
     this.isLoadingLevel = true;
     this.loadLevel(++BasicGame.currentLevel);
     this.game.world.bringToTop(this.lifesGroup);
@@ -297,6 +297,7 @@ BasicGame.Game.prototype.subtractAllLifes = function(destroyPlayer){
     Phaser.Easing.Quadratic.Out,
     true);
 
+  this.eye.destroyTimers();
   if(destroyPlayer){
     this.player.dieWithDignity();
 

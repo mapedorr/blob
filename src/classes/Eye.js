@@ -96,7 +96,7 @@ BasicGame.Eye.prototype.update = function () {
 
   this.viewZoneSprite.visible = this.searching;
 
-  if(this.gameObj.isLoadingLevel == true){
+  if(this.gameObj.isLoadingLevel === true){
     // the EYE will start the level as irritated (sleeping)
     this.eye.animations.play('irritated');
     return;
@@ -133,19 +133,16 @@ BasicGame.Eye.prototype.update = function () {
     if(!playerInShadow){
       attack = true;
     }
-  }
 
-  if (this.searching === true && attack === false){
-    // i can't see the player, lets calm down
-    // this.calmDown();
-
-    //- - - | DEVELOPMENT MODE | - - -
-    if(BasicGame.Game.developmentMode === true){
-      this.PlayerObj.player.tint = 0xffffff;
+    if (attack === false){
+      //- - - | DEVELOPMENT MODE | - - -
+      if(BasicGame.Game.developmentMode === true){
+        this.PlayerObj.player.tint = 0xffffff;
+      }
+    } else if (attack === true) {
+      //I see the player...I've to KILL IT
+      this.shootPlayer(this.PlayerObj.player);
     }
-  } else if (attack === true) {
-    //I see the player...I've to KILL IT
-    this.shootPlayer(this.PlayerObj.player);
   }
 
   // This just tells the engine it should update the texture cache
@@ -153,7 +150,7 @@ BasicGame.Eye.prototype.update = function () {
 };
 
 BasicGame.Eye.prototype.isPlayerInsideViewZone = function(){
-  if(this.viewZoneSprite.visible == true){
+  if(this.viewZoneSprite.visible === true){
     this.viewZoneSprite.x = this.viewZoneSprite.positions['' + this.eye.animations.currentFrame.index];
     return this.game.physics.arcade.overlap(this.PlayerObj.player,
       this.viewZoneSprite);
@@ -224,53 +221,113 @@ BasicGame.Eye.prototype.shootPlayer = function(target){
     this.eye.animations.play('angry');
     this.lightning.shoot(target);
 
+    this.destroyTimers(this.getTiredTimer, this.getMadTimer, this.searchAgain);
+
     // init the timer that will make the EYE calm down again and restart the
     // search
-    var calmDownTimer = this.game.time.create(true);
-    calmDownTimer.add(4000,
+    this.calmDownTimer = this.game.time.create(true);
+    this.calmDownTimer.add(3000,
       function(){
-        this.shooting = false;
         this.initSearch();
+
+        var _self = this;
+        setTimeout(function(){_self.shooting = false}, 200);
       },
       this);
 
-    calmDownTimer.start();
+    this.calmDownTimer.start();
   }
-
-  //I see the player. I'm not anger any more. I'M GOING TO KILL IT.
-  // this.anger = false;
-
-  // this.lightningTimer -= this.game.time.elapsed;
-  // if (this.lightningTimer <= 0) {
-  //   this.angerTimer = 2000;
-  //   this.eyeStateTimer = this.searchingTime;
-  // }
 };
 
-BasicGame.Eye.prototype.initSearch = function(){
+BasicGame.Eye.prototype.initSearch = function(delay){
   if (this.searching === false) {
-    this.searching = true;
-    this.eye.animations.play('search');
+
+    if (delay === true) {
+      var _self = this;
+      setTimeout(function(){_self.initSearch();}, 500);
+      return;
+    }
+
     this.viewZoneSprite.x = this.viewZoneSprite.positions['0'];
+    this.eye.animations.play('search');
+    this.searching = true;
 
     // init the timer that will make the EYE increase the search speed
-    var intensifiesTimer = this.game.time.create(true);
-    intensifiesTimer.add(8000,
+    this.getTiredTimer = this.game.time.create(true);
+    this.getTiredTimer.add(16100,
       function(){
+        if (this.shooting === true) return;
         this.searching = false;
-        this.eye.animations.play('angry');
-
-        // shake the world
-        this.shake();
-
-        // intensify search speed
-        this.eye.animations.getAnimation("search").speed += 1;
+        this.getTired();
       },
       this);
 
-    intensifiesTimer.start();
+    this.getTiredTimer.start();
+  }
+};
 
-    // this.eyeStateTimer = this.searchingTime;
+BasicGame.Eye.prototype.getTired = function(){
+  this.eye.animations.play('tired');
+
+  this.getMadTimer = this.game.time.create(true);
+  this.getMadTimer.add(1200,
+    function(){
+      this.getMad();
+    },
+    this);
+
+  this.getMadTimer.start();
+};
+
+BasicGame.Eye.prototype.getMad = function(){
+  this.eye.animations.play('angry');
+
+  // shake the world
+  this.shake();
+
+  // intensify search speed
+  this.eye.animations.getAnimation("search").speed += 1;
+
+  this.searchAgain = this.game.time.create(true);
+  this.searchAgain.add(1600,
+    function(){
+      this.eye.x = this.eye.originalX;
+      this.initSearch();
+    },
+    this);
+
+  this.searchAgain.start();
+};
+
+BasicGame.Eye.prototype.shake = function(){
+  this.shakeTween = this.shakeTween || this.game.add.tween(this.eye)
+  this.shakeTween.to({x: this.eye.originalX + 10},
+    40,
+    Phaser.Easing.Sinusoidal.InOut,
+    false,
+    0,
+    4,
+    true).start();
+  this.shakeTween.onComplete.add(function(){
+  }, this);
+};
+
+BasicGame.Eye.prototype.destroyTimers = function(){
+  if (arguments.length === 0) {
+    this.calmDownTimer && this.calmDownTimer.destroy();
+    this.getTiredTimer && this.getTiredTimer.destroy();
+    this.getMadTimer && this.getMadTimer.destroy();
+    this.searchAgain && this.searchAgain.destroy();
+
+    this.viewZoneSprite.x = this.viewZoneSprite.positions['0'];
+    this.searching = false;
+    this.shooting = false;
+
+    return;
+  }
+
+  for (var i = arguments.length - 1; i >= 0; i--) {
+    if(arguments[i]) arguments[i].destroy();
   }
 };
 
@@ -305,22 +362,8 @@ BasicGame.Eye.prototype.updateLevel = function (level) {
   this.eye.animations.getAnimation("search").speed = this.originalSearchSpeed;
 };
 
-BasicGame.Eye.prototype.shake = function(){
-  this.shakeTween = this.shakeTween || this.game.add.tween(this.eye)
-  this.shakeTween.to({x: this.eye.originalX + 10},
-    40,
-    Phaser.Easing.Sinusoidal.InOut,
-    false,
-    0,
-    4,
-    true).start();
-  this.shakeTween.onComplete.add(function(){
-    this.eye.x = this.eye.originalX;
-    this.initSearch();
-  }, this);
-};
-
 BasicGame.Eye.prototype.rejoice = function(){
+  this.destroyTimers();
   this.eye.animations.play('happy');
   this.shakeTween = this.shakeTween || this.game.add.tween(this.eye)
   this.shakeTween.to({y: this.eye.originalY + 10},
