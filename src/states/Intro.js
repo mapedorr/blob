@@ -10,8 +10,8 @@ BasicGame.Intro = function (game) {
   
   this.fontId = 'font';
   this.textColors = {
-    'H': 0xF2C249,
-    'B': 0x2a84c1
+    'H': 0x000000,
+    'B': 0xFFFFFF
   };
   this.dialogs = {
     "es": [
@@ -68,7 +68,10 @@ BasicGame.Intro = function (game) {
 };
 
 BasicGame.Intro.prototype.create = function(){
-  this.game.stage.backgroundColor = 0x3D4C53;
+  // set the backgound
+  // this.game.stage.backgroundColor = 0x3D4C53;
+  this.background = this.game.add.tileSprite(0, 0,
+    this.game.world.width, this.game.world.height, "sky03");
 
   // create the group and text for the dialog and the Skip
   this.textBitmapsGroup = this.game.add.group();
@@ -92,7 +95,7 @@ BasicGame.Intro.prototype.create = function(){
     16,
     this.textBitmapsGroup);
   this.skipBitmap.align = "left";
-  this.skipBitmap.tint = 0xFFFFFF;
+  this.skipBitmap.tint = 0xF2C249;
   this.skipBitmap.anchor.set(1, 1);
 
   // add the keyboard listener for Skip
