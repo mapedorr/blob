@@ -8,6 +8,8 @@ BasicGame.Lightning = function (game, gameObj){
   this.player = null;
   this.eye = null;
   this.level = null;
+
+  this.lightningSound = null;
 };
 
 BasicGame.Lightning.prototype.create = function(eye, player, level){
@@ -34,6 +36,10 @@ BasicGame.Lightning.prototype.create = function(eye, player, level){
   this.fakeThing.body.allowGravity = false;
 
   this.lightningTimer = 0;
+
+  if (!this.lightningSound) {
+    this.lightningSound = this.game.add.sound('ray', 0.5);
+  }
 };
 
 BasicGame.Lightning.prototype.update = function () {
@@ -43,6 +49,7 @@ BasicGame.Lightning.prototype.update = function () {
       function(){
         this.gameObj.subtractLife();
         this.fakeThing.x = this.fakeThing.y = -10;
+        this.lightningSound.play();
       },
       null,
       this);

@@ -25,6 +25,8 @@ BasicGame.Level = function (game, gameObj) {
   this.fontId = 'font';
   this.hasFloor = false;
   this.hasSpikes = false;
+
+  this.daySound = null;
 };
 
 BasicGame.Level.prototype.create = function () {
@@ -70,6 +72,10 @@ BasicGame.Level.prototype.create = function () {
   this.dayPhraseTextBitmap.tint = 0x515151;
 
   this.createLevel(BasicGame.currentLevel);
+
+  if (!this.daySound) {
+    this.daySound = this.game.add.sound('day', 0.3);
+  }
 };
 
 BasicGame.Level.prototype.destroyCurrentLevel = function(){
@@ -220,6 +226,8 @@ BasicGame.Level.prototype.showDay = function(){
   this.levelTextGroup.alpha = 1;
 
   this.game.world.bringToTop(this.levelTextGroup);
+
+  this.daySound.play();
 
   // create the timer
   var dayTimer = this.game.time.create(true);

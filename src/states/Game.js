@@ -21,10 +21,12 @@ BasicGame.Game = function (game) {
   this.isLoadingLevel = null;
   this.lifes = null;
   this.lifesGroup = null;
+
+  this.music = null;
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 20;
+BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 1;
 BasicGame.isRetrying = false;
 
 BasicGame.Game.prototype.preload = function(){
@@ -68,6 +70,11 @@ BasicGame.Game.prototype.create = function(){
   // configure the camera for shaking
   this.game.camera.setSize(this.game.world.width/2, this.game.world.height/2);
   this.game.camera.setPosition(0, 0);
+
+  // add the music
+  if (!this.music) {
+    this.music = this.game.add.sound('level_music', 0.5, true);
+  }
 
   // create the level
   this.level.create();
@@ -138,6 +145,9 @@ BasicGame.Game.prototype.create = function(){
     this.eye.initSearch(true);
     this.player.player.body.enable = true;
     this.isLoadingLevel = false;
+    if (this.music.isPlaying === false) {
+      this.music.play();
+    }
   }, this);
 
   // create the tween for shaking the camera

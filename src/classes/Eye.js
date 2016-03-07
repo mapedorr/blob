@@ -22,6 +22,8 @@ BasicGame.Eye = function (game, gameObj) {
 
   // view zone
   this.viewZoneSprite = null;
+
+  this.eyeSound = null;
 };
 
 BasicGame.Eye.prototype.preload = function () {};
@@ -86,6 +88,10 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
     '5': this.viewZoneSprite.position.x + zoneDiv * 2,
     '6': this.game.world.width - this.zoneSize
   };
+
+  if (!this.eyeSound) {
+    this.eyeSound = this.game.add.sound('eye', 0.2);
+  }
 };
 
 BasicGame.Eye.prototype.update = function () {
@@ -376,6 +382,8 @@ BasicGame.Eye.prototype.rejoice = function(){
   this.shakeTween.onComplete.add(function(){
     this.eye.y = this.eye.originalY;
   }, this);
+
+  this.eyeSound.play();
 };
 
 

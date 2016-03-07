@@ -17,37 +17,45 @@ BasicGame.Intro = function (game) {
     "es": [
       {
         character: 'H',
-        text: 'Tienes que calmarte, todo estará bien.'
+        text: 'Tienes que calmarte, todo estará bien.',
+        bips: 3
       },
       {
         character: 'B',
-        text: '¿Cómo puedes decir eso? No puedo hacerlo!'
+        text: '¿Cómo puedes decir eso? No puedo hacerlo!',
+        bips: 3
       },
       {
         character: 'H',
-        text: 'Descansa, ya verás cómo en unos días dejará de acecharte.'
+        text: 'Descansa, ya verás cómo en unos días dejará de acecharte.',
+        bips: 5
       },
       {
         character: 'B',
-        text: 'Creo que no seré capaz...'
+        text: 'Creo que no seré capaz...',
+        bips: 2
       }
     ],
     "en": [
       {
         character: 'H',
-        text: 'Calm down, all its going to be fine.'
+        text: 'Calm down, all its going to be fine.',
+        bips: 3
       },
       {
         character: 'B',
-        text: "How can you say that? I can't do that!"
+        text: "How can you say that? I can't do that!",
+        bips: 3
       },
       {
         character: 'H',
-        text: 'Have a rest, it will stop haunting you in a few days.'
+        text: 'Have a rest, it will stop haunting you in a few days.',
+        bips: 4
       },
       {
         character: 'B',
-        text: "I think I won't be able to handle this..."
+        text: "I think I won't be able to handle this...",
+        bips: 3
       }
     ]
   };
@@ -65,6 +73,10 @@ BasicGame.Intro = function (game) {
   this.sPressedFlag = false;
 
   this.goingToGame = false;
+
+  this.BSound = null;
+  this.HSound = null;
+  this.soundLoopTimer = null;
 };
 
 BasicGame.Intro.prototype.create = function(){
@@ -110,6 +122,10 @@ BasicGame.Intro.prototype.create = function(){
     Phaser.Easing.Quadratic.Out,
     false);
 
+  // load the sounds of B and H
+  this.BSound = this.game.add.sound('b', 0.5);
+  this.HSound = this.game.add.sound('h', 0.5);
+
   // show the first dialog
   this.updateDialog();
 };
@@ -132,15 +148,25 @@ BasicGame.Intro.prototype.update = function(){
 
 BasicGame.Intro.prototype.updateDialog = function(){
   if(this.dialogNumber <= this.dialogs[BasicGame.language].length - 1){
+    var dialogObj = this.dialogs[BasicGame.language][this.dialogNumber];
     // there are still dialogs to be shown
-    var currentDialogLine = this.dialogs[BasicGame.language][this.dialogNumber].text;
-    var character = this.dialogs[BasicGame.language][this.dialogNumber].character;
+    var currentDialogLine = dialogObj.text;
+    var character = dialogObj.character;
 
     this.dialogTextBitmap.tint = this.textColors[character];
     this.dialogTextBitmap.setText(character + ': ' + currentDialogLine);
 
     this.dialogTextBitmap.alpha = 0;
     this.dialogTween.start();
+
+    // play the bips of the dialog
+    if (dialogObj.bips > 0) {
+      this.soundLoopTimer = this.game.time.create(true);
+      this.soundLoopTimer.repeat(100, dialogObj.bips, function(){
+        this[dialogObj.character + "Sound"].play();
+      }, this);
+      this.soundLoopTimer.start();
+    }
 
     this.dialogNumber++;
   }else{

@@ -22,6 +22,8 @@ BasicGame.Player = function (game, input, gameObj) {
   this.rightKey = Phaser.Keyboard.RIGHT;
   this.jumpKey = Phaser.Keyboard.SPACEBAR;
 
+  this.jumpSound = null;
+
   this.upPressedFlag = false;
   this.dead = false;
 };
@@ -74,6 +76,10 @@ BasicGame.Player.prototype.create = function (level) {
   this.bitmap.context.fillStyle = 'rgb(0, 0, 255)';
   this.bitmap.context.strokeStyle = 'rgb(0, 0, 255)';
   this.game.add.image(0, 0, this.bitmap);
+
+  if (!this.jumpSound) {
+    this.jumpSound = this.game.add.sound('jump', 0.5);
+  }
 };
 
 BasicGame.Player.prototype.update = function () {
@@ -154,6 +160,7 @@ BasicGame.Player.prototype.update = function () {
     if(!onTheGround && onLeftWall && upPressed){
       this.player.body.acceleration.x = this.ACCELERATION * 8
       this.player.body.velocity.y = this.JUMP_SPEED + 50;
+      this.jumpSound.play();
     }
   }else if (rightPressed){
     // If the RIGHT key is down, set the player velocity to move right
@@ -161,6 +168,7 @@ BasicGame.Player.prototype.update = function () {
     if(!onTheGround && onRightWall && upPressed){
       this.player.body.acceleration.x = -this.ACCELERATION *8;
       this.player.body.velocity.y = this.JUMP_SPEED + 50;
+      this.jumpSound.play();
     }
   }else{
     this.player.body.acceleration.x = 0;
@@ -168,6 +176,7 @@ BasicGame.Player.prototype.update = function () {
 
   if (upPressed && onTheGround) {
     this.player.body.velocity.y = this.JUMP_SPEED;
+    this.jumpSound.play();
   }
 
   // This just tells the engine it should update the texture cache

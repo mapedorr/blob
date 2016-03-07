@@ -45,6 +45,13 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('spike-d', 'assets/images/spike-d.png');
   this.load.spritesheet('player','assets/sprites/player.png', 32, 32);
   this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);
+  this.load.audio('jump', 'assets/soundfx/jump.wav', true);
+  this.load.audio('day', 'assets/soundfx/day.wav', true);
+  this.load.audio('b', 'assets/soundfx/b.wav', true);
+  this.load.audio('h', 'assets/soundfx/h.wav', true);
+  this.load.audio('ray', 'assets/soundfx/ray.wav', true);
+  this.load.audio('eye', 'assets/soundfx/eye.wav', true);
+  this.load.audio('level_music', 'assets/music/levels_music.mp3', true);
 
   this.load.bitmapFont('font','assets/fonts/PressStart2P_0.png','assets/fonts/PressStart2P.xml');
 
