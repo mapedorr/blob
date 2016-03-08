@@ -45,13 +45,30 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('spike-d', 'assets/images/spike-d.png');
   this.load.spritesheet('player','assets/sprites/player.png', 32, 32);
   this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);
+  this.load.audio('en-lang', 'assets/soundfx/en.wav', true);
+  this.load.audio('es-lang', 'assets/soundfx/es.wav', true);
   this.load.audio('jump', 'assets/soundfx/jump.wav', true);
+  this.load.audio('death', 'assets/soundfx/death.wav', true);
   this.load.audio('day', 'assets/soundfx/day.wav', true);
   this.load.audio('b', 'assets/soundfx/b.wav', true);
   this.load.audio('h', 'assets/soundfx/h.wav', true);
   this.load.audio('ray', 'assets/soundfx/ray.wav', true);
   this.load.audio('eye', 'assets/soundfx/eye.wav', true);
+  this.load.audio('eye-anger', 'assets/soundfx/anger.wav', true);
   this.load.audio('level_music', 'assets/music/levels_music.mp3', true);
+  // load the sounds for the pieces
+  for(var i = 1; i <= 20; i++){
+    if(i < 10){
+      this.load.audio('piece0' + i,
+        'assets/soundfx/piece0' + i + '.wav',
+        true);
+    }
+    else{
+      this.load.audio('piece' + i,
+        'assets/soundfx/piece' + i + '.wav',
+        true);
+    }
+  }
 
   this.load.bitmapFont('font','assets/fonts/PressStart2P_0.png','assets/fonts/PressStart2P.xml');
 
@@ -79,6 +96,6 @@ BasicGame.Preloader.prototype.update = function(){
   //this.cache.isSoundDecoded('mainMenuMusic')
   if (this.ready == false) {
     this.ready = true;
-    this.state.start('Game');
+    this.state.start('MainMenu');
   }
 };

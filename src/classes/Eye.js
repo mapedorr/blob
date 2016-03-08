@@ -23,7 +23,8 @@ BasicGame.Eye = function (game, gameObj) {
   // view zone
   this.viewZoneSprite = null;
 
-  this.eyeSound = null;
+  this.laughSound = null;
+  this.angerSound = null;
 };
 
 BasicGame.Eye.prototype.preload = function () {};
@@ -89,8 +90,12 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
     '6': this.game.world.width - this.zoneSize
   };
 
-  if (!this.eyeSound) {
-    this.eyeSound = this.game.add.sound('eye', 0.2);
+  if (!this.laughSound) {
+    this.laughSound = this.game.add.sound('eye', 0.2);
+  }
+
+  if (!this.angerSound) {
+    this.angerSound = this.game.add.sound('eye-anger', 1);
   }
 };
 
@@ -287,6 +292,7 @@ BasicGame.Eye.prototype.getTired = function(){
 
 BasicGame.Eye.prototype.getMad = function(){
   this.eye.animations.play('angry');
+  this.angerSound.play();
 
   // shake the world
   this.shake();
@@ -383,7 +389,7 @@ BasicGame.Eye.prototype.rejoice = function(){
     this.eye.y = this.eye.originalY;
   }, this);
 
-  this.eyeSound.play();
+  this.laughSound.play();
 };
 
 

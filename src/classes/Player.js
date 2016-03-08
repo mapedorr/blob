@@ -23,6 +23,8 @@ BasicGame.Player = function (game, input, gameObj) {
   this.jumpKey = Phaser.Keyboard.SPACEBAR;
 
   this.jumpSound = null;
+  this.deathSound = null;
+  this.piecesSound = [];
 
   this.upPressedFlag = false;
   this.dead = false;
@@ -80,6 +82,17 @@ BasicGame.Player.prototype.create = function (level) {
   if (!this.jumpSound) {
     this.jumpSound = this.game.add.sound('jump', 0.5);
   }
+
+  if (!this.deathSound) {
+    this.deathSound = this.game.add.sound('death', 0.6);
+  }
+
+  // load the audio for pieces
+  if (!this.piecesSound || this.piecesSound.length === 0) {
+    for(var i = 1; i <= 20; i++){
+      this.piecesSound.push(this.game.add.sound('piece' + ((i < 10) ? '0' : '') + i, 0.5));
+    }
+  }
 };
 
 BasicGame.Player.prototype.update = function () {
@@ -96,7 +109,7 @@ BasicGame.Player.prototype.update = function () {
   this.game.physics.arcade.overlap(this.player, this.level.pieces,
     function(player, piece){
       piece.destroy();
-      this.collectedPieces++;
+      (this.piecesSound[this.collectedPieces++]).play();
       if(!this.level.pieces.children || !this.level.pieces.children.length){
         // the level has been finished
         this.level.endLevel();
@@ -309,6 +322,7 @@ BasicGame.Player.prototype.drawLinesToLight = function(lightImage){
 };
 
 BasicGame.Player.prototype.updateLevel = function (level) {
+  this.collectedPieces = 0;
   this.player.body.enable = false;
   this.level = level;
   this.player.position.set(this.level.initPlayerPos.x,
@@ -317,6 +331,12 @@ BasicGame.Player.prototype.updateLevel = function (level) {
 
 BasicGame.Player.prototype.dieWithDignity = function(){
   this.dead = true;
+
+  var timer = this.game.time.create(true);
+  timer.add(100, function(){
+    this.deathSound.play();
+  }, this);
+  timer.start();
 
   // play the dead animation
   this.player.animations.play('dying');

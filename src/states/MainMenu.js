@@ -10,11 +10,21 @@ BasicGame.MainMenu = function (game) {
   this.playButton = null;
   this.jugarButton = null;
   this.showIntroTimer = null;
+  this.enSound = null;
+  this.esSound = null;
 };
 
 BasicGame.MainMenu.prototype.create = function(){
   this.add.tileSprite(0, 0,
     this.game.world.width, this.game.world.height, 'mainMenuBackground');
+
+  if (!this.enSound) {
+    this.enSound = this.game.add.sound('en-lang', 0.6);
+  }
+
+  if (!this.esSound) {
+    this.esSound = this.game.add.sound('es-lang', 0.6);
+  }
 
   // create the group for the play buttons
   this.playGroup = this.game.add.group();
@@ -49,9 +59,11 @@ BasicGame.MainMenu.prototype.create = function(){
 
 BasicGame.MainMenu.prototype.update = function(){
   if(this.input.keyboard.isDown(Phaser.Keyboard.LEFT)){
+    this.enSound.play();
     this.playButton.frame = 1;
     this.showIntroTimer.start();
   }else if(this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
+    this.esSound.play();
     this.jugarButton.frame = 1;
     BasicGame.language = "es";
     this.showIntroTimer.start();
