@@ -196,6 +196,13 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.isReady = true;
 };
 
+BasicGame.Level.prototype.render = function(){
+  var _self = this;
+  this.pieces.forEach(function(pieceSprite){
+    _self.game.debug.body(pieceSprite, 'rgba(0,0,255,0.4)');
+  });
+};
+
 BasicGame.Level.prototype.endLevel = function(){
   BasicGame.isRetrying = false;
   var secondsToEnd = this.gameObj.countdownDuration;

@@ -196,6 +196,11 @@ BasicGame.Player.prototype.update = function () {
   this.bitmap.dirty = true;
 };
 
+BasicGame.Player.prototype.render = function(){
+  // Sprite debug info
+  this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
+};
+
 // This function should return true when the player activates the "go left" control
 // In this case, either holding the right arrow or tapping or clicking on the left
 // side of the screen.

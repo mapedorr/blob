@@ -26,7 +26,7 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 1;
+BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") < 30 && localStorage.getItem("oh-my-blob")) || 26;
 BasicGame.isRetrying = false;
 
 BasicGame.Game.prototype.preload = function(){
@@ -215,6 +215,11 @@ BasicGame.Game.prototype.update = function() {
       this.fpsText.setText(this.game.time.fps + ' FPS');
     }
   }
+};
+
+BasicGame.Game.prototype.render = function(){
+  this.player.render();
+  this.level.render();
 };
 
 BasicGame.Game.prototype.quitGame = function(){
