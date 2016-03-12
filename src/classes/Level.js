@@ -169,8 +169,7 @@ BasicGame.Level.prototype.createLevel = function(num){
     _self.game.physics.arcade.enableBody(pieceSprite);
     pieceSprite.body.allowGravity = false;
     pieceSprite.body.immovable = false;
-    pieceSprite.body.moves = false;
-    pieceSprite.mass = 0;
+    pieceSprite.body.friction = new Phaser.Point(0, 0);
   });
 
   // get the player initial position
@@ -197,10 +196,12 @@ BasicGame.Level.prototype.createLevel = function(num){
 };
 
 BasicGame.Level.prototype.render = function(){
-  var _self = this;
-  this.pieces.forEach(function(pieceSprite){
-    _self.game.debug.body(pieceSprite, 'rgba(0,0,255,0.4)');
-  });
+  if(BasicGame.Game.developmentMode === true){
+    var _self = this;
+    this.pieces.forEach(function(pieceSprite){
+      _self.game.debug.body(pieceSprite, 'rgba(0,0,255,0.8)');
+    });
+  }
 };
 
 BasicGame.Level.prototype.endLevel = function(){

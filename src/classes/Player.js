@@ -106,14 +106,16 @@ BasicGame.Player.prototype.update = function () {
     this.game.physics.arcade.collide(this.player, this.level.ground);
   }
 
+  this.player.touchingPiece = false;
+
   this.game.physics.arcade.overlap(this.player, this.level.pieces,
     function(player, piece){
+      player.touchingPiece = true;
       piece.destroy();
       (this.piecesSound[this.collectedPieces++]).play();
       if(!this.level.pieces.children || !this.level.pieces.children.length){
         // the level has been finished
         this.level.endLevel();
-        return;
       }
     },
     null,
@@ -156,12 +158,12 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  var leftPressed = this.leftInputIsActive() == true;
-  var rightPressed = this.rightInputIsActive() == true;
-  var upPressed = this.upInputIsActive() == true;
-  var onTheGround = this.player.body.touching.down == true;
-  var onRightWall = this.player.body.touching.right == true;
-  var onLeftWall = this.player.body.touching.left == true;
+  var leftPressed = this.leftInputIsActive() === true;
+  var rightPressed = this.rightInputIsActive() === true;
+  var upPressed = this.upInputIsActive() === true;
+  var onTheGround = this.player.body.touching.down === true && this.player.touchingPiece === false;
+  var onRightWall = this.player.body.touching.right === true && this.player.touchingPiece === false;
+  var onLeftWall = this.player.body.touching.left === true && this.player.touchingPiece === false;
 
   if(onRightWall || onLeftWall){
     this.player.body.velocity.y = this.SLID_SPEED;
@@ -197,8 +199,10 @@ BasicGame.Player.prototype.update = function () {
 };
 
 BasicGame.Player.prototype.render = function(){
-  // Sprite debug info
-  this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
+  if(BasicGame.Game.developmentMode === true){
+    // Sprite debug info
+    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
+  }
 };
 
 // This function should return true when the player activates the "go left" control
