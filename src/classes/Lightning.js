@@ -38,7 +38,7 @@ BasicGame.Lightning.prototype.create = function(eye, player, level){
   this.lightningTimer = 0;
 
   if (!this.lightningSound) {
-    this.lightningSound = this.game.add.sound('ray', 0.5);
+    this.lightningSound = this.game.add.sound('ray', 0.2);
   }
 };
 

@@ -74,7 +74,7 @@ BasicGame.Level.prototype.create = function () {
   this.createLevel(BasicGame.currentLevel);
 
   if (!this.daySound) {
-    this.daySound = this.game.add.sound('day', 0.3);
+    this.daySound = this.game.add.sound('day', 0.2);
   }
 };
 

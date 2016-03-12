@@ -23,11 +23,15 @@ BasicGame.Player = function (game, input, gameObj) {
   this.jumpKey = Phaser.Keyboard.SPACEBAR;
 
   this.jumpSound = null;
+  this.walkSound = null;
   this.deathSound = null;
   this.piecesSound = [];
 
   this.upPressedFlag = false;
   this.dead = false;
+
+  this.leftFirstPress = false;
+  this.rightFirstPress = false;
 };
 
 BasicGame.Player.prototype.preload = function () {
@@ -80,7 +84,11 @@ BasicGame.Player.prototype.create = function (level) {
   this.game.add.image(0, 0, this.bitmap);
 
   if (!this.jumpSound) {
-    this.jumpSound = this.game.add.sound('jump', 0.5);
+    this.jumpSound = this.game.add.sound('jump', 0.2);
+  }
+
+  if (!this.walkSound) {
+    this.walkSound = this.game.add.sound('walk', 0.2);
   }
 
   if (!this.deathSound) {
@@ -90,7 +98,7 @@ BasicGame.Player.prototype.create = function (level) {
   // load the audio for pieces
   if (!this.piecesSound || this.piecesSound.length === 0) {
     for(var i = 1; i <= 20; i++){
-      this.piecesSound.push(this.game.add.sound('piece' + ((i < 10) ? '0' : '') + i, 0.5));
+      this.piecesSound.push(this.game.add.sound('piece' + ((i < 10) ? '0' : '') + i, 0.2));
     }
   }
 };
@@ -170,14 +178,26 @@ BasicGame.Player.prototype.update = function () {
   }
 
   if(leftPressed){
-    // If the LEFT key is down, set the player velocity to move left
+    this.rightFirstPress = false;
     this.player.body.acceleration.x = -this.ACCELERATION;
+    if (onTheGround === true && this.leftFirstPress === false) {
+      this.leftFirstPress = true;
+      this.walkSound.play();
+    }
+
+    // If the LEFT key is down, set the player velocity to move left
     if(!onTheGround && onLeftWall && upPressed){
       this.player.body.acceleration.x = this.ACCELERATION * 8
       this.player.body.velocity.y = this.JUMP_SPEED + 50;
       this.jumpSound.play();
     }
   }else if (rightPressed){
+    this.leftFirstPress = false;
+    if (onTheGround === true && this.rightFirstPress === false) {
+      this.rightFirstPress = true;
+      this.walkSound.play();
+    }
+
     // If the RIGHT key is down, set the player velocity to move right
     this.player.body.acceleration.x = this.ACCELERATION;
     if(!onTheGround && onRightWall && upPressed){
@@ -186,6 +206,7 @@ BasicGame.Player.prototype.update = function () {
       this.jumpSound.play();
     }
   }else{
+    this.leftFirstPress = this.rightFirstPress = false;
     this.player.body.acceleration.x = 0;
   }
 

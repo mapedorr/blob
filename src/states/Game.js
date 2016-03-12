@@ -73,7 +73,7 @@ BasicGame.Game.prototype.create = function(){
 
   // add the music
   if (!this.music) {
-    this.music = this.game.add.sound('level_music', 0.5, true);
+    this.music = this.game.add.sound('level_music', 0.1, true);
   }
 
   // create the level

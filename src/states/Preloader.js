@@ -48,6 +48,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.audio('en-lang', 'assets/soundfx/en.wav', true);
   this.load.audio('es-lang', 'assets/soundfx/es.wav', true);
   this.load.audio('jump', 'assets/soundfx/jump.wav', true);
+  this.load.audio('walk', 'assets/soundfx/walk.wav', true);
   this.load.audio('death', 'assets/soundfx/death.wav', true);
   this.load.audio('day', 'assets/soundfx/day.wav', true);
   this.load.audio('b', 'assets/soundfx/b.wav', true);
@@ -73,7 +74,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.bitmapFont('font','assets/fonts/PressStart2P_0.png','assets/fonts/PressStart2P.xml');
 
   // load the map for the first level
-  for(var i = 1; i <= 31; i++){
+  for(var i = 1; i <= 30; i++){
     if(i < 10){
       this.game.load.tilemap('lvl0' + i,
         'assets/tilemaps/maps/level0' + i + '.json',
