@@ -21,6 +21,8 @@ var BasicGame = BasicGame || {
     return this.rest + '' + this.deaths + '' + this.currentLevel;
   },
   readCode: function(code) {
+    if (code.length < 4) return;
+
     this.currentLevel = parseInt(code.slice(code.length -2, code.length));
     this.deaths = parseInt(code.slice(1, code.length - 2));
     this.rest = parseInt(code.charAt(0));

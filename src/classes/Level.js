@@ -71,7 +71,7 @@ BasicGame.Level.prototype.create = function () {
   this.dayPhraseTextBitmap.align = "center";
   this.dayPhraseTextBitmap.tint = 0x515151;
 
-  this.createLevel(BasicGame.currentLevel);
+  this.createLevel(parseInt(BasicGame.currentLevel));
 
   if (!this.daySound) {
     this.daySound = this.game.add.sound('day', 0.2);
