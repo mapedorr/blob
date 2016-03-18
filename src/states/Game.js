@@ -26,7 +26,6 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.developmentMode = false;
-BasicGame.currentLevel = (localStorage.getItem("oh-my-blob") <= 30 && localStorage.getItem("oh-my-blob")) || 1;
 BasicGame.isRetrying = false;
 
 BasicGame.Game.prototype.preload = function(){
@@ -258,7 +257,7 @@ BasicGame.Game.prototype.loadLevel = function(levelNumber){
   this.game.world.bringToTop(this.light.lightBitmap);
   this.game.world.bringToTop(this.level.pieces);
 
-  localStorage.setItem("oh-my-blob", levelNumber);
+  localStorage.setItem("oh-my-blob", BasicGame.setDay(levelNumber));
 };
 
 BasicGame.Game.prototype.shakeCamera = function(){
@@ -281,6 +280,8 @@ BasicGame.Game.prototype.subtractLife = function(){
     Phaser.Easing.Quadratic.Out,
     true);
   if(this.lifes <= 0){
+    localStorage.setItem("oh-my-blob", BasicGame.addDeath());
+
     // notify to the EYE the player has died
     this.eye.rejoice();
 
@@ -304,6 +305,8 @@ BasicGame.Game.prototype.subtractLife = function(){
 
 
 BasicGame.Game.prototype.subtractAllLifes = function(destroyPlayer){
+  localStorage.setItem("oh-my-blob", BasicGame.addDeath());
+
   this.lifes = 0;
 
   var lifeTween = this.game.add.tween(this.lifesGroup);

@@ -92,7 +92,7 @@ BasicGame.Player.prototype.create = function (level) {
   }
 
   if (!this.deathSound) {
-    this.deathSound = this.game.add.sound('death', 0.6);
+    this.deathSound = this.game.add.sound('death', 0.3);
   }
 
   // load the audio for pieces

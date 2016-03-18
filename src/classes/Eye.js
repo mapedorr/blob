@@ -91,11 +91,11 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   };
 
   if (!this.laughSound) {
-    this.laughSound = this.game.add.sound('eye', 0.2);
+    this.laughSound = this.game.add.sound('eye', 0.1);
   }
 
   if (!this.angerSound) {
-    this.angerSound = this.game.add.sound('eye-anger', 1);
+    this.angerSound = this.game.add.sound('eye-anger', 0.8);
   }
 };
 

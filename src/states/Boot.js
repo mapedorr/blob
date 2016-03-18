@@ -1,5 +1,30 @@
 var BasicGame = BasicGame || {
-  language: "en"
+  language: "en",
+  currentLevel: 1,
+  deaths: 0,
+  rest: 0,
+  setDay: function(n) {
+    this.currentLevel = (n < 10) ? ('0' + n) : n;
+    console.log(":::", this.currentLevel);
+    return this.getCode();
+  },
+  addDeath: function() {
+    this.deaths++;
+    return this.getCode();
+  },
+  setRest: function() {
+    this.rest = 1;
+    return this.getCode();
+  },
+  getCode: function() {
+    console.log(this.rest + '' + this.deaths + '' + this.currentLevel);
+    return this.rest + '' + this.deaths + '' + this.currentLevel;
+  },
+  readCode: function(code) {
+    this.currentLevel = parseInt(code.slice(code.length -2, code.length));
+    this.deaths = parseInt(code.slice(1, code.length - 2));
+    this.rest = parseInt(code.charAt(0));
+  }
 };
 
 BasicGame.Boot = function (game) {
@@ -44,5 +69,8 @@ BasicGame.Boot.prototype.create = function () {
 BasicGame.Boot.prototype.update = function () {
   //  By this point the preloader assets have loaded to the cache, we've set the game settings
   //  So now let's start the real preloader going
+  if (localStorage.getItem("oh-my-blob")) {
+    BasicGame.readCode(localStorage.getItem("oh-my-blob"));
+  }
   this.state.start('Preloader');
 };
