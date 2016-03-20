@@ -49,6 +49,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.audio('es-lang', 'assets/soundfx/es.wav', true);
   this.load.audio('jump', 'assets/soundfx/jump.wav', true);
   this.load.audio('walk', 'assets/soundfx/walk.wav', true);
+  this.load.audio('slide', 'assets/soundfx/slide.wav', true);
   this.load.audio('death', 'assets/soundfx/death.wav', true);
   this.load.audio('day', 'assets/soundfx/day.wav', true);
   this.load.audio('b', 'assets/soundfx/b.wav', true);

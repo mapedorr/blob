@@ -24,6 +24,7 @@ BasicGame.Player = function (game, input, gameObj) {
 
   this.jumpSound = null;
   this.walkSound = null;
+  this.slideSound = null;
   this.deathSound = null;
   this.piecesSound = [];
 
@@ -85,14 +86,32 @@ BasicGame.Player.prototype.create = function (level) {
 
   if (!this.jumpSound) {
     this.jumpSound = this.game.add.sound('jump', 0.2);
+    this.jumpSound.onPlay.add(function(){
+      this.slideSound.stop();
+    }, this);
   }
 
   if (!this.walkSound) {
     this.walkSound = this.game.add.sound('walk', 0.2);
+    this.walkSound.onPlay.add(function(){
+      this.slideSound.stop();
+    }, this);
+    this.walkSound.onStop.add(function(){
+      if (this.onTheGround === true) {
+        this.slideSound.play();
+      }
+    }, this);
+  }
+
+  if (!this.slideSound) {
+    this.slideSound = this.game.add.sound('slide', 0.1, true);
   }
 
   if (!this.deathSound) {
     this.deathSound = this.game.add.sound('death', 0.3);
+    this.deathSound.onPlay.add(function(){
+      this.slideSound.stop();
+    }, this);
   }
 
   // load the audio for pieces
@@ -169,48 +188,70 @@ BasicGame.Player.prototype.update = function () {
   var leftPressed = this.leftInputIsActive() === true;
   var rightPressed = this.rightInputIsActive() === true;
   var upPressed = this.upInputIsActive() === true;
-  var onTheGround = this.player.body.touching.down === true && this.player.touchingPiece === false;
+  this.onTheGround = this.player.body.touching.down === true && this.player.touchingPiece === false;
   var onRightWall = this.player.body.touching.right === true && this.player.touchingPiece === false;
   var onLeftWall = this.player.body.touching.left === true && this.player.touchingPiece === false;
 
   if(onRightWall || onLeftWall){
     this.player.body.velocity.y = this.SLID_SPEED;
+    if (this.slideSound.isPlaying === false) {
+      this.slideSound.play();
+    }
   }
 
   if(leftPressed){
     this.rightFirstPress = false;
     this.player.body.acceleration.x = -this.ACCELERATION;
-    if (onTheGround === true && this.leftFirstPress === false) {
-      this.leftFirstPress = true;
-      this.walkSound.play();
+    if (this.onTheGround === true) {
+      if (this.leftFirstPress === false) {
+        this.leftFirstPress = true;
+        this.walkSound.play();
+      }
+
+      if (this.slideSound.isPlaying === false && this.walkSound.isPlaying === false) {
+        this.slideSound.play();
+      }
     }
 
     // If the LEFT key is down, set the player velocity to move left
-    if(!onTheGround && onLeftWall && upPressed){
+    if(!this.onTheGround && onLeftWall && upPressed){
       this.player.body.acceleration.x = this.ACCELERATION * 8
       this.player.body.velocity.y = this.JUMP_SPEED + 50;
       this.jumpSound.play();
     }
+    else if (!this.onTheGround && !onLeftWall) {
+      this.slideSound.stop();
+    }
   }else if (rightPressed){
     this.leftFirstPress = false;
-    if (onTheGround === true && this.rightFirstPress === false) {
-      this.rightFirstPress = true;
-      this.walkSound.play();
+    if (this.onTheGround === true) {
+      if (this.rightFirstPress === false) {
+        this.rightFirstPress = true;
+        this.walkSound.play();
+      }
+
+      if (this.slideSound.isPlaying === false && this.walkSound.isPlaying === false) {
+        this.slideSound.play();
+      }
     }
 
     // If the RIGHT key is down, set the player velocity to move right
     this.player.body.acceleration.x = this.ACCELERATION;
-    if(!onTheGround && onRightWall && upPressed){
+    if (!this.onTheGround && onRightWall && upPressed) {
       this.player.body.acceleration.x = -this.ACCELERATION *8;
       this.player.body.velocity.y = this.JUMP_SPEED + 50;
       this.jumpSound.play();
     }
+    else if (!this.onTheGround && !onRightWall) {
+      this.slideSound.stop();
+    }
   }else{
     this.leftFirstPress = this.rightFirstPress = false;
     this.player.body.acceleration.x = 0;
+    this.slideSound.stop();
   }
 
-  if (upPressed && onTheGround) {
+  if (upPressed && this.onTheGround) {
     this.player.body.velocity.y = this.JUMP_SPEED;
     this.jumpSound.play();
   }
