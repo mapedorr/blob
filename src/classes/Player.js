@@ -25,6 +25,8 @@ BasicGame.Player = function (game, input, gameObj) {
   this.jumpSound = null;
   this.walkSound = null;
   this.slideSound = null;
+  this.fallSound = null;
+  this.justLeaveGround = false;
   this.deathSound = null;
   this.piecesSound = [];
 
@@ -105,6 +107,10 @@ BasicGame.Player.prototype.create = function (level) {
 
   if (!this.slideSound) {
     this.slideSound = this.game.add.sound('slide', 0.1, true);
+  }
+
+  if (!this.fallSound) {
+    this.fallSound = this.game.add.sound('fall', 0.1);
   }
 
   if (!this.deathSound) {
@@ -191,12 +197,33 @@ BasicGame.Player.prototype.update = function () {
   this.onTheGround = this.player.body.touching.down === true && this.player.touchingPiece === false;
   var onRightWall = this.player.body.touching.right === true && this.player.touchingPiece === false;
   var onLeftWall = this.player.body.touching.left === true && this.player.touchingPiece === false;
+  var headHit = this.player.body.touching.up === true && this.player.touchingPiece === false && this.onTheGround === false;
 
-  if(onRightWall || onLeftWall){
+  if (this.player.body.touching.down === false &&
+      this.player.body.touching.right === false &&
+      this.player.body.touching.left === false &&
+      this.justLeaveGround === false) {
+    this.justLeaveGround = true;
+  }
+
+  if (onRightWall || onLeftWall) {
     this.player.body.velocity.y = this.SLID_SPEED;
     if (this.slideSound.isPlaying === false) {
       this.slideSound.play();
     }
+
+    if (this.justLeaveGround === true) {
+      this.justLeaveGround = false;
+      this.fallSound.play();
+    }
+  }
+
+  if (this.onTheGround === false) {
+    if (this.slideSound.isPlaying === true) {
+      this.slideSound.stop();
+    }
+
+
   }
 
   if(leftPressed){
@@ -254,6 +281,14 @@ BasicGame.Player.prototype.update = function () {
   if (upPressed && this.onTheGround) {
     this.player.body.velocity.y = this.JUMP_SPEED;
     this.jumpSound.play();
+  }
+
+  if ((headHit === true && this.fallSound.isPlaying === false) ||
+      (this.justLeaveGround === true && this.onTheGround === true)) {
+    if (this.justLeaveGround === true) {
+      this.justLeaveGround = false;
+    }
+    this.fallSound.play();
   }
 
   // This just tells the engine it should update the texture cache
@@ -396,6 +431,8 @@ BasicGame.Player.prototype.updateLevel = function (level) {
   this.collectedPieces = 0;
   this.player.body.enable = false;
   this.level = level;
+  this.justLeaveGround = false;
+  this.slideSound.stop();
   this.player.position.set(this.level.initPlayerPos.x,
     this.level.initPlayerPos.y);
 };
