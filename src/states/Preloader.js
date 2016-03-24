@@ -58,6 +58,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.audio('ray', 'assets/soundfx/ray.wav', true);
   this.load.audio('eye', 'assets/soundfx/eye.wav', true);
   this.load.audio('eye-anger', 'assets/soundfx/anger.wav', true);
+  this.load.audio('spike', 'assets/soundfx/spike.wav', true);
   this.load.audio('level_music', 'assets/music/levels_music.mp3', true);
   // load the sounds for the pieces
   for(var i = 1; i <= 20; i++){

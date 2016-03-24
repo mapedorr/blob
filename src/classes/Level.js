@@ -27,6 +27,7 @@ BasicGame.Level = function (game, gameObj) {
   this.hasSpikes = false;
 
   this.daySound = null;
+  this.spikeSound = null;
 };
 
 BasicGame.Level.prototype.create = function () {
@@ -75,6 +76,10 @@ BasicGame.Level.prototype.create = function () {
 
   if (!this.daySound) {
     this.daySound = this.game.add.sound('day', 0.2);
+  }
+
+  if (!this.spikeSound) {
+    this.spikeSound = this.game.add.sound('spike', 0.3);
   }
 };
 
@@ -276,17 +281,8 @@ BasicGame.Level.prototype.addWidthSpike = function(platformSprite, inBottom){
 
   if(!inBottom){
     // create the tweens for showing and hiding the spikes
-    var showSpikeTween = this.game.add.tween(spikeSprite)
-      .to({y: spikeSprite.desY},
-        100,
-        null,
-        false,
-        300);
-    showSpikeTween.onComplete.add(function(){
-      this.isHidden = false;
-      this.hideTween.start();
-      this.parent.openedSpikes++;
-    }, spikeSprite);
+    var showSpikeTween = this.createShowSpikeTween(spikeSprite,
+      {y: spikeSprite.desY}, 100, 300);
 
     var hideSpikeTween = this.game.add.tween(spikeSprite)
       .to({y: spikeSprite.oriY},
@@ -336,17 +332,8 @@ BasicGame.Level.prototype.addHeightSpike = function(platformSprite, side){
   }
 
   // create the tweens for showing and hiding the spikes
-  var showSpikeTween = this.game.add.tween(spikeSprite)
-    .to({x: spikeSprite.desX},
-      100,
-      null,
-      false,
-      500);
-  showSpikeTween.onComplete.add(function(){
-    this.isHidden = false;
-    this.hideTween.start();
-    this.parent.openedSpikes++;
-  }, spikeSprite);
+  var showSpikeTween = this.createShowSpikeTween(spikeSprite,
+    {x: spikeSprite.desX}, 100, 500);
 
   var hideSpikeTween = this.game.add.tween(spikeSprite)
     .to({x: spikeSprite.oriX},
@@ -368,4 +355,23 @@ BasicGame.Level.prototype.addHeightSpike = function(platformSprite, side){
   spikeSprite.body.allowGravity = false;
 
   return spikeSprite;
+};
+
+BasicGame.Level.prototype.createShowSpikeTween = function(spikeSprite, properties, duration, delay) {
+  var _self = this;
+  var showSpikeTween = this.game.add.tween(spikeSprite)
+    .to(properties,
+      duration,
+      null,
+      false,
+      delay);
+
+  showSpikeTween.onComplete.add(function(){
+    this.isHidden = false;
+    this.hideTween.start();
+    this.parent.openedSpikes++;
+    _self.spikeSound.play();
+  }, spikeSprite);
+
+  return showSpikeTween;
 };
