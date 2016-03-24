@@ -1,6 +1,6 @@
 var BasicGame = BasicGame || {
-  language: "en",
-  currentLevel: 25,
+  language: "es",
+  currentLevel: 30,
   deaths: 0,
   rest: 0,
   setDay: function(n) {
@@ -17,7 +17,6 @@ var BasicGame = BasicGame || {
     return this.getCode();
   },
   getCode: function() {
-    console.log(this.rest + '' + this.deaths + '' + this.currentLevel);
     return this.rest + '' + this.deaths + '' + this.currentLevel;
   },
   readCode: function(code) {
@@ -26,6 +25,11 @@ var BasicGame = BasicGame || {
     this.currentLevel = parseInt(code.slice(code.length -2, code.length));
     this.deaths = parseInt(code.slice(1, code.length - 2));
     this.rest = parseInt(code.charAt(0));
+
+    console.log("this.deaths", this.deaths);
+  },
+  getDeaths: function() {
+    return this.deaths;
   }
 };
 

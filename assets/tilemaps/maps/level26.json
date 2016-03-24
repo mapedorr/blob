@@ -33,7 +33,7 @@
          "name":"platforms",
          "objects":[
                 {
-                 "height":64,
+                 "height":128,
                  "id":19,
                  "name":"",
                  "properties":
@@ -45,7 +45,7 @@
                  "visible":true,
                  "width":32,
                  "x":32,
-                 "y":224
+                 "y":160
                 }, 
                 {
                  "height":32,
@@ -147,7 +147,7 @@
         {
          "color":"#ffa0a4",
          "draworder":"topdown",
-         "height":20,
+         "height":0,
          "name":"spikes",
          "objects":[
                 {
@@ -288,7 +288,7 @@
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
-         "width":32,
+         "width":0,
          "x":0,
          "y":0
         }, 

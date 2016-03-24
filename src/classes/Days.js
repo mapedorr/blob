@@ -14,7 +14,8 @@ BasicGame.Days = function () {
           "text": {
             "en": "(peaceful days)",
             "es": "(días tranquilos)"
-          }
+          },
+          "waitTime": 5000
         },
     11: { "number": 83 },
     12: { "number": 74 },
@@ -32,49 +33,57 @@ BasicGame.Days = function () {
           "text": {
             "en": "How could I do it?...how could I?",
             "es": "¿Cómo pude hacerlo?...¿cómo pude?"
-          }
+          },
+          "waitTime": 5000
         },
     24: { "number": 6 ,
           "text": {
             "en": "H: You have to calm down, I told you it wouldn't be easy. Don't!...wait there, I'll go.",
             "es": "H: Tienes que calmarte, te dije que no sería fácil. No!...espera, voy para allá."
-          }
+          },
+          "waitTime": 5000
         },
     25: { "number": 5,
           "text": {
             "en": "I must talk H.",
             "es": "Tengo que hablar con H."
-          }
+          },
+          "waitTime": 5000
         },
     26: { "number": 4,
           "text": {
             "en": "Don't don't don't...there must be something I can do",
             "es": "No no no no...debe haber algo que pueda hacer"
-          }
+          },
+          "waitTime": 5000
         },
     27: { "number": 3,
           "text": {
             "en": "I have to tell everything...I...must...",
             "es": "Tengo que contarlo todo...tengo...que..."
-          }
+          },
+          "waitTime": 5000
         },
     28: { "number": 2,
           "text": {
             "en": "...maybe it deserved it...but..who am I to judge?",
             "es": "...o tal vez sí lo merecía...pero...¿quién soy yo para juzgar?"
-          }
+          },
+          "waitTime": 5000
         },
     29: { "number": 1,
           "text": {
             "en": "...did not deserve it...",
             "es": "...no se lo merecía...no..."
-          }
+          },
+          "waitTime": 5000
         },
     30: { "number": 0,
           "text": {
             "en": "...oh...what I've done?",
             "es": "...pero...¿qué he hecho?"
-          }
+          },
+          "waitTime": 5000
         }
   };
 };

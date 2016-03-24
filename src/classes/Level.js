@@ -68,7 +68,6 @@ BasicGame.Level.prototype.create = function () {
     this.fontSize / 2,
     this.levelTextGroup);
   this.dayPhraseTextBitmap.maxWidth = this.game.world.width;
-  this.dayPhraseTextBitmap.width = this.game.world.width;
   this.dayPhraseTextBitmap.align = "center";
   this.dayPhraseTextBitmap.tint = 0x515151;
 
@@ -246,7 +245,8 @@ BasicGame.Level.prototype.showDay = function(){
   var dayTimer = this.game.time.create(true);
 
   // set the timer to stop showing the day
-  dayTimer.add(2000,
+  var currentDayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
+  dayTimer.add(currentDayObj.waitTime || 2000,
     function(){
       this.levelTextGroup.alpha = 0;
       this.isShowingDays = false;

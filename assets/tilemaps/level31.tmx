@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="19">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="25">
  <objectgroup name="floor">
-  <object id="1" x="0" y="608" width="224" height="32">
+  <object id="1" x="0" y="608" width="864" height="32">
    <properties>
     <property name="gid" value="p2"/>
    </properties>
@@ -11,11 +11,21 @@
   <object id="11" x="352" y="0" width="32" height="544"/>
   <object id="14" x="192" y="160" width="32" height="192"/>
  </objectgroup>
+ <objectgroup color="#ffa0a4" name="spikes">
+  <object id="23" x="96" y="416" width="64" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="24" x="128" y="448" width="32" height="64">
+   <properties>
+    <property name="spike-platform" value="1"/>
+    <property name="spike-side" value="r"/>
+   </properties>
+  </object>
+ </objectgroup>
  <objectgroup name="pieces">
-  <object id="5" x="272" y="496" width="16" height="16"/>
-  <object id="15" x="272" y="336" width="16" height="16"/>
   <object id="16" x="272" y="80" width="16" height="16"/>
-  <object id="17" x="112" y="496" width="16" height="16"/>
   <object id="18" x="1008" y="592" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="player_pos">

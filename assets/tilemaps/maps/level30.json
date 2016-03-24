@@ -61,38 +61,6 @@
          "name":"spikes",
          "objects":[
                 {
-                 "height":64,
-                 "id":145,
-                 "name":"",
-                 "properties":
-                    {
-                     "spike-platform":"1",
-                     "spike-side":"r"
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":0,
-                 "y":576
-                }, 
-                {
-                 "height":64,
-                 "id":199,
-                 "name":"",
-                 "properties":
-                    {
-                     "spike-platform":"1",
-                     "spike-side":"l"
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":32,
-                 "y":576
-                }, 
-                {
                  "height":32,
                  "id":200,
                  "name":"",
@@ -230,7 +198,7 @@
                  "visible":true,
                  "width":32,
                  "x":32,
-                 "y":416
+                 "y":448
                 }, 
                 {
                  "height":32,
@@ -630,7 +598,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":303,
+ "nextobjectid":304,
  "orientation":"orthogonal",
  "properties":
     {

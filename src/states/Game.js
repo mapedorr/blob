@@ -243,9 +243,16 @@ BasicGame.Game.prototype.hideDarkness = function(){
 };
 
 BasicGame.Game.prototype.loadLevel = function(levelNumber){
+  if (levelNumber > 30) {
+    // congrats, you ended the game
+    this.state.start('TheEnd');
+    return;
+  }
+
   if (this.background.key != this.getSkyName()) {
     this.background.loadTexture(this.getSkyName());
   }
+
   this.level.destroyCurrentLevel();
   this.level.createLevel(levelNumber);
 

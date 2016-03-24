@@ -76,8 +76,8 @@ BasicGame.Preloader.prototype.preload = function(){
 
   this.load.bitmapFont('font','assets/fonts/PressStart2P_0.png','assets/fonts/PressStart2P.xml');
 
-  // load the map for the first level
-  for(var i = 1; i <= 30; i++){
+  // load the tilemaps of each level
+  for(var i = 1; i <= 31; i++){
     if(i < 10){
       this.game.load.tilemap('lvl0' + i,
         'assets/tilemaps/maps/level0' + i + '.json',
@@ -100,6 +100,6 @@ BasicGame.Preloader.prototype.update = function(){
   //this.cache.isSoundDecoded('mainMenuMusic')
   if (this.ready == false) {
     this.ready = true;
-    this.state.start('Game');
+    this.state.start('TheEnd');
   }
 };
