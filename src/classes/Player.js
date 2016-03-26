@@ -94,7 +94,7 @@ BasicGame.Player.prototype.create = function (level) {
   }
 
   if (!this.walkSound) {
-    this.walkSound = this.game.add.sound('walk', 0.2);
+    this.walkSound = this.game.add.sound('walk', 0.1);
     this.walkSound.onPlay.add(function(){
       this.slideSound.stop();
     }, this);
@@ -106,7 +106,7 @@ BasicGame.Player.prototype.create = function (level) {
   }
 
   if (!this.slideSound) {
-    this.slideSound = this.game.add.sound('slide', 0.1, true);
+    this.slideSound = this.game.add.sound('slide', 0.08, true);
   }
 
   if (!this.fallSound) {
@@ -158,6 +158,9 @@ BasicGame.Player.prototype.update = function () {
     this.game.physics.arcade.collide(this.player, this.level.walls,
       function(player, spikePlatform){
         if(spikePlatform.spikeRef && spikePlatform.spikeRef.isHidden === true){
+          if (this.gameObj.level.spikeSound.isPlaying === false) {
+            this.gameObj.level.spikeSound.play();
+          }
           spikePlatform.spikeRef.showTween.start();
         }
       }, null, this);
@@ -439,6 +442,7 @@ BasicGame.Player.prototype.updateLevel = function (level) {
 
 BasicGame.Player.prototype.dieWithDignity = function(){
   this.dead = true;
+  this.slideSound.stop();
 
   var timer = this.game.time.create(true);
   timer.add(100, function(){

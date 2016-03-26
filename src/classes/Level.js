@@ -21,7 +21,6 @@ BasicGame.Level = function (game, gameObj) {
   };
 
   // font attributes
-  this.fontSize = 32;
   this.fontId = 'font';
   this.hasFloor = false;
   this.hasSpikes = false;
@@ -51,21 +50,21 @@ BasicGame.Level.prototype.create = function () {
 
   // create the bitmap for the day number
   this.dayNumberTextBitmap = this.game.add.bitmapText(this.game.world.width/2,
-    this.game.world.height/2,
+    this.game.world.height/2 - 15,
     this.fontId,
     '',
-    this.fontSize,
+    72,
     this.levelTextGroup);
   this.dayNumberTextBitmap.anchor.set(.5, .5);
   this.dayNumberTextBitmap.align = "center";
-  this.dayNumberTextBitmap.tint = 0x212121;
+  this.dayNumberTextBitmap.tint = 0x1e3137;
 
   // create the bitmap for the day phrase
   this.dayPhraseTextBitmap = this.game.add.bitmapText(0,
-    this.game.world.height/2 + 40,
+    this.dayNumberTextBitmap.bottom + 20,
     this.fontId,
     '',
-    this.fontSize / 2,
+    48,
     this.levelTextGroup);
   this.dayPhraseTextBitmap.maxWidth = this.game.world.width;
   this.dayPhraseTextBitmap.align = "center";
@@ -74,11 +73,11 @@ BasicGame.Level.prototype.create = function () {
   this.createLevel(parseInt(BasicGame.currentLevel));
 
   if (!this.daySound) {
-    this.daySound = this.game.add.sound('day', 0.2);
+    this.daySound = this.game.add.sound('day', 0.15);
   }
 
   if (!this.spikeSound) {
-    this.spikeSound = this.game.add.sound('spike', 0.3);
+    this.spikeSound = this.game.add.sound('spike', 0.2);
   }
 };
 
@@ -370,7 +369,6 @@ BasicGame.Level.prototype.createShowSpikeTween = function(spikeSprite, propertie
     this.isHidden = false;
     this.hideTween.start();
     this.parent.openedSpikes++;
-    _self.spikeSound.play();
   }, spikeSprite);
 
   return showSpikeTween;

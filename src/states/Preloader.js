@@ -43,8 +43,13 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('spike-r', 'assets/images/spike-r.png');
   this.load.image('spike-l', 'assets/images/spike-l.png');
   this.load.image('spike-d', 'assets/images/spike-d.png');
+  this.load.image('end_scene', 'assets/images/end_scene.png');
+
   this.load.spritesheet('player','assets/sprites/player.png', 32, 32);
   this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);
+
+  this.load.atlas('clouds', 'assets/sprites/clouds.png', 'assets/sprites/clouds.xml', null, Phaser.Loader.TEXTURE_ATLAS_XML_STARLING);
+
   this.load.audio('en-lang', 'assets/soundfx/en.wav', true);
   this.load.audio('es-lang', 'assets/soundfx/es.wav', true);
   this.load.audio('jump', 'assets/soundfx/jump.wav', true);
@@ -60,6 +65,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.audio('eye-anger', 'assets/soundfx/anger.wav', true);
   this.load.audio('spike', 'assets/soundfx/spike.wav', true);
   this.load.audio('level_music', 'assets/music/levels_music.mp3', true);
+  this.load.audio('the_end', 'assets/music/the_end.mp3', true);
   // load the sounds for the pieces
   for(var i = 1; i <= 20; i++){
     if(i < 10){
@@ -74,7 +80,8 @@ BasicGame.Preloader.prototype.preload = function(){
     }
   }
 
-  this.load.bitmapFont('font','assets/fonts/PressStart2P_0.png','assets/fonts/PressStart2P.xml');
+  // this.load.bitmapFont('font','assets/fonts/PressStart2P_0.png','assets/fonts/PressStart2P.xml');
+  this.load.bitmapFont('font','assets/fonts/teko-light_0.png','assets/fonts/teko-light.fnt', null, 5);
 
   // load the tilemaps of each level
   for(var i = 1; i <= 31; i++){

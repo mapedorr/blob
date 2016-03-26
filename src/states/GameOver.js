@@ -48,14 +48,15 @@ BasicGame.GameOver.prototype.create = function(){
   // this.game.stage.backgroundColor = 0x000;
   this.background = this.game.add.tileSprite(0, 0,
     this.game.world.width, this.game.world.height, this.getSkyName());
+  this.background.alpha = 0.3;
 
   // create the group and text for the "Game Over" text
   this.gameOverGroup = this.game.add.group();
   this.dialogTextBitmap = this.add.bitmapText(this.game.world.width/2,
-    this.game.world.height/2 - 50,
+    this.game.world.height/2 - 20,
     this.fontId,
     this.getPhrase(),
-    18,
+    48,
     this.gameOverGroup);
   this.dialogTextBitmap.anchor.set(.5, .5);
   this.dialogTextBitmap.tint = 0xFFFFFF;
@@ -63,21 +64,21 @@ BasicGame.GameOver.prototype.create = function(){
   // create the group and text for the phrase
   this.phraseGroup = this.game.add.group();
   this.phraseBitmap = this.add.bitmapText(this.game.world.width/2,
-    this.game.world.height/2,
+    this.dialogTextBitmap.bottom + 20,
     this.fontId,
     this.hSpeech[BasicGame.language],
-    14,
+    48,
     this.phraseGroup);
   this.phraseBitmap.anchor.set(.5, .5);
-  this.phraseBitmap.tint = 0x000000;
+  this.phraseBitmap.tint = 0xFFFF50;
 
   // create the group and text for Try again
   this.tryAgainGroup = this.game.add.group();
   this.tryAgainBitmap = this.game.add.bitmapText(this.game.world.width/2,
-    this.game.world.height/2 + 200,
+    this.game.world.height/2 + 280,
     this.fontId,
     this.tryAgainText[BasicGame.language],
-    12,
+    36,
     this.tryAgainGroup);
   this.tryAgainBitmap.anchor.set(.5, .5);
   this.tryAgainBitmap.tint = 0xF2C249;

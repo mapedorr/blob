@@ -10,7 +10,7 @@ BasicGame.Intro = function (game) {
   
   this.fontId = 'font';
   this.textColors = {
-    'H': 0x000000,
+    'H': 0xFFFF50,
     'B': 0xFFFFFF
   };
   this.dialogs = {
@@ -92,7 +92,7 @@ BasicGame.Intro.prototype.create = function(){
     this.game.world.height / 2,
     this.fontId,
     '???',
-    14,
+    36,
     this.textBitmapsGroup);
   this.dialogTextBitmap.align = "left";
   this.dialogTextBitmap.anchor.set(.5, .5);
@@ -104,7 +104,7 @@ BasicGame.Intro.prototype.create = function(){
     this.game.world.height - 20,
     this.fontId,
     this.skipText[BasicGame.language],
-    16,
+    32,
     this.textBitmapsGroup);
   this.skipBitmap.align = "left";
   this.skipBitmap.tint = 0xF2C249;
@@ -123,8 +123,8 @@ BasicGame.Intro.prototype.create = function(){
     false);
 
   // load the sounds of B and H
-  this.BSound = this.game.add.sound('b', 0.5);
-  this.HSound = this.game.add.sound('h', 0.5);
+  this.BSound = this.game.add.sound('b', 0.2);
+  this.HSound = this.game.add.sound('h', 0.2);
 
   // show the first dialog
   this.updateDialog();
