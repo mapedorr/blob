@@ -169,56 +169,6 @@ BasicGame.Eye.prototype.isPlayerInsideViewZone = function(){
   return false;
 };
 
-BasicGame.Eye.prototype.calmDown = function(){
-  if (this.shooting === true) {
-    return;
-  }
-
-  this.lightningTimer = 0;
-  if(this.anger == true){
-    this.angerTimer -= this.game.time.elapsed;
-    if(this.angerTimer <= 0){
-      this.angerTimer = 0;
-      this.anger = false;
-
-      // make the EYE look angry
-      this.eye.animations.play('angry');
-      this.eyeStateTimer = this.searchingTime;
-
-      // shake the world
-      // this.gameObj.shakeCamera();
-      this.shake();
-
-      // intensify search speed
-      this.eye.animations.getAnimation("search").speed += 1;
-
-      // choose a platform for shooting it
-      // this.lightningTimer = 2000;
-      // var chosenPlatform = this.game.rnd.integerInRange(0, this.level.walls.length - 1);
-      // this.lightning.shoot(this.level.walls.getAt(chosenPlatform));
-    }
-  }
-
-  this.eyeStateTimer -= this.game.time.elapsed;
-  if(this.eyeStateTimer <= (this.searchingTime - 2000) && this.eyeStateTimer > 0) {
-    // after 2 seconds, search for the player
-    this.eye.animations.play('search');
-  }else if(this.eyeStateTimer <= 0){
-    this.eye.animations.play('tired');
-
-    if(!this.anger) {
-      // init the timer that will make THE EYE intensifies its searching
-      this.angerTimer = 2000;
-      this.anger = true;
-    }
-  }else{
-    if(this.eye.animations.currentAnim.name != 'angry'){
-      this.viewZoneSprite.visible = false;
-      this.eye.animations.play('irritated');
-    }
-  }
-};
-
 BasicGame.Eye.prototype.shootPlayer = function(target){
   //- - - | DEVELOPMENT MODE | - - -
   if(BasicGame.Game.developmentMode === true) {
@@ -298,7 +248,11 @@ BasicGame.Eye.prototype.getMad = function(){
   this.shake();
 
   // intensify search speed
-  this.eye.animations.getAnimation("search").speed += 1;
+  if (this.eye.animations.getAnimation("search").speed < 4) {
+    console.log("yep");
+    this.eye.animations.getAnimation("search").speed += 1;
+  }
+
 
   this.searchAgain = this.game.time.create(true);
   this.searchAgain.add(1600,

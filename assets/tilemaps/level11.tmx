@@ -22,7 +22,6 @@
   <object id="35" x="928" y="448" width="32" height="32"/>
   <object id="37" x="768" y="160" width="32" height="32"/>
   <object id="38" x="64" y="480" width="32" height="64"/>
-  <object id="40" x="928" y="64" width="32" height="32"/>
  </objectgroup>
  <objectgroup name="pieces">
   <object id="12" x="816" y="368" width="16" height="16"/>
@@ -30,8 +29,7 @@
   <object id="22" x="48" y="592" width="16" height="16"/>
   <object id="24" x="816" y="176" width="16" height="16"/>
   <object id="41" x="912" y="272" width="16" height="16"/>
-  <object id="42" x="912" y="16" width="16" height="16"/>
-  <object id="45" x="912" y="80" width="16" height="16"/>
+  <object id="42" x="912" y="80" width="16" height="16"/>
   <object id="46" x="912" y="464" width="16" height="16"/>
   <object id="47" x="48" y="48" width="16" height="16"/>
  </objectgroup>

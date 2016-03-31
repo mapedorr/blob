@@ -52,6 +52,44 @@ BasicGame.TheEnd = function (game) {
         bips: 3,
         waitTime: 3
       }
+    ],
+    "en": [
+      {
+        character: 'B',
+        text: '388 days has passed since I murdered M.',
+        bips: 2,
+        waitTime: 3
+      },
+      {
+        character: 'B',
+        text: 'I was tempted to tell all to the police like 30 times.',
+        bips: 3,
+        waitTime: 4
+      },
+      {
+        character: 'B',
+        text: 'The first days were the hardest. It was very difficult to avoid The Remorse.',
+        bips: 4,
+        waitTime: 5
+      },
+      {
+        character: 'B',
+        text: 'But I succeeded.',
+        bips: 1,
+        waitTime: 2
+      },
+      {
+        character: 'B',
+        text: 'Now that I think about it, get benefit from another\'s death is not such bad thing.',
+        bips: 4,
+        waitTime: 5
+      },
+      {
+        character: 'B',
+        text: 'I think I start to understand the way H. thinks.',
+        bips: 3,
+        waitTime: 3
+      }
     ]
   };
   this.textBitmapsGroup = null;

@@ -432,6 +432,7 @@ BasicGame.Player.prototype.drawLinesToLight = function(lightImage){
 
 BasicGame.Player.prototype.updateLevel = function (level) {
   this.collectedPieces = 0;
+  this.player.body.reset(this.player.x, this.player.y);
   this.player.body.enable = false;
   this.level = level;
   this.justLeaveGround = false;

@@ -142,11 +142,11 @@ BasicGame.Game.prototype.create = function(){
   this.brightnessTween.onComplete.add(function(){
     // this.eye.eyeStateTimer = this.eye.searchingTime;
     this.eye.initSearch(true);
-    this.player.player.body.enable = true;
     this.isLoadingLevel = false;
     if (this.music.isPlaying === false) {
       this.music.play();
     }
+    this.player.player.body.enable = true;
   }, this);
 
   // create the tween for shaking the camera

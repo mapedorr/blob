@@ -1,11 +1,10 @@
 var BasicGame = BasicGame || {
   language: "es",
-  currentLevel: 30,
+  currentLevel: 1,
   deaths: 0,
   rest: 0,
   setDay: function(n) {
     this.currentLevel = (n < 10) ? ('0' + n) : n;
-    console.log(":::", this.currentLevel);
     return this.getCode();
   },
   addDeath: function() {
@@ -25,8 +24,6 @@ var BasicGame = BasicGame || {
     this.currentLevel = parseInt(code.slice(code.length -2, code.length));
     this.deaths = parseInt(code.slice(1, code.length - 2));
     this.rest = parseInt(code.charAt(0));
-
-    console.log("this.deaths", this.deaths);
   },
   getDeaths: function() {
     return this.deaths;

@@ -241,21 +241,6 @@
                  "width":32,
                  "x":64,
                  "y":480
-                }, 
-                {
-                 "height":32,
-                 "id":40,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":928,
-                 "y":64
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -347,21 +332,6 @@
                 {
                  "height":16,
                  "id":42,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":912,
-                 "y":16
-                }, 
-                {
-                 "height":16,
-                 "id":45,
                  "name":"",
                  "properties":
                     {
