@@ -398,8 +398,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":96,
-                 "y":448
+                 "x":768,
+                 "y":160
                 }],
          "opacity":1,
          "type":"objectgroup",
