@@ -18,7 +18,7 @@ BasicGame.TheEnd = function (game) {
     "es": [
       {
         character: 'B',
-        text: 'Han pasado 388 días desde que acabé con la vida de M.',
+        text: 'Han pasado 388 días desde que acabé con la vida de Margareth.',
         bips: 3,
         waitTime: 3
       },
@@ -48,7 +48,7 @@ BasicGame.TheEnd = function (game) {
       },
       {
         character: 'B',
-        text: 'Creo que empiezo a entender la forma de pensar de H.',
+        text: 'Creo que empiezo a entender la forma de pensar de Hub.',
         bips: 3,
         waitTime: 3
       }
@@ -56,7 +56,7 @@ BasicGame.TheEnd = function (game) {
     "en": [
       {
         character: 'B',
-        text: '388 days has passed since I murdered M.',
+        text: '388 days has passed since I murdered Margareth.',
         bips: 2,
         waitTime: 3
       },
@@ -86,7 +86,7 @@ BasicGame.TheEnd = function (game) {
       },
       {
         character: 'B',
-        text: 'I think I start to understand the way H. thinks.',
+        text: 'I think I start to understand the way Hub thinks.',
         bips: 3,
         waitTime: 3
       }
@@ -133,13 +133,17 @@ BasicGame.TheEnd.prototype.create = function() {
   }, this);
   this.cloudsTimer.start();
 
+  // play the music
+  this.music = this.game.add.sound('the_end', 0.1, true);
+  this.music.play();
+
+  // add the sun light for the clouds
+  this.game.add.image(0, -96, 'sun_light').alpha = 0.5;
+
   // create the group that will contain the dialog
   this.textBitmapsGroup = this.game.add.group();
   this.textBitmapsGroup.y = 10;
   this.textBitmapsGroup.x = 0;
-
-  this.music = this.game.add.sound('the_end', 0.1, true);
-  this.music.play();
 };
 
 BasicGame.TheEnd.prototype.update = function(){};

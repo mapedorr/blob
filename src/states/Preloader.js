@@ -25,9 +25,11 @@ BasicGame.Preloader.prototype.preload = function(){
   //As this is just a Project Template I've not provided these assets, swap them for your own.
 
   //  ---| The assets for the Main menu
-  this.load.image('mainMenuBackground', 'assets/images/main_menu_background.png');
+  this.load.image('mainMenuBackground', 'assets/images/splash_screen.png');
   this.load.spritesheet('playButton','assets/sprites/play_button.png', 400, 256);
   this.load.spritesheet('jugarButton','assets/sprites/jugar_button.png', 400, 256);
+  this.load.spritesheet('continueButton','assets/sprites/continue_button.png', 400, 256);
+  this.load.spritesheet('continuarButton','assets/sprites/continuar_button.png', 400, 256);
   //  this.load.audio('mainMenuMusic',['assets/music/main_menu.ogg'],true);
 
   //  ---| The assets for the Game
@@ -44,6 +46,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('spike-l', 'assets/images/spike-l.png');
   this.load.image('spike-d', 'assets/images/spike-d.png');
   this.load.image('end_scene', 'assets/images/end_scene.png');
+  this.load.image('sun_light', 'assets/images/sun_light.png');
 
   this.load.spritesheet('player','assets/sprites/player.png', 32, 32);
   this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);

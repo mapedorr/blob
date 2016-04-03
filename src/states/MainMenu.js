@@ -19,28 +19,28 @@ BasicGame.MainMenu.prototype.create = function(){
     this.game.world.width, this.game.world.height, 'mainMenuBackground');
 
   if (!this.enSound) {
-    this.enSound = this.game.add.sound('en-lang', 0.6);
+    this.enSound = this.game.add.sound('en-lang', 0.4);
   }
 
   if (!this.esSound) {
-    this.esSound = this.game.add.sound('es-lang', 0.6);
+    this.esSound = this.game.add.sound('es-lang', 0.4);
   }
 
   // create the group for the play buttons
   this.playGroup = this.game.add.group();
 
   this.playButton = this.add.sprite(this.world.width/2, this.world.height/2,
-    'playButton', 0, this.playGroup);
+    (BasicGame.currentLevel === 1) ? 'playButton' : 'continueButton', 0, this.playGroup);
   this.playButton.anchor.set(0.5, 0);
   this.playButton.scale.setTo(0.8, 0.8);
-  this.playButton.x -= this.playButton.width / 2 + 40;
+  this.playButton.x -= this.playButton.width / 2 + 180;
   this.playButton.y += 30;
 
   this.jugarButton = this.add.sprite(this.world.width/2, this.world.height/2,
-    'jugarButton', 0, this.playGroup);
+    (BasicGame.currentLevel === 1) ? 'jugarButton' : 'continuarButton', 0, this.playGroup);
   this.jugarButton.anchor.set(0.5, 0);
   this.jugarButton.scale.setTo(0.8, 0.8);
-  this.jugarButton.x += this.jugarButton.width / 2 + 40;
+  this.jugarButton.x += this.jugarButton.width / 2 + 180;
   this.jugarButton.y += 30;
 
   this.game.input.keyboard.addKeyCapture([
@@ -62,18 +62,14 @@ BasicGame.MainMenu.prototype.update = function(){
     this.enSound.play();
     this.playButton.frame = 1;
     this.showIntroTimer.start();
-  }else if(this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
+  } else if(this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
     this.esSound.play();
     this.jugarButton.frame = 1;
     BasicGame.language = "es";
     this.showIntroTimer.start();
   }
-
-  // if(BasicGame.language){
-  //   this.showIntroTimer.start();
-  // }
 };
 
 BasicGame.MainMenu.prototype.showIntro = function(){
-  this.state.start('Intro');
+  this.state.start((BasicGame.currentLevel === 1) ? 'Intro' : 'Game');
 };

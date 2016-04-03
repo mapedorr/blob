@@ -18,22 +18,22 @@ BasicGame.GameOver = function(game){
 
   this.bSpeech = {
     "a": {
-      "es": "B: Pensé que lo había superado.",
-      "en": "B: I thought I had overcome this."
+      "es": "Bill: Pensé que lo había superado.",
+      "en": "Bill: I thought I had overcome this."
     },
     "b": {
-      "es": "B: Creo que nunca lograré superarlo.",
-      "en": "B: I think I'll never be able to get over this."
+      "es": "Bill: Creo que nunca lograré superarlo.",
+      "en": "Bill: I think I'll never be able to get over this."
     },
     "c": {
-      "es": "B: No puedo más con esto.",
-      "en": "B: I can't handle this."
+      "es": "Bill: No puedo más con esto.",
+      "en": "Bill: I can't handle this."
     }
   };
 
   this.hSpeech = {
-    "es": "H: Espera...¿Qué vas a hacer?",
-    "en": "H: Wait...¿What are you going to do?"
+    "es": "Hub: Espera...¿Qué vas a hacer?",
+    "en": "Hub: Wait...¿What are you going to do?"
   };
 
   this.tryAgainText = {

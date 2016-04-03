@@ -10,50 +10,50 @@ BasicGame.Intro = function (game) {
   
   this.fontId = 'font';
   this.textColors = {
-    'H': 0xFFFF50,
-    'B': 0xFFFFFF
+    'Hub': 0xFFFF50,
+    'Bill': 0xFFFFFF
   };
   this.dialogs = {
     "es": [
       {
-        character: 'H',
+        character: 'Hub',
         text: 'Tienes que calmarte, todo estará bien.',
         bips: 3
       },
       {
-        character: 'B',
+        character: 'Bill',
         text: '¿Cómo puedes decir eso? No puedo hacerlo!',
         bips: 3
       },
       {
-        character: 'H',
+        character: 'Hub',
         text: 'Descansa, ya verás cómo en unos días dejará de acecharte.',
         bips: 5
       },
       {
-        character: 'B',
+        character: 'Bill',
         text: 'Creo que no seré capaz...',
         bips: 2
       }
     ],
     "en": [
       {
-        character: 'H',
+        character: 'Hub',
         text: 'Calm down, all its going to be fine.',
         bips: 3
       },
       {
-        character: 'B',
+        character: 'Bill',
         text: "How can you say that? I can't do that!",
         bips: 3
       },
       {
-        character: 'H',
+        character: 'Hub',
         text: 'Have a rest, it will stop haunting you in a few days.',
         bips: 4
       },
       {
-        character: 'B',
+        character: 'Bill',
         text: "I think I won't be able to handle this...",
         bips: 3
       }
@@ -163,7 +163,7 @@ BasicGame.Intro.prototype.updateDialog = function(){
     if (dialogObj.bips > 0) {
       this.soundLoopTimer = this.game.time.create(true);
       this.soundLoopTimer.repeat(100, dialogObj.bips, function(){
-        this[dialogObj.character + "Sound"].play();
+        this[dialogObj.character.charAt(0) + "Sound"].play();
       }, this);
       this.soundLoopTimer.start();
     }
