@@ -86,6 +86,10 @@ BasicGame.Preloader.prototype.preload = function(){
   // this.load.bitmapFont('font','assets/fonts/PressStart2P_0.png','assets/fonts/PressStart2P.xml');
   this.load.bitmapFont('font','assets/fonts/teko-light_0.png','assets/fonts/teko-light.fnt', null, 5);
 
+  // load the tilemap for the splash screen
+  this.game.load.tilemap('splash_lvl', 'assets/tilemaps/maps/splash.json',
+        null, Phaser.Tilemap.TILED_JSON);
+
   // load the tilemaps of each level
   for(var i = 1; i <= 31; i++){
     if(i < 10){
