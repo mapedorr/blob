@@ -22,7 +22,8 @@ BasicGame.Light.prototype.create = function (level) {
 
   //Add the light(s)
   this.lightGroup = this.game.add.group();
-  light = this.game.add.sprite((this.game.world.width / 2) - 16, -16, 'light');
+  light = this.game.add.sprite((this.game.world.width / 2), -16, 'light');
+  // light = this.game.add.sprite((this.game.world.width / 2) - 16, -16, 'light');
   light.alpha = 0;
 
   // Set the pivot point of the light to the center of the texture

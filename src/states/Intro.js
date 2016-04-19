@@ -81,9 +81,10 @@ BasicGame.Intro = function (game) {
 
 BasicGame.Intro.prototype.create = function(){
   // set the backgound
-  // this.game.stage.backgroundColor = 0x3D4C53;
-  this.background = this.game.add.tileSprite(0, 0,
-    this.game.world.width, this.game.world.height, "sky03");
+  this.game.stage.backgroundColor = 0x000000;
+  // this.background = this.game.add.tileSprite(0, 0,
+  //   this.game.world.width, this.game.world.height, "sky03");
+  // this.background.alpha = 0.2;
 
   // create the group and text for the dialog and the Skip
   this.textBitmapsGroup = this.game.add.group();
