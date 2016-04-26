@@ -5,7 +5,7 @@
 var BasicGame = BasicGame || {};
 
 BasicGame.MainMenu = function (game) {
-  this.music = null;
+  this.splash_music = null;
   this.playButton = null;
   this.jugarButton = null;
   this.showIntroTimer = null;
@@ -99,10 +99,14 @@ BasicGame.MainMenu.prototype.create = function(){
     },
     this);
 
-  // add the music
-  if (!this.music) {
-    this.music = this.game.add.sound('splash_music', 0.2, true);
-    this.music.play();
+  // add the splash_music
+  if (!this.splash_music) {
+    this.splash_music = this.game.add.sound('splash_music', 0.2, true);
+    this.splash_music.onFadeComplete.addOnce(function(soundObj) {
+      console.log("!!!!!!!!!!!!");
+      soundObj.stop();
+    }, this);
+    this.splash_music.play();
   }
 
   this.darknessGroup = this.add.group();
@@ -150,7 +154,7 @@ BasicGame.MainMenu.prototype.update = function(){
 };
 
 BasicGame.MainMenu.prototype.moveFakePlayer = function (targetX) {
-  this.music.fadeOut(1600);
+  this.splash_music.fadeOut(1480);
   this.movingPlayer = true;
   var moveTween = this.game.add.tween(this.fakeplayer)
     .to({x: targetX},
