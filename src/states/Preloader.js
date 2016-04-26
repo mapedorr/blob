@@ -14,18 +14,34 @@ BasicGame.Preloader.prototype.preload = function(){
   //These are the assets we loaded in Boot.js
   //A nice sparkly background and a loading progress bar
   this.background = this.add.sprite(0, 0, 'preloaderBackground');
+  this.banner = this.add.image(this.game.world.width / 2, this.game.world.height - 40, 'loading_banner');
+  this.banner.anchor.set(0.5, 0);
   this.preloadBar = this.add.sprite(0, 0, 'preloaderBar');
+
+  var blink = this.game.add.tween(this.banner)
+    .to({alpha: 0},
+      700,
+      null,
+      true,
+      0,
+      -1,
+      true);
+
 
   //This sets the preloadBar sprite as a loader sprite.
   //What that does is automatically crop the sprite from 0 to full-width
   //as the files below are loaded in.
-  this.load.setPreloadSprite(this.preloadBar);
+  this.load.setPreloadSprite(this.preloadBar, 1);
 
   //Here we load the rest of the assets our game needs.
   //As this is just a Project Template I've not provided these assets, swap them for your own.
 
   //  ---| The assets for the Main menu
-  this.load.image('mainMenuBackground', 'assets/images/splash_screen.png');
+  // this.load.image('mainMenuBackground', 'assets/images/splash_screen.png');
+  this.load.image('splash_view', 'assets/images/splash_view.png');
+  this.load.image('title', 'assets/images/title.png');
+  // this.load.image('title01', 'assets/images/title_01.png');
+  // this.load.image('title02', 'assets/images/title_02.png');
   this.load.spritesheet('playButton','assets/sprites/play_button.png', 400, 256);
   this.load.spritesheet('jugarButton','assets/sprites/jugar_button.png', 400, 256);
   this.load.spritesheet('continueButton','assets/sprites/continue_button.png', 400, 256);
@@ -67,8 +83,9 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.audio('eye', 'assets/soundfx/eye.wav', true);
   this.load.audio('eye-anger', 'assets/soundfx/anger.wav', true);
   this.load.audio('spike', 'assets/soundfx/spike.wav', true);
-  this.load.audio('level_music', 'assets/music/levels_music.mp3', true);
-  this.load.audio('the_end', 'assets/music/the_end.mp3', true);
+  this.load.audio('splash_music', 'assets/music/splash_music.ogg', true);
+  this.load.audio('level_music', 'assets/music/levels_music.ogg', true);
+  this.load.audio('the_end', 'assets/music/the_end.ogg', true);
   // load the sounds for the pieces
   for(var i = 1; i <= 20; i++){
     if(i < 10){

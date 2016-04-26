@@ -6,23 +6,19 @@
          "name":"floor",
          "objects":[
                 {
-                 "height":96,
+                 "height":136,
                  "id":1,
                  "name":"",
                  "properties":
                     {
                      "gid":"p2"
                     },
-                 "propertytypes":
-                    {
-                     "gid":"string"
-                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":1024,
                  "x":0,
-                 "y":544
+                 "y":608
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -37,20 +33,28 @@
          "name":"platforms",
          "objects":[
                 {
-                 "height":128,
+                 "height":32,
                  "id":11,
                  "name":"",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":192,
                  "x":416,
-                 "y":224
+                 "y":288
                 }, 
                 {
-                 "height":64,
+                 "height":32,
                  "id":25,
                  "name":"",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -59,9 +63,13 @@
                  "y":256
                 }, 
                 {
-                 "height":64,
+                 "height":32,
                  "id":26,
                  "name":"",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -73,6 +81,10 @@
                  "height":32,
                  "id":29,
                  "name":"",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -84,6 +96,10 @@
                  "height":32,
                  "id":30,
                  "name":"",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -95,6 +111,10 @@
                  "height":32,
                  "id":32,
                  "name":"",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -106,6 +126,10 @@
                  "height":32,
                  "id":33,
                  "name":"",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -154,12 +178,16 @@
                  "height":8,
                  "id":6,
                  "name":"plyr",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":32,
                  "x":496,
-                 "y":512
+                 "y":576
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -170,6 +198,10 @@
         }],
  "nextobjectid":35,
  "orientation":"orthogonal",
+ "properties":
+    {
+
+    },
  "renderorder":"right-down",
  "tileheight":32,
  "tilesets":[],

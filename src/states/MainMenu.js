@@ -11,6 +11,7 @@ BasicGame.MainMenu = function (game) {
   this.showIntroTimer = null;
   this.enSound = null;
   this.esSound = null;
+  this.listenKeys = false;
 };
 
 BasicGame.MainMenu.prototype.create = function(){
@@ -28,32 +29,54 @@ BasicGame.MainMenu.prototype.create = function(){
   this.map.createFromObjects("platforms", "", 'platform', 0, true, false,
     this.walls, Phaser.Sprite, false);
 
-  // create the play buttons
-  this.playButton = this.add.sprite(-20, this.world.height - 210,
-    (BasicGame.currentLevel === 1) ? 'playButton' : 'continueButton', 0);
-  this.playButton.anchor.set(0, 0);
-  this.playButton.scale.setTo(0.5, 0.5);
-
-  this.jugarButton = this.add.sprite(this.world.width + 20, this.world.height - 210,
-    (BasicGame.currentLevel === 1) ? 'jugarButton' : 'continuarButton', 0);
-  this.jugarButton.anchor.set(1, 0);
-  this.jugarButton.scale.setTo(0.5, 0.5);
-
   // add the fake player
   this.fakeplayer = this.game.add.sprite(this.map.objects.player_pos[0].x,
     this.map.objects.player_pos[0].y,
     'player');
   this.movingPlayer = false;
 
+  // this.gameTitleBack = this.game.add.image(this.game.world.width / 2 - 5,
+  //   this.game.world.height / 2 + 150, 'title02');
+  // this.gameTitleBack.anchor.set(0.5, 0.5);
+
   // add light and generate shadows
   this.light = new BasicGame.Light(this.game, this);
   this.light.create(this);
   this.light.drawShadows();
 
-  // add EYE image
-  this.add.tileSprite(0, 0,
-    this.game.world.width, this.game.world.height, 'mainMenuBackground');
+  // create the play buttons
+  this.buttons = this.game.add.group();
+  this.playButton = this.add.sprite(-20, this.world.height - 150,
+    (BasicGame.currentLevel === 1) ? 'playButton' : 'continueButton', 0);
+  this.playButton.anchor.set(0, 0);
+  this.playButton.scale.setTo(0.5, 0.5);
+  this.playButton.alpha = 0.8;
 
+  this.jugarButton = this.add.sprite(this.world.width + 20, this.world.height - 150,
+    (BasicGame.currentLevel === 1) ? 'jugarButton' : 'continuarButton', 0);
+  this.jugarButton.anchor.set(1, 0);
+  this.jugarButton.scale.setTo(0.5, 0.5);
+  this.jugarButton.alpha = 0.8;
+
+  this.buttons.addChild(this.playButton);
+  this.buttons.addChild(this.jugarButton);
+  this.buttons.alpha = 0;
+
+  // add the zone of view for the splash screen
+  this.zoneView = this.game.add.image(this.game.world.width / 2, 0, 'splash_view');
+  this.zoneView.anchor.set(0.5, 0);
+  this.zoneView.alpha = 0;
+
+  // add the fake EYE
+  this.fakeEye = this.game.add.sprite(this.game.world.width / 2, 64, 'eye', 10);
+  this.fakeEye.anchor.set(0.5, 0.5);
+
+  // add the game title
+  this.gameTitle = this.game.add.image(this.game.world.width / 2 - 5,
+    this.game.world.height / 2 + 150, 'title');
+  this.gameTitle.anchor.set(0.5, 0.5);
+
+  // add key listeners
   this.game.input.keyboard.addKeyCapture([
     Phaser.Keyboard.LEFT,
     Phaser.Keyboard.RIGHT
@@ -61,11 +84,11 @@ BasicGame.MainMenu.prototype.create = function(){
 
   // load sounds
   if (!this.enSound) {
-    this.enSound = this.game.add.sound('en-lang', 0.4);
+    this.enSound = this.game.add.sound('en-lang', 0.2);
   }
 
   if (!this.esSound) {
-    this.esSound = this.game.add.sound('es-lang', 0.4);
+    this.esSound = this.game.add.sound('es-lang', 0.2);
   }
 
   // create the go-to-next-state timer
@@ -75,10 +98,38 @@ BasicGame.MainMenu.prototype.create = function(){
       this.showIntro();
     },
     this);
+
+  // add the music
+  if (!this.music) {
+    this.music = this.game.add.sound('splash_music', 0.2, true);
+    this.music.play();
+  }
+
+  this.darknessGroup = this.add.group();
+  var darknessBitmap = new Phaser.BitmapData(this.game,
+    'darkness_main',
+    this.game.width,
+    this.game.height);
+  darknessBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
+  darknessBitmap.ctx.fillStyle = '#000';
+  darknessBitmap.ctx.fill();
+  var darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
+  this.darknessGroup.addChild(darknessSprite);
+
+  this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
+  this.darknessTween.to({alpha: 0},
+    5000,
+    Phaser.Easing.Quadratic.Out,
+    true,
+    4500);
+  this.darknessTween.onComplete.add(function(){
+    this.showButtons();
+  }, this);
 };
 
 BasicGame.MainMenu.prototype.update = function(){
-  if (this.movingPlayer === true) {
+  if (this.listenKeys == false ||
+      this.movingPlayer === true) {
     return;
   }
 
@@ -86,19 +137,20 @@ BasicGame.MainMenu.prototype.update = function(){
     // this.world.bringToTop(this.playButton);
     this.enSound.play();
     this.playButton.frame = 1;
+    this.playButton.alpha = 1;
     this.moveFakePlayer(-32);
-    // this.showIntroTimer.start();
   } else if(this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
     // this.world.bringToTop(this.jugarButton);
     this.esSound.play();
     this.jugarButton.frame = 1;
+    this.jugarButton.alpha = 1;
     BasicGame.language = "es";
     this.moveFakePlayer(this.game.world.width + 32);
-    // this.showIntroTimer.start();
   }
 };
 
 BasicGame.MainMenu.prototype.moveFakePlayer = function (targetX) {
+  this.music.fadeOut(1600);
   this.movingPlayer = true;
   var moveTween = this.game.add.tween(this.fakeplayer)
     .to({x: targetX},
@@ -109,6 +161,20 @@ BasicGame.MainMenu.prototype.moveFakePlayer = function (targetX) {
     this.showIntro();
   }, this);
   moveTween.start();
+};
+
+BasicGame.MainMenu.prototype.showButtons = function () {
+  var showButtonsTween = this.game.add.tween(this.buttons)
+    .to({alpha: 1},
+      1000,
+      null,
+      false);
+  showButtonsTween.onComplete.add(function(){
+    this.fakeEye.frame = 0;
+    this.zoneView.alpha = 1;
+    this.listenKeys = true;
+  }, this);
+  showButtonsTween.start();
 };
 
 BasicGame.MainMenu.prototype.showIntro = function(){
