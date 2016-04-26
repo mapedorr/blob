@@ -8,14 +8,19 @@ BasicGame.Player = function (game, input, gameObj) {
   this.level = null;
   this.bitmap = null;
   this.collectedPieces = 0;
+  this.jumpPressed = false;
 
   // define movement constants
   this.MAX_SPEED = 300; // pixels/second
   this.ACCELERATION = 1500; // pixels/second/second
+  this.ACCELERATION_WALL = this.ACCELERATION * 15;
   this.DRAG = 2500; // pixels/second
   this.GRAVITY = 2600; // pixels/second/second
-  this.JUMP_SPEED = -850; // pixels/second (negative y is up)
+  this.JUMP_SPEED = -650; // pixels/second (negative y is up)
+  this.JUMP_SPEED_WALL = -800;
   this.SLID_SPEED = 1;
+  this.JUMP_TIME = 150;
+  this.JUMP_MULTIPLIER = 0.7;
 
   // define gameplay keys
   this.leftKey = Phaser.Keyboard.LEFT;
@@ -57,7 +62,7 @@ BasicGame.Player.prototype.create = function (level) {
   this.game.physics.arcade.enable(this.player);
 
   //Set player minimum and maximum movement speed
-  this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 10); // x, y
+  this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 20); // x, y
 
   //Add drag to the player that slows them down when they are not accelerating
   this.player.body.drag.setTo(this.DRAG, 0); // x, y
@@ -184,7 +189,7 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  if(this.player.body.onFloor() === true){
+  if (this.player.body.onFloor() === true) {
     this.dead = true;
     this.player.body.collideWorldBounds = false;
     this.gameObj.subtractAllLifes();
@@ -225,13 +230,12 @@ BasicGame.Player.prototype.update = function () {
     if (this.slideSound.isPlaying === true) {
       this.slideSound.stop();
     }
-
-
   }
 
-  if(leftPressed){
+  if (leftPressed) {
     this.rightFirstPress = false;
     this.player.body.acceleration.x = -this.ACCELERATION;
+
     if (this.onTheGround === true) {
       if (this.leftFirstPress === false) {
         this.leftFirstPress = true;
@@ -245,15 +249,19 @@ BasicGame.Player.prototype.update = function () {
 
     // If the LEFT key is down, set the player velocity to move left
     if(!this.onTheGround && onLeftWall && upPressed){
-      this.player.body.acceleration.x = this.ACCELERATION * 8
-      this.player.body.velocity.y = this.JUMP_SPEED + 50;
+      this.player.body.acceleration.x = this.ACCELERATION_WALL;
+      this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+      this.jumpMultiplier = 0;
       this.jumpSound.play();
     }
     else if (!this.onTheGround && !onLeftWall) {
       this.slideSound.stop();
     }
-  }else if (rightPressed){
+  }
+  else if (rightPressed) {
     this.leftFirstPress = false;
+    this.player.body.acceleration.x = this.ACCELERATION;
+
     if (this.onTheGround === true) {
       if (this.rightFirstPress === false) {
         this.rightFirstPress = true;
@@ -265,25 +273,39 @@ BasicGame.Player.prototype.update = function () {
       }
     }
 
-    // If the RIGHT key is down, set the player velocity to move right
-    this.player.body.acceleration.x = this.ACCELERATION;
     if (!this.onTheGround && onRightWall && upPressed) {
-      this.player.body.acceleration.x = -this.ACCELERATION *8;
-      this.player.body.velocity.y = this.JUMP_SPEED + 50;
+      this.player.body.acceleration.x = -this.ACCELERATION_WALL;
+      this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+      this.jumpMultiplier = 0;
       this.jumpSound.play();
     }
     else if (!this.onTheGround && !onRightWall) {
       this.slideSound.stop();
     }
-  }else{
+  }
+  else {
     this.leftFirstPress = this.rightFirstPress = false;
     this.player.body.acceleration.x = 0;
+    this.player.body.velocity.x = 0;
     this.slideSound.stop();
   }
 
-  if (upPressed && this.onTheGround) {
+  if (upPressed === true && this.onTheGround === true) {
     this.player.body.velocity.y = this.JUMP_SPEED;
     this.jumpSound.play();
+    this.jumpMultiplier = this.JUMP_MULTIPLIER;
+  }
+
+  // make the jump a bit higher if the player keeps pressing the jump button
+  if (this.input.keyboard.downDuration(this.jumpKey, this.JUMP_TIME) === true) {
+    this.player.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
+    if (this.jumpMultiplier > 0.1)
+      this.jumpMultiplier *= 0.95;
+    else
+      this.jumpMultiplier = 0;
+  }
+  else {
+    this.jumpMultiplier = 0;
   }
 
   if ((headHit === true && this.fallSound.isPlaying === false) ||
@@ -322,11 +344,12 @@ BasicGame.Player.prototype.rightInputIsActive = function () {
 // This function should return true when the player activates the "jump" control
 // In this case, either holding the up arrow or tapping or clicking on the center
 // part of the screen.
-BasicGame.Player.prototype.upInputIsActive = function () {
-  if(this.input.keyboard.isDown(this.jumpKey) && this.upPressedFlag == false){
+BasicGame.Player.prototype.upInputIsActive = function (duration) {
+  if (this.input.keyboard.downDuration(this.jumpKey, duration) && this.upPressedFlag == false) {
     this.upPressedFlag = true;
     return true;
-  }else if(!this.input.keyboard.isDown(this.jumpKey) && this.upPressedFlag == true){
+  }
+  else if (!this.input.keyboard.downDuration(this.jumpKey, duration) && this.upPressedFlag == true) {
     this.upPressedFlag = false;
   }
   return false;

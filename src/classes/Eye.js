@@ -248,11 +248,9 @@ BasicGame.Eye.prototype.getMad = function(){
   this.shake();
 
   // intensify search speed
-  if (this.eye.animations.getAnimation("search").speed < 4) {
-    console.log("yep");
+  if (this.eye.animations.getAnimation("search").speed < 3) {
     this.eye.animations.getAnimation("search").speed += 1;
   }
-
 
   this.searchAgain = this.game.time.create(true);
   this.searchAgain.add(1600,
