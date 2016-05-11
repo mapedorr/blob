@@ -12,15 +12,15 @@ BasicGame.Player = function (game, input, gameObj) {
 
   // define movement constants
   this.MAX_SPEED = 300; // pixels/second
-  this.ACCELERATION = 1500; // pixels/second/second
-  this.ACCELERATION_WALL = this.ACCELERATION * 15;
+  this.ACCELERATION = 1000; // pixels/second/second
+  this.ACCELERATION_WALL = 1000 * 12;
   this.DRAG = 2500; // pixels/second
   this.GRAVITY = 2600; // pixels/second/second
   this.JUMP_SPEED = -650; // pixels/second (negative y is up)
-  this.JUMP_SPEED_WALL = -800;
+  this.JUMP_SPEED_WALL = -830;
   this.SLID_SPEED = 1;
   this.JUMP_TIME = 150;
-  this.JUMP_MULTIPLIER = 0.7;
+  this.JUMP_MULTIPLIER = 0.5;
 
   // define gameplay keys
   this.leftKey = Phaser.Keyboard.LEFT;
@@ -211,11 +211,14 @@ BasicGame.Player.prototype.update = function () {
       this.player.body.touching.right === false &&
       this.player.body.touching.left === false &&
       this.justLeaveGround === false) {
+    this.player.body.offset.x = 0;
     this.justLeaveGround = true;
   }
 
   if (onRightWall || onLeftWall) {
     this.player.body.velocity.y = this.SLID_SPEED;
+    this.player.body.offset.x = 0;
+
     if (this.slideSound.isPlaying === false) {
       this.slideSound.play();
     }
@@ -227,16 +230,20 @@ BasicGame.Player.prototype.update = function () {
   }
 
   if (this.onTheGround === false) {
+    this.player.body.offset.x = 0;
     if (this.slideSound.isPlaying === true) {
       this.slideSound.stop();
     }
   }
 
   if (leftPressed) {
+    // If the LEFT key is down, set the player velocity to move left
     this.rightFirstPress = false;
     this.player.body.acceleration.x = -this.ACCELERATION;
 
     if (this.onTheGround === true) {
+      this.player.body.offset.x = 5;
+
       if (this.leftFirstPress === false) {
         this.leftFirstPress = true;
         this.walkSound.play();
@@ -246,23 +253,26 @@ BasicGame.Player.prototype.update = function () {
         this.slideSound.play();
       }
     }
-
-    // If the LEFT key is down, set the player velocity to move left
-    if(!this.onTheGround && onLeftWall && upPressed){
-      this.player.body.acceleration.x = this.ACCELERATION_WALL;
-      this.player.body.velocity.y = this.JUMP_SPEED_WALL;
-      this.jumpMultiplier = 0;
-      this.jumpSound.play();
-    }
-    else if (!this.onTheGround && !onLeftWall) {
-      this.slideSound.stop();
+    else {
+      if (onLeftWall && upPressed){
+        this.player.body.acceleration.x = this.ACCELERATION_WALL;
+        this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+        this.jumpMultiplier = 0;
+        this.jumpSound.play();
+      }
+      else if (!onLeftWall) {
+        this.slideSound.stop();
+      }
     }
   }
   else if (rightPressed) {
+    // If the RIGHT key is down, set the player velocity to move right
     this.leftFirstPress = false;
     this.player.body.acceleration.x = this.ACCELERATION;
 
     if (this.onTheGround === true) {
+      this.player.body.offset.x = -5;
+
       if (this.rightFirstPress === false) {
         this.rightFirstPress = true;
         this.walkSound.play();
@@ -272,25 +282,28 @@ BasicGame.Player.prototype.update = function () {
         this.slideSound.play();
       }
     }
-
-    if (!this.onTheGround && onRightWall && upPressed) {
-      this.player.body.acceleration.x = -this.ACCELERATION_WALL;
-      this.player.body.velocity.y = this.JUMP_SPEED_WALL;
-      this.jumpMultiplier = 0;
-      this.jumpSound.play();
-    }
-    else if (!this.onTheGround && !onRightWall) {
-      this.slideSound.stop();
+    else {
+      if (onRightWall && upPressed) {
+        this.player.body.acceleration.x = -this.ACCELERATION_WALL;
+        this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+        this.jumpMultiplier = 0;
+        this.jumpSound.play();
+      }
+      else if (!onRightWall) {
+        this.slideSound.stop();
+      }
     }
   }
   else {
     this.leftFirstPress = this.rightFirstPress = false;
     this.player.body.acceleration.x = 0;
     this.player.body.velocity.x = 0;
+    this.player.body.offset.x = 0;
     this.slideSound.stop();
   }
 
   if (upPressed === true && this.onTheGround === true) {
+    this.player.body.offset.x = 0;
     this.player.body.velocity.y = this.JUMP_SPEED;
     this.jumpSound.play();
     this.jumpMultiplier = this.JUMP_MULTIPLIER;

@@ -1,6 +1,6 @@
 var BasicGame = BasicGame || {
   language: "en",
-  currentLevel: 10,
+  currentLevel: 27,
   deaths: 0,
   rest: 0,
   setDay: function(n) {
