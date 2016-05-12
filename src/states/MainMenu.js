@@ -12,6 +12,10 @@ BasicGame.MainMenu = function (game) {
   this.enSound = null;
   this.esSound = null;
   this.listenKeys = false;
+
+  this.fontId = 'font';
+  this.creditsTextBitmap = null;
+  this.restartTextBitmap = null;
 };
 
 BasicGame.MainMenu.prototype.create = function(){
@@ -58,8 +62,32 @@ BasicGame.MainMenu.prototype.create = function(){
   this.jugarButton.scale.setTo(0.5, 0.5);
   this.jugarButton.alpha = 0.8;
 
+  this.creditsTextBitmap = this.add.bitmapText(this.game.world.width / 2,
+    this.game.world.height - 32,
+    this.fontId,
+    '(C) Credits/Créditos',
+    36);
+  this.creditsTextBitmap.align = "center";
+  this.creditsTextBitmap.anchor.set(.5, 0);
+
+  if (BasicGame.currentLevel > 1) {
+    this.restartTextBitmap = this.add.bitmapText((this.game.world.width / 2) + 10,
+      this.game.world.height - 32,
+      this.fontId,
+      '(R) Restart/Reiniciar',
+      36);
+    this.restartTextBitmap.align = "center";
+
+    this.creditsTextBitmap.anchor.set(1, 0);
+    this.creditsTextBitmap.x -= 10;
+  }
+
   this.buttons.addChild(this.playButton);
   this.buttons.addChild(this.jugarButton);
+  this.buttons.addChild(this.creditsTextBitmap);
+  if (BasicGame.currentLevel > 1) {
+    this.buttons.addChild(this.restartTextBitmap);
+  }
   this.buttons.alpha = 0;
 
   // add the zone of view for the splash screen
@@ -103,12 +131,12 @@ BasicGame.MainMenu.prototype.create = function(){
   if (!this.splash_music) {
     this.splash_music = this.game.add.sound('splash_music', 0.2, true);
     this.splash_music.onFadeComplete.addOnce(function(soundObj) {
-      console.log("!!!!!!!!!!!!");
       soundObj.stop();
     }, this);
     this.splash_music.play();
   }
 
+  // DARKNESS
   this.darknessGroup = this.add.group();
   var darknessBitmap = new Phaser.BitmapData(this.game,
     'darkness_main',
@@ -137,13 +165,14 @@ BasicGame.MainMenu.prototype.update = function(){
     return;
   }
 
-  if(this.input.keyboard.isDown(Phaser.Keyboard.LEFT)){
+  if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
     // this.world.bringToTop(this.playButton);
     this.enSound.play();
     this.playButton.frame = 1;
     this.playButton.alpha = 1;
     this.moveFakePlayer(-32);
-  } else if(this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
+  }
+  else if(this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
     // this.world.bringToTop(this.jugarButton);
     this.esSound.play();
     this.jugarButton.frame = 1;
@@ -151,6 +180,20 @@ BasicGame.MainMenu.prototype.update = function(){
     BasicGame.language = "es";
     this.moveFakePlayer(this.game.world.width + 32);
   }
+  else if (this.input.keyboard.isDown(Phaser.Keyboard.C)) {
+    // load the credits scene
+    this.listenKeys == false;
+    this.splash_music.stop();
+    this.state.start('Credits');
+  }
+  else if (this.input.keyboard.isDown(Phaser.Keyboard.R)) {
+    // clean the localStorage, then set the currrent level to 1, show intro
+    this.listenKeys = false;
+    localStorage.removeItem("oh-my-blob");
+    BasicGame.reset();
+    this.showIntro();
+  }
+
 };
 
 BasicGame.MainMenu.prototype.moveFakePlayer = function (targetX) {

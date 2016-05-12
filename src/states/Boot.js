@@ -27,6 +27,11 @@ var BasicGame = BasicGame || {
   },
   getDeaths: function() {
     return this.deaths;
+  },
+  reset: function() {
+    this.currentLevel = 1,
+    this.deaths = 0,
+    this.rest = 0
   }
 };
 
