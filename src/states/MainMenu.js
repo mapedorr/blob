@@ -191,6 +191,7 @@ BasicGame.MainMenu.prototype.update = function(){
     this.listenKeys = false;
     localStorage.removeItem("oh-my-blob");
     BasicGame.reset();
+    this.splash_music.stop();
     this.showIntro();
   }
 

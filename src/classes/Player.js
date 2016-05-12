@@ -253,7 +253,7 @@ BasicGame.Player.prototype.update = function () {
     this.player.body.acceleration.x = -this.ACCELERATION;
 
     if (this.onTheGround === true) {
-      this.player.body.offset.x = 5;
+      // this.player.body.offset.x = 5;
 
       if (this.leftFirstPress === false) {
         this.leftFirstPress = true;
@@ -282,7 +282,7 @@ BasicGame.Player.prototype.update = function () {
     this.player.body.acceleration.x = this.ACCELERATION;
 
     if (this.onTheGround === true) {
-      this.player.body.offset.x = -5;
+      // this.player.body.offset.x = -5;
 
       if (this.rightFirstPress === false) {
         this.rightFirstPress = true;

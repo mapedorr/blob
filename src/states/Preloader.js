@@ -134,6 +134,6 @@ BasicGame.Preloader.prototype.update = function(){
   //this.cache.isSoundDecoded('mainMenuMusic')
   if (this.ready == false) {
     this.ready = true;
-    this.state.start('MainMenu');
+    this.state.start('Game');
   }
 };
