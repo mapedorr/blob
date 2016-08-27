@@ -20,6 +20,7 @@ BasicGame.Player = function (game, input, gameObj) {
   this.bitmap = null;
   this.collectedPieces = 0;
   this.jumpPressed = false;
+  this.currentJumpMultiplier = 0;
 
   // define movement constants
   this.MAX_SPEED = 300; // pixels/second
@@ -31,7 +32,8 @@ BasicGame.Player = function (game, input, gameObj) {
   this.JUMP_SPEED_WALL = -830;
   this.SLID_SPEED = 1;
   this.JUMP_TIME = 150;
-  this.JUMP_MULTIPLIER = 0.5;
+  this.JUMP_MULTIPLIER_AMOUNT = 0.08;
+  this.JUMP_MULTIPLIER_MAX = 1.5;
 
   // define gameplay keys
   this.leftKey = Phaser.Keyboard.LEFT;
@@ -92,9 +94,6 @@ BasicGame.Player.prototype.create = function (level) {
 
   //Make the player collide with world bounds
   this.player.body.collideWorldBounds = true;
-
-  // make the camera follow the player
-  // this.game.camera.follow(this.player);
 
   // create a bitmap texture for drawing lines
   this.bitmap = this.game.add.bitmapData(this.game.width, this.game.height);
@@ -223,12 +222,14 @@ BasicGame.Player.prototype.update = function () {
       this.player.body.touching.left === false &&
       this.justLeaveGround === false) {
     this.player.body.offset.x = 0;
+    this.currentJumpMultiplier = 0;
     this.justLeaveGround = true;
   }
 
   if (onRightWall || onLeftWall) {
     this.player.body.velocity.y = this.SLID_SPEED;
     this.player.body.offset.x = 0;
+    this.currentJumpMultiplier = 0;
 
     if (this.slideSound.isPlaying === false) {
       this.slideSound.play();
@@ -242,9 +243,8 @@ BasicGame.Player.prototype.update = function () {
 
   if (this.onTheGround === false) {
     this.player.body.offset.x = 0;
-    if (this.slideSound.isPlaying === true) {
-      this.slideSound.stop();
-    }
+    this.slideSound.stop();
+    this.currentJumpMultiplier = 0;
   }
 
   if (leftPressed) {
@@ -253,6 +253,7 @@ BasicGame.Player.prototype.update = function () {
     this.player.body.acceleration.x = -this.ACCELERATION;
 
     if (this.onTheGround === true) {
+      this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
       // this.player.body.offset.x = 5;
 
       if (this.leftFirstPress === false) {
@@ -260,19 +261,21 @@ BasicGame.Player.prototype.update = function () {
         this.walkSound.play();
       }
 
-      if (this.slideSound.isPlaying === false && this.walkSound.isPlaying === false) {
+      if (this.slideSound.isPlaying === false &&
+          this.walkSound.isPlaying === false) {
+        this.currentJumpMultiplier = 0;
         this.slideSound.play();
       }
     }
     else {
-      if (onLeftWall && upPressed){
+      if (!onLeftWall) {
+        this.slideSound.stop();
+      }
+      else if (upPressed){
         this.player.body.acceleration.x = this.ACCELERATION_WALL;
         this.player.body.velocity.y = this.JUMP_SPEED_WALL;
         this.jumpMultiplier = 0;
         this.jumpSound.play();
-      }
-      else if (!onLeftWall) {
-        this.slideSound.stop();
       }
     }
   }
@@ -283,60 +286,68 @@ BasicGame.Player.prototype.update = function () {
 
     if (this.onTheGround === true) {
       // this.player.body.offset.x = -5;
+      this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
 
       if (this.rightFirstPress === false) {
         this.rightFirstPress = true;
         this.walkSound.play();
       }
 
-      if (this.slideSound.isPlaying === false && this.walkSound.isPlaying === false) {
+      if (this.slideSound.isPlaying === false &&
+          this.walkSound.isPlaying === false) {
         this.slideSound.play();
       }
     }
     else {
-      if (onRightWall && upPressed) {
+      if (!onRightWall) {
+        this.slideSound.stop();
+      }
+      else if (upPressed) {
         this.player.body.acceleration.x = -this.ACCELERATION_WALL;
         this.player.body.velocity.y = this.JUMP_SPEED_WALL;
-        this.jumpMultiplier = 0;
         this.jumpSound.play();
-      }
-      else if (!onRightWall) {
-        this.slideSound.stop();
       }
     }
   }
   else {
+    // not moving in X direction
     this.leftFirstPress = this.rightFirstPress = false;
     this.player.body.acceleration.x = 0;
     this.player.body.velocity.x = 0;
     this.player.body.offset.x = 0;
+    this.currentJumpMultiplier = 0;
+    this.walkSound.stop();
     this.slideSound.stop();
   }
 
   if (upPressed === true && this.onTheGround === true) {
+    console.log(Math.random());
+    var jumpMul = Math.min(this.currentJumpMultiplier, this.JUMP_MULTIPLIER_MAX);
+    console.log('jumpMul', jumpMul);
     this.player.body.offset.x = 0;
     this.player.body.velocity.y = this.JUMP_SPEED;
+    this.player.body.velocity.y += this.JUMP_SPEED  * 0.1 * jumpMul;
     this.jumpSound.play();
-    this.jumpMultiplier = this.JUMP_MULTIPLIER;
   }
 
   // make the jump a bit higher if the player keeps pressing the jump button
-  if (this.input.keyboard.downDuration(this.jumpKey, this.JUMP_TIME) === true) {
-    this.player.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
-    if (this.jumpMultiplier > 0.1)
-      this.jumpMultiplier *= 0.95;
-    else
-      this.jumpMultiplier = 0;
-  }
-  else {
-    this.jumpMultiplier = 0;
-  }
+  // if (this.input.keyboard.downDuration(this.jumpKey, this.JUMP_TIME) === true) {
+  //   this.player.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
+  //   if (this.jumpMultiplier > 0.1)
+  //     this.jumpMultiplier *= 0.95;
+  //   else
+  //     this.jumpMultiplier = 0;
+  // }
+  // else {
+  //   this.jumpMultiplier = 0;
+  // }
 
   if ((headHit === true && this.fallSound.isPlaying === false) ||
       (this.justLeaveGround === true && this.onTheGround === true)) {
     if (this.justLeaveGround === true) {
       this.justLeaveGround = false;
     }
+
     this.fallSound.play();
   }
 
