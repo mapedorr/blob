@@ -111,20 +111,20 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
 };
 
 BasicGame.Eye.prototype.update = function () {
-  if(BasicGame.Game.developmentMode === true){
+  if(BasicGame.Game.developmentMode === true) {
     // clear the bitmap where we are drawing our lines
     this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
   }
 
   this.viewZoneSprite.visible = this.searching;
 
-  if(this.gameObj.isLoadingLevel === true){
+  if(this.gameObj.isLoadingLevel === true) {
     // the EYE will start the level as irritated (sleeping)
     this.eye.animations.play('irritated');
     return;
   }
 
-  if(this.eye.animations.currentAnim.name === 'happy'){
+  if(this.eye.animations.currentAnim.name === 'happy') {
     // the player is dead, I'm the happiest EYE in the hole universe
     return;
   }
@@ -136,7 +136,7 @@ BasicGame.Eye.prototype.update = function () {
   var attack = false;
 
   // check if the player is in the side of vision of the EYE
-  if(this.searching === true && this.isPlayerInsideViewZone() === true){
+  if(this.searching === true && this.isPlayerInsideViewZone() === true) {
     // define the lines that connects the target to the eye
     // this isn't drawn on screen.
     var rays = [];
@@ -151,14 +151,14 @@ BasicGame.Eye.prototype.update = function () {
     // check if the player is in the shadows
     var playerInShadow = this.PlayerObj.isInShadow();
 
-    // if(!wallIntersect && !playerInShadow){
-    if(!playerInShadow){
+    // if(!wallIntersect && !playerInShadow) {
+    if(!playerInShadow) {
       attack = true;
     }
 
-    if (attack === false){
+    if (attack === false) {
       //- - - | DEVELOPMENT MODE | - - -
-      if(BasicGame.Game.developmentMode === true){
+      if(BasicGame.Game.developmentMode === true) {
         this.PlayerObj.player.tint = 0xffffff;
       }
     } else if (attack === true) {
@@ -171,8 +171,8 @@ BasicGame.Eye.prototype.update = function () {
   this.bitmap.dirty = true;
 };
 
-BasicGame.Eye.prototype.isPlayerInsideViewZone = function(){
-  if(this.viewZoneSprite.visible === true){
+BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
+  if(this.viewZoneSprite.visible === true) {
     this.viewZoneSprite.x = this.viewZoneSprite.positions['' + this.eye.animations.currentFrame.index];
     return this.game.physics.arcade.overlap(this.PlayerObj.player,
       this.viewZoneSprite);
@@ -180,7 +180,7 @@ BasicGame.Eye.prototype.isPlayerInsideViewZone = function(){
   return false;
 };
 
-BasicGame.Eye.prototype.shootPlayer = function(target){
+BasicGame.Eye.prototype.shootPlayer = function (target) {
   //- - - | DEVELOPMENT MODE | - - -
   if(BasicGame.Game.developmentMode === true) {
     this.drawLinesToTarget(target);
@@ -199,11 +199,11 @@ BasicGame.Eye.prototype.shootPlayer = function(target){
     // search
     this.calmDownTimer = this.game.time.create(true);
     this.calmDownTimer.add(3000,
-      function(){
+      function () {
         this.initSearch();
 
         var _self = this;
-        setTimeout(function(){_self.shooting = false}, 200);
+        setTimeout(function () {_self.shooting = false}, 200);
       },
       this);
 
@@ -211,12 +211,12 @@ BasicGame.Eye.prototype.shootPlayer = function(target){
   }
 };
 
-BasicGame.Eye.prototype.initSearch = function(delay){
+BasicGame.Eye.prototype.initSearch = function (delay) {
   if (this.searching === false) {
 
     if (delay === true) {
       var _self = this;
-      setTimeout(function(){_self.initSearch();}, 500);
+      setTimeout(function () {_self.initSearch();}, 500);
       return;
     }
 
@@ -227,7 +227,7 @@ BasicGame.Eye.prototype.initSearch = function(delay){
     // init the timer that will make the EYE increase the search speed
     this.getTiredTimer = this.game.time.create(true);
     this.getTiredTimer.add(16100,
-      function(){
+      function () {
         if (this.shooting === true) return;
         this.searching = false;
         this.getTired();
@@ -238,12 +238,12 @@ BasicGame.Eye.prototype.initSearch = function(delay){
   }
 };
 
-BasicGame.Eye.prototype.getTired = function(){
+BasicGame.Eye.prototype.getTired = function () {
   this.eye.animations.play('tired');
 
   this.getMadTimer = this.game.time.create(true);
   this.getMadTimer.add(1200,
-    function(){
+    function () {
       this.getMad();
     },
     this);
@@ -251,7 +251,7 @@ BasicGame.Eye.prototype.getTired = function(){
   this.getMadTimer.start();
 };
 
-BasicGame.Eye.prototype.getMad = function(){
+BasicGame.Eye.prototype.getMad = function () {
   this.eye.animations.play('angry');
   this.angerSound.play();
 
@@ -265,7 +265,7 @@ BasicGame.Eye.prototype.getMad = function(){
 
   this.searchAgain = this.game.time.create(true);
   this.searchAgain.add(1600,
-    function(){
+    function () {
       this.eye.x = this.eye.originalX;
       this.initSearch();
     },
@@ -274,7 +274,7 @@ BasicGame.Eye.prototype.getMad = function(){
   this.searchAgain.start();
 };
 
-BasicGame.Eye.prototype.shake = function(){
+BasicGame.Eye.prototype.shake = function () {
   this.shakeTween = this.shakeTween || this.game.add.tween(this.eye)
   this.shakeTween.to({x: this.eye.originalX + 10},
     40,
@@ -283,11 +283,11 @@ BasicGame.Eye.prototype.shake = function(){
     0,
     4,
     true).start();
-  this.shakeTween.onComplete.add(function(){
+  this.shakeTween.onComplete.add(function () {
   }, this);
 };
 
-BasicGame.Eye.prototype.destroyTimers = function(){
+BasicGame.Eye.prototype.destroyTimers = function () {
   if (arguments.length === 0) {
     this.calmDownTimer && this.calmDownTimer.destroy();
     this.getTiredTimer && this.getTiredTimer.destroy();
@@ -306,7 +306,7 @@ BasicGame.Eye.prototype.destroyTimers = function(){
   }
 };
 
-BasicGame.Eye.prototype.drawLinesToTarget = function(target){
+BasicGame.Eye.prototype.drawLinesToTarget = function (target) {
   // Draw a line from the eye to the target
   this.bitmap.context.beginPath();
   this.bitmap.context.moveTo(target.x, target.y);
@@ -337,7 +337,7 @@ BasicGame.Eye.prototype.updateLevel = function (level) {
   this.eye.animations.getAnimation("search").speed = this.originalSearchSpeed;
 };
 
-BasicGame.Eye.prototype.rejoice = function(){
+BasicGame.Eye.prototype.rejoice = function (callback) {
   this.destroyTimers();
   this.eye.animations.play('happy');
   this.shakeTween = this.shakeTween || this.game.add.tween(this.eye)
@@ -348,8 +348,9 @@ BasicGame.Eye.prototype.rejoice = function(){
     0,
     10,
     true).start();
-  this.shakeTween.onComplete.add(function(){
+  this.shakeTween.onComplete.add(function () {
     this.eye.y = this.eye.originalY;
+    callback();
   }, this);
 
   this.laughSound.play();
@@ -363,12 +364,12 @@ BasicGame.Eye.prototype.rejoice = function(){
 //   //Check intersections for each ray
 //   //If at least one ray has no intersection with a wall, then THE EYE can see his enemy.
 //   var hiddenRays = 0;
-//   rays.forEach(function(ray){
+//   rays.forEach(function (ray) {
 //     var intersect = null;
 
 //     // For each of the walls...
 //     this.level.walls.forEach(function (wall) {
-//       if(intersect){
+//       if(intersect) {
 //         return;
 //       }
 
@@ -390,7 +391,7 @@ BasicGame.Eye.prototype.rejoice = function(){
 //       }
 //     }, this);
 
-//     if(intersect){
+//     if(intersect) {
 //       //This edge is hidden. :D
 //       hiddenRays++;
 //     }
@@ -400,3 +401,14 @@ BasicGame.Eye.prototype.rejoice = function(){
 //   return hiddenRays == 4;
 
 // };
+
+BasicGame.Eye.prototype.restartLevel = function () {
+  this.anger = false;
+
+  // restore the searching speed to its default
+  this.viewZoneSprite.x = this.viewZoneSprite.positions['0'];
+  this.eye.animations.play('search');
+  this.searching = true;
+  this.eye.animations.getAnimation("search").speed = this.originalSearchSpeed;
+  this.eyeStateTimer = this.searchingTime;
+};

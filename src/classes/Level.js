@@ -93,33 +93,33 @@ BasicGame.Level.prototype.create = function () {
   }
 };
 
-BasicGame.Level.prototype.destroyCurrentLevel = function(){
+BasicGame.Level.prototype.destroyCurrentLevel = function () {
   this.map.destroy();
-  if(this.ground){
+  if(this.ground) {
     this.ground.destroy();
   }
   this.walls.destroy();
-  if(this.hasSpikes){
-    this.spikes.forEach(function(spikeSprite){
+  if(this.hasSpikes) {
+    this.spikes.forEach(function (spikeSprite) {
       spikeSprite.showTween.stop();
       spikeSprite.hideTween.stop();
     });
     this.spikes.destroy();
   }
-  if(this.pieces){
+  if(this.pieces) {
     this.pieces.destroy();
   }
   this.dayNumberTextBitmap.setText("");
   this.dayPhraseTextBitmap.setText("");
 };
 
-BasicGame.Level.prototype.createLevel = function(num){
+BasicGame.Level.prototype.createLevel = function (num) {
   var _self = this;
   this.map = this.game.add.tilemap('lvl' + ((num < 10) ? '0' + num : num));
 
   // create the floor of the level
   this.hasFloor = false;
-  if(this.map.objects.floor){
+  if(this.map.objects.floor) {
     this.hasFloor = true;
     this.ground = this.game.add.group();
 
@@ -128,7 +128,7 @@ BasicGame.Level.prototype.createLevel = function(num){
 
     this.ground.enableBody = true;
     this.game.physics.arcade.enable(this.ground);
-    this.ground.forEach(function(groundSprite){
+    this.ground.forEach(function (groundSprite) {
       groundSprite.body.immovable = true;
       groundSprite.body.allowGravity = false;
     });
@@ -141,14 +141,14 @@ BasicGame.Level.prototype.createLevel = function(num){
 
   this.walls.enableBody = true;
   this.game.physics.arcade.enable(this.walls);
-  this.walls.forEach(function(platformSprite){
+  this.walls.forEach(function (platformSprite) {
     platformSprite.body.immovable = true;
     platformSprite.body.allowGravity = false;
   });
 
   // create the spikes (and platform) of the level
   this.hasSpikes = false;
-  if(this.map.objects.spikes){
+  if(this.map.objects.spikes) {
     this.hasSpikes = true;
 
     this.spikes = this.game.add.group();
@@ -156,8 +156,8 @@ BasicGame.Level.prototype.createLevel = function(num){
 
     this.map.createFromObjects("spikes", "", 'spike-platform', 0, true, false,
       this.walls, Phaser.Sprite, false);
-    this.walls.forEach(function(platformSprite){
-      if(platformSprite["spike-platform"] == "1"){
+    this.walls.forEach(function (platformSprite) {
+      if(platformSprite["spike-platform"] == "1") {
         var createdSpike = null;
         if (platformSprite["spike-side"]) {
           createdSpike = _self.addHeightSpike(platformSprite, platformSprite["spike-side"]);
@@ -179,7 +179,7 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.map.createFromObjects("pieces", "", 'piece', null, true, false,
     this.pieces, Phaser.Sprite, false);
 
-  this.pieces.forEach(function(pieceSprite){
+  this.pieces.forEach(function (pieceSprite) {
     pieceSprite.anchor.set(.5, .5);
     _self.game.physics.arcade.enableBody(pieceSprite);
     pieceSprite.body.allowGravity = false;
@@ -188,7 +188,7 @@ BasicGame.Level.prototype.createLevel = function(num){
   });
 
   // get the player initial position
-  if(this.map.objects.player_pos){
+  if(this.map.objects.player_pos) {
     this.initPlayerPos.x = this.map.objects.player_pos[0].x;
     this.initPlayerPos.y = this.map.objects.player_pos[0].y;
   }
@@ -199,7 +199,7 @@ BasicGame.Level.prototype.createLevel = function(num){
   var dayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
   this.dayNumberTextBitmap.setText(this.dayText[BasicGame.language] + ' ' + dayObj.number);
   this.dayNumberTextBitmap.y = this.dayNumberTextBitmap.oriY;
-  if(dayObj.text){
+  if(dayObj.text) {
     this.dayPhraseTextBitmap.setText(dayObj.text[BasicGame.language]);
     this.dayPhraseTextBitmap.x = this.game.world.width/2 - this.dayPhraseTextBitmap.width/2;
   }
@@ -214,16 +214,16 @@ BasicGame.Level.prototype.createLevel = function(num){
   this.isReady = true;
 };
 
-BasicGame.Level.prototype.render = function(){
-  if(BasicGame.Game.developmentMode === true){
+BasicGame.Level.prototype.render = function () {
+  if(BasicGame.Game.developmentMode === true) {
     var _self = this;
-    this.pieces.forEach(function(pieceSprite){
+    this.pieces.forEach(function (pieceSprite) {
       _self.game.debug.body(pieceSprite, 'rgba(0,0,255,0.8)');
     });
   }
 };
 
-BasicGame.Level.prototype.endLevel = function(){
+BasicGame.Level.prototype.endLevel = function () {
   BasicGame.isRetrying = false;
   var secondsToEnd = this.gameObj.countdownDuration;
 
@@ -232,7 +232,7 @@ BasicGame.Level.prototype.endLevel = function(){
 
   // starts the timer that will end the level
   this.endTimer.add(secondsToEnd * 1000,
-    function(){
+    function () {
       // enable the flag that indicates the other objects the level is finished
       this.isEnded = true;
     },
@@ -242,8 +242,8 @@ BasicGame.Level.prototype.endLevel = function(){
   this.gameObj.showDarkness();
 };
 
-BasicGame.Level.prototype.showDay = function(){
-  if(this.isShowingDays == true){
+BasicGame.Level.prototype.showDay = function () {
+  if(this.isShowingDays == true) {
     return;
   }
 
@@ -262,7 +262,7 @@ BasicGame.Level.prototype.showDay = function(){
   // set the timer to stop showing the day
   var currentDayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
   dayTimer.add(currentDayObj.waitTime || 2000,
-    function(){
+    function () {
       this.levelTextGroup.alpha = 0;
       this.isShowingDays = false;
       this.gameObj.hideDarkness();
@@ -272,11 +272,11 @@ BasicGame.Level.prototype.showDay = function(){
   dayTimer.start();
 };
 
-BasicGame.Level.prototype.addWidthSpike = function(platformSprite, inBottom){
+BasicGame.Level.prototype.addWidthSpike = function (platformSprite, inBottom) {
   // add the spikes to the platform
   var spikeSprite = null;
 
-  if(!inBottom){
+  if(!inBottom) {
     spikeSprite = this.game.add.tileSprite(platformSprite.x,
       platformSprite.y + 5,
       platformSprite.width, 16, "spike", 0, this.spikes);
@@ -294,7 +294,7 @@ BasicGame.Level.prototype.addWidthSpike = function(platformSprite, inBottom){
     // spikeSprite.desY = platformSprite.y -16;
   }
 
-  if(!inBottom){
+  if(!inBottom) {
     // create the tweens for showing and hiding the spikes
     var showSpikeTween = this.createShowSpikeTween(spikeSprite,
       {y: spikeSprite.desY}, 100, 300);
@@ -305,7 +305,7 @@ BasicGame.Level.prototype.addWidthSpike = function(platformSprite, inBottom){
         Phaser.Easing.Exponential.Out,
         false,
         1000);
-    hideSpikeTween.onComplete.add(function(){
+    hideSpikeTween.onComplete.add(function () {
       this.isHidden = true;
       this.parent.openedSpikes--;
     }, spikeSprite);
@@ -322,7 +322,7 @@ BasicGame.Level.prototype.addWidthSpike = function(platformSprite, inBottom){
   return spikeSprite;
 };
 
-BasicGame.Level.prototype.addHeightSpike = function(platformSprite, side){
+BasicGame.Level.prototype.addHeightSpike = function (platformSprite, side) {
   // add the spikes to the platform
   var spikeSprite = null;
   if (side === 'r') {
@@ -356,7 +356,7 @@ BasicGame.Level.prototype.addHeightSpike = function(platformSprite, side){
       Phaser.Easing.Exponential.Out,
       false,
       1000);
-  hideSpikeTween.onComplete.add(function(){
+  hideSpikeTween.onComplete.add(function () {
     this.isHidden = true;
     this.parent.openedSpikes--;
   }, spikeSprite);
@@ -372,7 +372,7 @@ BasicGame.Level.prototype.addHeightSpike = function(platformSprite, side){
   return spikeSprite;
 };
 
-BasicGame.Level.prototype.createShowSpikeTween = function(spikeSprite, properties, duration, delay) {
+BasicGame.Level.prototype.createShowSpikeTween = function (spikeSprite, properties, duration, delay) {
   var _self = this;
   var showSpikeTween = this.game.add.tween(spikeSprite)
     .to(properties,
@@ -381,11 +381,19 @@ BasicGame.Level.prototype.createShowSpikeTween = function(spikeSprite, propertie
       false,
       delay);
 
-  showSpikeTween.onComplete.add(function(){
+  showSpikeTween.onComplete.add(function () {
     this.isHidden = false;
     this.hideTween.start();
     this.parent.openedSpikes++;
   }, spikeSprite);
 
   return showSpikeTween;
+};
+
+BasicGame.Level.prototype.restartLevel = function () {
+  // enable the body physics for each piece and make it visible
+  this.pieces.forEach(function (pieceSprite) {
+    pieceSprite.alpha = 1;
+    pieceSprite.body.enable = true;
+  });
 };

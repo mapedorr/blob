@@ -185,9 +185,12 @@ BasicGame.Player.prototype.update = function () {
   this.game.physics.arcade.overlap(this.player, this.level.pieces,
     function(player, piece) {
       player.touchingPiece = true;
-      piece.destroy();
+      // piece.destroy();
+      piece.body.enable = false;
+      piece.alpha = 0;
+
       (this.piecesSound[this.collectedPieces++]).play();
-      if (!this.level.pieces.children || !this.level.pieces.children.length) {
+      if(this.collectedPieces === this.level.pieces.children.length){
         // the level has been finished
         this.level.endLevel();
       }
@@ -573,4 +576,18 @@ BasicGame.Player.prototype.dieWithDignity = function() {
 
   // play the dead animation
   this.player.animations.play('dying');
+};
+
+BasicGame.Player.prototype.restartLevel = function () {
+  this.collectedPieces = 0;
+
+  this.player.body.reset(this.player.x, this.player.y);
+  this.walkSound.stop();
+  this.slideSound.stop();
+  this.player.position.set(this.level.initPlayerPos.x,
+    this.level.initPlayerPos.y);
+
+  this.dead = false;
+  this.player.animations.play('normal');
+
 };

@@ -28,7 +28,7 @@ BasicGame.Game = function (game) {
 BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
 
-BasicGame.Game.prototype.preload = function(){
+BasicGame.Game.prototype.preload = function () {
   // create the days object
   this.days = new BasicGame.Days();
 
@@ -54,7 +54,7 @@ BasicGame.Game.prototype.preload = function(){
   this.lightning = new BasicGame.Lightning(this.game, this);
 };
 
-BasicGame.Game.prototype.create = function(){
+BasicGame.Game.prototype.create = function () {
   // define properties
   this.lifes = 3;
   this.showFPS = false;
@@ -81,14 +81,14 @@ BasicGame.Game.prototype.create = function(){
   // create the player
   this.player.create(this.level);
 
-  if(this.level.spikes){
+  if (this.level.spikes) {
    this.game.world.bringToTop(this.level.spikes);
     this.game.world.bringToTop(this.level.walls);
   }
 
   // create the group of sprites for lifes
   this.lifesGroup = this.game.add.group();
-  for(var i=0; i<this.lifes; i++){
+  for(var i=0; i<this.lifes; i++) {
     var lifeSprite = new Phaser.Sprite(this.game, 0, 0, "player");
     lifeSprite.scale.set(0.5, 0.8);
     lifeSprite.x = (i % 3) * (lifeSprite.width + 6);
@@ -126,11 +126,12 @@ BasicGame.Game.prototype.create = function(){
     this.countdownDuration * 1000,
     Phaser.Easing.Quadratic.Out,
     false);
-  this.darknessTween.onComplete.add(function(){
+  this.darknessTween.onComplete.add(function () {
     this.inDarkness = true;
-    if(this.lifes <= 0){
+    if (this.lifes <= 0) {
       // show the game over screen
-      this.state.start('GameOver');
+      // this.state.start('GameOver');
+      this.restartLevel();
     }
   }, this);
 
@@ -139,7 +140,7 @@ BasicGame.Game.prototype.create = function(){
     700,
     null,
     false);
-  this.brightnessTween.onComplete.add(function(){
+  this.brightnessTween.onComplete.add(function () {
     // this.eye.eyeStateTimer = this.eye.searchingTime;
     this.eye.initSearch(true);
     this.isLoadingLevel = false;
@@ -158,19 +159,19 @@ BasicGame.Game.prototype.create = function(){
     0,
     4,
     true);
-  this.shakeTween.onComplete.add(function(){
+  this.shakeTween.onComplete.add(function () {
     // set the camera position to its initial position
     this.game.camera.setPosition(0, 0);
   }, this);
 
   // show FPS
-  if(BasicGame.Game.developmentMode){
+  if (BasicGame.Game.developmentMode) {
     this.game.time.advancedTiming = true;
     this.fpsText = this.game.add.text(this.game.world.width / 2 - 80, 100, '', { font: '80px Arial', fill: '#fefefe' });
   }
 };
 
-BasicGame.Game.prototype.update = function() {
+BasicGame.Game.prototype.update = function () {
   // update the light
   this.light.update();
 
@@ -183,9 +184,9 @@ BasicGame.Game.prototype.update = function() {
   // update the lightning
   this.lightning.update();
 
-  if(this.level.isReady == true){
+  if (this.level.isReady == true) {
     this.level.isReady = false;
-    if(BasicGame.isRetrying === false){
+    if (BasicGame.isRetrying === false) {
      this.level.showDay();
     }
     else {
@@ -195,8 +196,8 @@ BasicGame.Game.prototype.update = function() {
     return;
   }
 
-  if(this.level.isEnded == true){
-    if(this.inDarkness == false){
+  if (this.level.isEnded == true) {
+    if (this.inDarkness == false) {
       return;
     }
 
@@ -209,25 +210,25 @@ BasicGame.Game.prototype.update = function() {
   }
 
   // show development information
-  if(BasicGame.Game.developmentMode){
+  if (BasicGame.Game.developmentMode) {
     if (this.game.time.fps !== 0) {
       this.fpsText.setText(this.game.time.fps + ' FPS');
     }
   }
 };
 
-BasicGame.Game.prototype.render = function(){
+BasicGame.Game.prototype.render = function () {
   this.player.render();
   this.level.render();
 };
 
-BasicGame.Game.prototype.quitGame = function(){
+BasicGame.Game.prototype.quitGame = function () {
   //Here you should destroy anything you no longer need.
   //Stop music, delete sprites, purge caches, free resources, all that good stuff.
   this.state.start('MainMenu');
 };
 
-BasicGame.Game.prototype.showDarkness = function(durationInMS){
+BasicGame.Game.prototype.showDarkness = function (durationInMS) {
   this.game.world.bringToTop(this.darknessGroup);
   // this.darknessTween.to({alpha: 1},
   //   durationInMS || this.countdownDuration * 1000,
@@ -237,12 +238,12 @@ BasicGame.Game.prototype.showDarkness = function(durationInMS){
   this.darknessTween.start();
 };
 
-BasicGame.Game.prototype.hideDarkness = function(){
+BasicGame.Game.prototype.hideDarkness = function () {
   this.inDarkness = false;
   this.brightnessTween.start();
 };
 
-BasicGame.Game.prototype.loadLevel = function(levelNumber){
+BasicGame.Game.prototype.loadLevel = function (levelNumber) {
   if (levelNumber > 30) {
     // congrats, you ended the game
     this.state.start('TheEnd');
@@ -267,17 +268,19 @@ BasicGame.Game.prototype.loadLevel = function(levelNumber){
   localStorage.setItem("oh-my-blob", BasicGame.setDay(levelNumber));
 };
 
-BasicGame.Game.prototype.shakeCamera = function(){
+BasicGame.Game.prototype.shakeCamera = function () {
   // shake the camera by moving it up and down 5 times really fast
   this.game.camera.y = 5;
-  if(!this.shakeTween.isRunning){
+  if (!this.shakeTween.isRunning) {
     this.shakeTween.start();
   }
 };
 
-BasicGame.Game.prototype.subtractLife = function(){
+BasicGame.Game.prototype.subtractLife = function () {
+  var that = this;
+
   // remove one life sprite
-  if(this.lifes <= 0){
+  if (this.lifes <= 0) {
     return;
   }
 
@@ -286,32 +289,21 @@ BasicGame.Game.prototype.subtractLife = function(){
     700,
     Phaser.Easing.Quadratic.Out,
     true);
-  if(this.lifes <= 0){
+  if (this.lifes <= 0) {
     localStorage.setItem("oh-my-blob", BasicGame.addDeath());
-
-    // notify to the EYE the player has died
-    this.eye.rejoice();
 
     // notify the PLAYER that is time to show the animation for dead
     this.player.dieWithDignity();
 
-    // create the timer
-    var gameOverTimer = this.game.time.create(true);
-
-    // set the timer to stop showing the day
-    gameOverTimer.add(1000,
-      function(){
-        this.state.start('GameOver');
-      },
-      this);
-
-    gameOverTimer.start();
-
+    // notify to the EYE the player has died
+    this.eye.rejoice(function () {
+      that.restartLevel();
+    });
   }
 };
 
 
-BasicGame.Game.prototype.subtractAllLifes = function(destroyPlayer){
+BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
   localStorage.setItem("oh-my-blob", BasicGame.addDeath());
 
   this.lifes = 0;
@@ -323,7 +315,7 @@ BasicGame.Game.prototype.subtractAllLifes = function(destroyPlayer){
     true);
 
   this.eye.destroyTimers();
-  if(destroyPlayer){
+  if (destroyPlayer) {
     this.player.dieWithDignity();
 
     // create the timer
@@ -331,8 +323,9 @@ BasicGame.Game.prototype.subtractAllLifes = function(destroyPlayer){
 
     // set the timer to stop showing the day
     gameOverTimer.add(1000,
-      function(){
-        this.state.start('GameOver');
+      function () {
+        // this.state.start('GameOver');
+        this.restartLevel();
       },
       this);
 
@@ -343,12 +336,26 @@ BasicGame.Game.prototype.subtractAllLifes = function(destroyPlayer){
   }
 };
 
-BasicGame.Game.prototype.getSkyName = function(){
-  if(BasicGame.currentLevel <= 10){
+BasicGame.Game.prototype.getSkyName = function () {
+  if (BasicGame.currentLevel <= 10) {
     return 'sky01';
   } else if (BasicGame.currentLevel <= 20) {
     return 'sky02';
   } else {
     return 'sky03';
   }
+};
+
+BasicGame.Game.prototype.restartLevel = function () {
+  // ToDo: 
+  // - Position the player in the beginning                                     (d)
+  // - Restore all the captured pieces in the level.
+  // - ...something else?
+  this.player.restartLevel();
+  this.level.restartLevel();
+  this.eye.restartLevel();
+
+  this.lifes = 3;
+
+  this.hideDarkness();
 };
