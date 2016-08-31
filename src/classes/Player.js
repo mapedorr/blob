@@ -21,19 +21,23 @@ BasicGame.Player = function (game, input, gameObj) {
   this.collectedPieces = 0;
   this.jumpPressed = false;
   this.currentJumpMultiplier = 0;
+  this.jumpChance = false;
+  this.walkInAirTimer = null;
 
   // define movement constants
-  this.MAX_SPEED = 300; // pixels/second
+  this.MAX_SPEED = 330; // pixels/second
   this.ACCELERATION = 1000; // pixels/second/second
   this.ACCELERATION_WALL = 1000 * 12;
+  this.PLAYER_BODY_OFFSET_X = 10;
   this.DRAG = 2500; // pixels/second
   this.GRAVITY = 2600; // pixels/second/second
   this.JUMP_SPEED = -650; // pixels/second (negative y is up)
+  // this.JUMP_SPEED = -800; // pixels/second (negative y is up)
   this.JUMP_SPEED_WALL = -830;
   this.SLID_SPEED = 1;
   this.JUMP_TIME = 150;
-  this.JUMP_MULTIPLIER_AMOUNT = 0.08;
-  this.JUMP_MULTIPLIER_MAX = 1.5;
+  this.JUMP_MULTIPLIER_AMOUNT = 0.01;
+  this.JUMP_MULTIPLIER_MAX = 0.23;
 
   // define gameplay keys
   this.leftKey = Phaser.Keyboard.LEFT;
@@ -103,17 +107,17 @@ BasicGame.Player.prototype.create = function (level) {
 
   if (!this.jumpSound) {
     this.jumpSound = this.game.add.sound('jump', 0.2);
-    this.jumpSound.onPlay.add(function(){
+    this.jumpSound.onPlay.add(function() {
       this.slideSound.stop();
     }, this);
   }
 
   if (!this.walkSound) {
     this.walkSound = this.game.add.sound('walk', 0.1);
-    this.walkSound.onPlay.add(function(){
+    this.walkSound.onPlay.add(function() {
       this.slideSound.stop();
     }, this);
-    this.walkSound.onStop.add(function(){
+    this.walkSound.onStop.add(function() {
       if (this.onTheGround === true) {
         this.slideSound.play();
       }
@@ -130,38 +134,60 @@ BasicGame.Player.prototype.create = function (level) {
 
   if (!this.deathSound) {
     this.deathSound = this.game.add.sound('death', 0.3);
-    this.deathSound.onPlay.add(function(){
+    this.deathSound.onPlay.add(function() {
       this.slideSound.stop();
     }, this);
   }
 
   // load the audio for pieces
   if (!this.piecesSound || this.piecesSound.length === 0) {
-    for(var i = 1; i <= 20; i++){
+    for(var i = 1; i <= 20; i++) {
       this.piecesSound.push(this.game.add.sound('piece' + ((i < 10) ? '0' : '') + i, 0.2));
     }
   }
+
+  // create a time to allow the player walk in the air for a while after
+  // leaving a platform
+  this.walkInAirTimer = this.game.time.create();
+  this.walkInAirTimer.add(1000, function () {
+    this.player.body.offset.x = 0;
+  }, this);
 };
 
 BasicGame.Player.prototype.update = function () {
-  if(BasicGame.Game.developmentMode === true){
+  var leftPressed = false;
+  var rightPressed = false;
+  var upPressed = false;
+  var onRightWall = false;
+  var onLeftWall = false;
+  var headHit = false;
+  var jumpMul = 0;
+
+  this.game.physics.arcade.isPaused = this.gameObj.isLoadingLevel;
+  if (this.gameObj.isLoadingLevel) {
+    this.player.body.velocity.y = 0;
+    return;
+  }
+
+  if (BasicGame.Game.developmentMode === true) {
     // clear the bitmap where we are drawing our lines
     this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
   }
 
   // check collisions
-  if(this.level.hasFloor === true){
+  if (this.level.hasFloor === true) {
     this.game.physics.arcade.collide(this.player, this.level.ground);
   }
 
   this.player.touchingPiece = false;
 
+  // check if the player touches a piece
   this.game.physics.arcade.overlap(this.player, this.level.pieces,
-    function(player, piece){
+    function(player, piece) {
       player.touchingPiece = true;
       piece.destroy();
       (this.piecesSound[this.collectedPieces++]).play();
-      if(!this.level.pieces.children || !this.level.pieces.children.length){
+      if (!this.level.pieces.children || !this.level.pieces.children.length) {
         // the level has been finished
         this.level.endLevel();
       }
@@ -169,10 +195,10 @@ BasicGame.Player.prototype.update = function () {
     null,
     this);
 
-  if(this.level.hasSpikes === true){
+  if (this.level.hasSpikes === true) {
     this.game.physics.arcade.collide(this.player, this.level.walls,
-      function(player, spikePlatform){
-        if(spikePlatform.spikeRef && spikePlatform.spikeRef.isHidden === true){
+      function(player, spikePlatform) {
+        if (spikePlatform.spikeRef && spikePlatform.spikeRef.isHidden === true) {
           if (this.gameObj.level.spikeSound.isPlaying === false) {
             this.gameObj.level.spikeSound.play();
           }
@@ -180,10 +206,10 @@ BasicGame.Player.prototype.update = function () {
         }
       }, null, this);
 
-    if(this.level.spikes.openedSpikes > 0){
+    if (this.level.spikes.openedSpikes > 0) {
       this.game.physics.arcade.overlap(this.player, this.level.spikes,
-        function(player, spike){
-          if(this.dead === false){
+        function(player, spike) {
+          if (this.dead === false) {
             this.player.body.allowGravity = false;
             this.player.body.velocity.y = 0;
             this.gameObj.subtractAllLifes(true);
@@ -194,7 +220,7 @@ BasicGame.Player.prototype.update = function () {
     this.game.physics.arcade.collide(this.player, this.level.walls);
   }
 
-  if(this.dead === true){
+  if (this.dead === true) {
     this.player.body.acceleration.x = 0;
     return;
   }
@@ -203,78 +229,102 @@ BasicGame.Player.prototype.update = function () {
     this.dead = true;
     this.player.body.collideWorldBounds = false;
     this.gameObj.subtractAllLifes();
-  }
-
-  if(this.gameObj.isLoadingLevel === true){
     return;
   }
 
-  var leftPressed = this.leftInputIsActive() === true;
-  var rightPressed = this.rightInputIsActive() === true;
-  var upPressed = this.upInputIsActive() === true;
-  this.onTheGround = this.player.body.touching.down === true && this.player.touchingPiece === false;
-  var onRightWall = this.player.body.touching.right === true && this.player.touchingPiece === false;
-  var onLeftWall = this.player.body.touching.left === true && this.player.touchingPiece === false;
-  var headHit = this.player.body.touching.up === true && this.player.touchingPiece === false && this.onTheGround === false;
+  
+  // handle player movement
+  leftPressed = this.leftInputIsActive() === true;
+  rightPressed = this.rightInputIsActive() === true;
+  upPressed = this.upInputIsActive() === true;
+  if (this.player.touchingPiece === false) {
+    this.onTheGround = this.player.body.touching.down === true;
+    onRightWall = this.player.body.touching.right === true;
+    onLeftWall = this.player.body.touching.left === true;
+    headHit = this.player.body.touching.up === true && this.onTheGround === false;
+  }
 
-  if (this.player.body.touching.down === false &&
-      this.player.body.touching.right === false &&
-      this.player.body.touching.left === false &&
+  // reset some values to default if the player is touching the ground
+  if (this.onTheGround) {
+    this.isFalling = false;
+    this.isJumping = false;
+  }
+  else {
+    this.walkSound.stop();
+    this.slideSound.stop();
+
+    // check if the player has left a platform walking, if true, give it a chance
+    // (an amount of time) to jump
+    if (this.player.body.offset.x === 0) {
+      if (!this.isJumping && this.player.body.velocity.y > 0) {
+        // replace the body of the player to keep it touching the ground
+        if (leftPressed) {
+          this.player.body.offset.x = this.PLAYER_BODY_OFFSET_X;
+        }
+        else if (rightPressed) {
+          this.player.body.offset.x = -this.PLAYER_BODY_OFFSET_X;
+        }
+
+        // restart the position of the player's body after an amount of time has
+        // passed
+        this.walkInAirTimer.start();
+      }
+    }
+    else if (this.player.body.velocity.y > 0) {
+      this.player.body.offset.x = 0;
+    }
+  }
+
+
+  // -------------------------------------------------------------------------
+  // REVISAR
+  if (!this.onTheGround && !onRightWall && !onLeftWall &&
       this.justLeaveGround === false) {
-    this.player.body.offset.x = 0;
-    this.currentJumpMultiplier = 0;
     this.justLeaveGround = true;
   }
 
+  // handle behaviour of player on walls
   if (onRightWall || onLeftWall) {
     this.player.body.velocity.y = this.SLID_SPEED;
-    this.player.body.offset.x = 0;
-    this.currentJumpMultiplier = 0;
 
-    if (this.slideSound.isPlaying === false) {
-      this.slideSound.play();
-    }
+    this.player.body.offset.x = this.currentJumpMultiplier = 0;
+    this.jumpChance = false;
 
+    !this.slideSound.isPlaying && this.slideSound.play();
+
+    // -------------------------------------------------------------------------
+    // REVISAR
     if (this.justLeaveGround === true) {
       this.justLeaveGround = false;
       this.fallSound.play();
     }
   }
 
-  if (this.onTheGround === false) {
-    this.player.body.offset.x = 0;
-    this.slideSound.stop();
-    this.currentJumpMultiplier = 0;
-  }
-
   if (leftPressed) {
-    // If the LEFT key is down, set the player velocity to move left
+    // set the player velocity to move left
     this.rightFirstPress = false;
     this.player.body.acceleration.x = -this.ACCELERATION;
 
-    if (this.onTheGround === true) {
-      this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
-      // this.player.body.offset.x = 5;
-
-      if (this.leftFirstPress === false) {
+    if (this.onTheGround || this.player.body.offset.x != 0) {
+      if (!this.leftFirstPress) {
         this.leftFirstPress = true;
+        this.currentJumpMultiplier = 0;
         this.walkSound.play();
       }
-
-      if (this.slideSound.isPlaying === false &&
-          this.walkSound.isPlaying === false) {
-        this.currentJumpMultiplier = 0;
-        this.slideSound.play();
+      else {
+        this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
       }
     }
     else {
       if (!onLeftWall) {
         this.slideSound.stop();
       }
-      else if (upPressed){
+      else if (upPressed) {
         this.player.body.acceleration.x = this.ACCELERATION_WALL;
         this.player.body.velocity.y = this.JUMP_SPEED_WALL;
-        this.jumpMultiplier = 0;
+
+        // jump jump jump
+        this.currentJumpMultiplier = 0;
         this.jumpSound.play();
       }
     }
@@ -284,18 +334,14 @@ BasicGame.Player.prototype.update = function () {
     this.leftFirstPress = false;
     this.player.body.acceleration.x = this.ACCELERATION;
 
-    if (this.onTheGround === true) {
-      // this.player.body.offset.x = -5;
-      this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
-
+    if (this.onTheGround || this.player.body.offset.x != 0) {
       if (this.rightFirstPress === false) {
         this.rightFirstPress = true;
+        this.currentJumpMultiplier = 0;
         this.walkSound.play();
       }
-
-      if (this.slideSound.isPlaying === false &&
-          this.walkSound.isPlaying === false) {
-        this.slideSound.play();
+      else {
+        this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
       }
     }
     else {
@@ -305,6 +351,9 @@ BasicGame.Player.prototype.update = function () {
       else if (upPressed) {
         this.player.body.acceleration.x = -this.ACCELERATION_WALL;
         this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+
+        // jump jump jump
+        this.currentJumpMultiplier = 0;
         this.jumpSound.play();
       }
     }
@@ -314,19 +363,28 @@ BasicGame.Player.prototype.update = function () {
     this.leftFirstPress = this.rightFirstPress = false;
     this.player.body.acceleration.x = 0;
     this.player.body.velocity.x = 0;
-    this.player.body.offset.x = 0;
     this.currentJumpMultiplier = 0;
     this.walkSound.stop();
     this.slideSound.stop();
+
+    // -------------------------------------------------------------------------
+    // ToDo
+    // this.player.body.offset.x = 0;
   }
 
-  if (upPressed === true && this.onTheGround === true) {
-    console.log(Math.random());
-    var jumpMul = Math.min(this.currentJumpMultiplier, this.JUMP_MULTIPLIER_MAX);
-    console.log('jumpMul', jumpMul);
-    this.player.body.offset.x = 0;
+  if (upPressed && (this.onTheGround || this.player.body.offset.x != 0)) {
+    jumpMul = Math.min(this.currentJumpMultiplier, this.JUMP_MULTIPLIER_MAX);
     this.player.body.velocity.y = this.JUMP_SPEED;
-    this.player.body.velocity.y += this.JUMP_SPEED  * 0.1 * jumpMul;
+    this.player.body.velocity.y += this.JUMP_SPEED * jumpMul;
+    this.isJumping = true;
+
+
+    this.player.body.offset.x = 0;
+
+
+
+    // jump jump jump
+    this.currentJumpMultiplier = 0;
     this.jumpSound.play();
   }
 
@@ -342,23 +400,25 @@ BasicGame.Player.prototype.update = function () {
   //   this.jumpMultiplier = 0;
   // }
 
-  if ((headHit === true && this.fallSound.isPlaying === false) ||
-      (this.justLeaveGround === true && this.onTheGround === true)) {
-    if (this.justLeaveGround === true) {
-      this.justLeaveGround = false;
-    }
-
+  if (headHit && !this.fallSound.isPlaying) {
     this.fallSound.play();
+  // if ((headHit === true && this.fallSound.isPlaying === false) ||
+  //     (this.justLeaveGround === true && this.onTheGround === true)) {
+  //   if (this.justLeaveGround === true) {
+  //     console.log('????');
+  //     this.justLeaveGround = false;
+  //   }
   }
 
   // This just tells the engine it should update the texture cache
   this.bitmap.dirty = true;
 };
 
-BasicGame.Player.prototype.render = function(){
-  if(BasicGame.Game.developmentMode === true){
-    // Sprite debug info
+BasicGame.Player.prototype.render = function() {
     this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
+    this.game.debug.bodyInfo(this.player, 'rgba(0,255,0,0.4)');
+  if (BasicGame.Game.developmentMode === true) {
+    // Sprite debug info
   }
 };
 
@@ -380,11 +440,13 @@ BasicGame.Player.prototype.rightInputIsActive = function () {
 // In this case, either holding the up arrow or tapping or clicking on the center
 // part of the screen.
 BasicGame.Player.prototype.upInputIsActive = function (duration) {
-  if (this.input.keyboard.downDuration(this.jumpKey, duration) && this.upPressedFlag == false) {
+  if (this.input.keyboard.isDown(this.jumpKey) && this.upPressedFlag == false) {
+  // if (this.input.keyboard.downDuration(this.jumpKey, duration) && this.upPressedFlag == false) {
     this.upPressedFlag = true;
     return true;
   }
-  else if (!this.input.keyboard.downDuration(this.jumpKey, duration) && this.upPressedFlag == true) {
+  else if (!this.input.keyboard.isDown(this.jumpKey) && this.upPressedFlag == true) {
+  // else if (!this.input.keyboard.downDuration(this.jumpKey, duration) && this.upPressedFlag == true) {
     this.upPressedFlag = false;
   }
   return false;
@@ -396,7 +458,7 @@ BasicGame.Player.prototype.isInShadow = function () {
   //If ALL the rays intersects a wall, then the player is in the shadows
   var lightImage = BasicGame.light.lightGroup.getAt(0);
 
-  if(BasicGame.Game.developmentMode === true){
+  if (BasicGame.Game.developmentMode === true) {
     this.drawLinesToLight(lightImage);
   }
 
@@ -465,7 +527,7 @@ BasicGame.Player.prototype.allRaysIntersectWall = function (rays) {
   return (hiddenRays == 4);
 };
 
-BasicGame.Player.prototype.drawLinesToLight = function(lightImage){
+BasicGame.Player.prototype.drawLinesToLight = function(lightImage) {
   // Draw a line from the eye to the target
   this.bitmap.context.beginPath();
   this.bitmap.context.moveTo(this.player.x, this.player.y);
@@ -499,12 +561,12 @@ BasicGame.Player.prototype.updateLevel = function (level) {
     this.level.initPlayerPos.y);
 };
 
-BasicGame.Player.prototype.dieWithDignity = function(){
+BasicGame.Player.prototype.dieWithDignity = function() {
   this.dead = true;
   this.slideSound.stop();
 
   var timer = this.game.time.create(true);
-  timer.add(100, function(){
+  timer.add(100, function() {
     this.deathSound.play();
   }, this);
   timer.start();
