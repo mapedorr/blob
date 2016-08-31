@@ -190,7 +190,7 @@ BasicGame.Player.prototype.update = function () {
       piece.alpha = 0;
 
       (this.piecesSound[this.collectedPieces++]).play();
-      if(this.collectedPieces === this.level.pieces.children.length){
+      if (this.collectedPieces === this.level.pieces.children.length) {
         // the level has been finished
         this.level.endLevel();
       }
@@ -213,8 +213,9 @@ BasicGame.Player.prototype.update = function () {
       this.game.physics.arcade.overlap(this.player, this.level.spikes,
         function(player, spike) {
           if (this.dead === false) {
-            this.player.body.allowGravity = false;
-            this.player.body.velocity.y = 0;
+            player.body.enable = false;
+            // this.player.body.allowGravity = false;
+            // this.player.body.velocity.y = 0;
             this.gameObj.subtractAllLifes(true);
           }
         }, null, this);
@@ -235,7 +236,6 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  
   // handle player movement
   leftPressed = this.leftInputIsActive() === true;
   rightPressed = this.rightInputIsActive() === true;
@@ -579,15 +579,18 @@ BasicGame.Player.prototype.dieWithDignity = function() {
 };
 
 BasicGame.Player.prototype.restartLevel = function () {
+  this.player.animations.play('normal');
   this.collectedPieces = 0;
 
+  ẗhis.player.body.enable = true;
   this.player.body.reset(this.player.x, this.player.y);
+  this.player.body.allowGravity = true;
+  this.player.body.velocity.y = 0;
   this.walkSound.stop();
   this.slideSound.stop();
   this.player.position.set(this.level.initPlayerPos.x,
     this.level.initPlayerPos.y);
 
   this.dead = false;
-  this.player.animations.play('normal');
 
 };
