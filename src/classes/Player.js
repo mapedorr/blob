@@ -213,9 +213,6 @@ BasicGame.Player.prototype.update = function () {
       this.game.physics.arcade.overlap(this.player, this.level.spikes,
         function(player, spike) {
           if (this.dead === false) {
-            player.body.enable = false;
-            // this.player.body.allowGravity = false;
-            // this.player.body.velocity.y = 0;
             this.gameObj.subtractAllLifes(true);
           }
         }, null, this);
@@ -568,6 +565,8 @@ BasicGame.Player.prototype.dieWithDignity = function() {
   this.dead = true;
   this.slideSound.stop();
 
+  this.player.body.enable = false;
+
   var timer = this.game.time.create(true);
   timer.add(100, function() {
     this.deathSound.play();
@@ -579,18 +578,18 @@ BasicGame.Player.prototype.dieWithDignity = function() {
 };
 
 BasicGame.Player.prototype.restartLevel = function () {
-  this.player.animations.play('normal');
   this.collectedPieces = 0;
-
-  ẗhis.player.body.enable = true;
-  this.player.body.reset(this.player.x, this.player.y);
-  this.player.body.allowGravity = true;
-  this.player.body.velocity.y = 0;
   this.walkSound.stop();
   this.slideSound.stop();
+
   this.player.position.set(this.level.initPlayerPos.x,
     this.level.initPlayerPos.y);
 
-  this.dead = false;
+  this.player.animations.play('normal');
 
+  this.player.body.reset(this.player.x, this.player.y);
+  this.player.body.allowGravity = true;
+  this.player.body.velocity.y = 0;
+  this.player.body.enable = true;
+  this.dead = false;
 };
