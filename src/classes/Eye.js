@@ -340,15 +340,16 @@ BasicGame.Eye.prototype.updateLevel = function (level) {
 BasicGame.Eye.prototype.rejoice = function (callback) {
   this.destroyTimers();
   this.eye.animations.play('happy');
-  this.shakeTween = this.shakeTween || this.game.add.tween(this.eye)
+  this.shakeTween = this.game.add.tween(this.eye)
   this.shakeTween.to({y: this.eye.originalY + 10},
     150,
-    Phaser.Easing.Sinusoidal.InOut,
+    null,
     false,
     0,
-    2,
+    4,
     true).start();
   this.shakeTween.onComplete.add(function () {
+    this.shakeTween.stop();
     this.eye.y = this.eye.originalY;
     this.initSearch();
     callback();

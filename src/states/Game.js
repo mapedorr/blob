@@ -6,7 +6,7 @@ var BasicGame = BasicGame || {};
 
 BasicGame.Game = function (game) {
   // CONSTANTS
-  this.LIFES_AMOUNT = 1;
+  this.LIFES_AMOUNT = 3;
 
   this.days = null;
   this.player = null;
@@ -369,8 +369,7 @@ BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {
 };
 
 BasicGame.Game.prototype.createLifeIndicators = function () {
-  console.log('x');
-  for(var i=0; i<this.lifes; i++) {
+  for (var i=0; i<this.lifes; i++) {
     var lifeSprite = new Phaser.Sprite(this.game, 0, 0, "player");
     lifeSprite.scale.set(0.5, 0.8);
     lifeSprite.x = (i % 3) * (lifeSprite.width + 6);
