@@ -346,7 +346,7 @@ BasicGame.Eye.prototype.rejoice = function (callback) {
     Phaser.Easing.Sinusoidal.InOut,
     false,
     0,
-    10,
+    2,
     true).start();
   this.shakeTween.onComplete.add(function () {
     this.eye.y = this.eye.originalY;

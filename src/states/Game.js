@@ -5,6 +5,9 @@
 var BasicGame = BasicGame || {};
 
 BasicGame.Game = function (game) {
+  // CONSTANTS
+  this.LIFES_AMOUNT = 1;
+
   this.days = null;
   this.player = null;
   this.level = null;
@@ -56,7 +59,7 @@ BasicGame.Game.prototype.preload = function () {
 
 BasicGame.Game.prototype.create = function () {
   // define properties
-  this.lifes = 3;
+  this.lifes = this.LIFES_AMOUNT;
   this.showFPS = false;
   this.countdownDuration = 0.7;
   this.inDarkness = true;
@@ -88,12 +91,9 @@ BasicGame.Game.prototype.create = function () {
 
   // create the group of sprites for lifes
   this.lifesGroup = this.game.add.group();
-  for(var i=0; i<this.lifes; i++) {
-    var lifeSprite = new Phaser.Sprite(this.game, 0, 0, "player");
-    lifeSprite.scale.set(0.5, 0.8);
-    lifeSprite.x = (i % 3) * (lifeSprite.width + 6);
-    this.lifesGroup.addChild(lifeSprite);
-  }
+
+  this.createLifeIndicators();
+
   this.lifesGroup.x = 15;
   this.lifesGroup.y = 0;
 
@@ -277,6 +277,7 @@ BasicGame.Game.prototype.shakeCamera = function () {
 };
 
 BasicGame.Game.prototype.subtractLife = function () {
+  console.log('wtf?');
   var that = this;
 
   // remove one life sprite
@@ -289,6 +290,7 @@ BasicGame.Game.prototype.subtractLife = function () {
     700,
     Phaser.Easing.Quadratic.Out,
     true);
+
   if (this.lifes <= 0) {
     localStorage.setItem("oh-my-blob", BasicGame.addDeath());
 
@@ -351,11 +353,24 @@ BasicGame.Game.prototype.restartLevel = function () {
   // - Position the player in the beginning                                     (d)
   // - Restore all the captured pieces in the level.
   // - ...something else?
+  console.log('wut?');
+
+  this.createLifeIndicators();
+
   this.player.restartLevel();
   this.level.restartLevel();
   this.eye.restartLevel();
 
-  this.lifes = 3;
+  this.lifes = this.LIFES_AMOUNT;
 
   this.hideDarkness();
+};
+
+BasicGame.Game.prototype.createLifeIndicators = function () {
+  for(var i=0; i<this.lifes; i++) {
+    var lifeSprite = new Phaser.Sprite(this.game, 0, 0, "player");
+    lifeSprite.scale.set(0.5, 0.8);
+    lifeSprite.x = (i % 3) * (lifeSprite.width + 6);
+    this.lifesGroup.addChild(lifeSprite);
+  }
 };

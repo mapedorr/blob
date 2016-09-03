@@ -96,7 +96,7 @@ BasicGame.Player.prototype.create = function (level) {
     this.jumpKey
   ]);
 
-  //Make the player collide with world bounds
+  // make the player collide with world bounds
   this.player.body.collideWorldBounds = true;
 
   // create a bitmap texture for drawing lines
@@ -374,6 +374,7 @@ BasicGame.Player.prototype.update = function () {
 
   if (upPressed && (this.onTheGround || this.player.body.offset.x != 0)) {
     jumpMul = Math.min(this.currentJumpMultiplier, this.JUMP_MULTIPLIER_MAX);
+    this.player.body.offset.x = 0;
     this.player.body.velocity.y = this.JUMP_SPEED;
     this.player.body.velocity.y += this.JUMP_SPEED * jumpMul;
     this.isJumping = true;
@@ -579,17 +580,16 @@ BasicGame.Player.prototype.dieWithDignity = function() {
 
 BasicGame.Player.prototype.restartLevel = function () {
   this.collectedPieces = 0;
+  this.player.body.collideWorldBounds = true;
+
   this.walkSound.stop();
   this.slideSound.stop();
 
-  this.player.position.set(this.level.initPlayerPos.x,
+  this.player.position.set(this.level.initPlayerPos.x,  
     this.level.initPlayerPos.y);
 
   this.player.animations.play('normal');
 
   this.player.body.reset(this.player.x, this.player.y);
-  this.player.body.allowGravity = true;
-  this.player.body.velocity.y = 0;
-  this.player.body.enable = true;
   this.dead = false;
 };
