@@ -350,6 +350,7 @@ BasicGame.Eye.prototype.rejoice = function (callback) {
     true).start();
   this.shakeTween.onComplete.add(function () {
     this.eye.y = this.eye.originalY;
+    this.initSearch();
     callback();
   }, this);
 

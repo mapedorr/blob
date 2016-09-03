@@ -99,6 +99,9 @@ BasicGame.Player.prototype.create = function (level) {
   // make the player collide with world bounds
   this.player.body.collideWorldBounds = true;
 
+  // disable physics in the player's body while the game starts
+  this.player.body.enable = false;
+
   // create a bitmap texture for drawing lines
   this.bitmap = this.game.add.bitmapData(this.game.width, this.game.height);
   this.bitmap.context.fillStyle = 'rgb(0, 0, 255)';
@@ -172,6 +175,10 @@ BasicGame.Player.prototype.update = function () {
   if (BasicGame.Game.developmentMode === true) {
     // clear the bitmap where we are drawing our lines
     this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
+  }
+
+  if (this.gameObj.isLoadingLevel === true || this.dead === true) {
+    return;
   }
 
   // check collisions
@@ -562,11 +569,14 @@ BasicGame.Player.prototype.updateLevel = function (level) {
     this.level.initPlayerPos.y);
 };
 
-BasicGame.Player.prototype.dieWithDignity = function() {
+BasicGame.Player.prototype.dieImploding = function() {
   this.dead = true;
   this.slideSound.stop();
 
   this.player.body.enable = false;
+  this.player.body.acceleration.x = 0;
+  this.player.body.velocity.y = 0;
+  this.player.body.allowGravity = false;
 
   var timer = this.game.time.create(true);
   timer.add(100, function() {
@@ -591,5 +601,11 @@ BasicGame.Player.prototype.restartLevel = function () {
   this.player.animations.play('normal');
 
   this.player.body.reset(this.player.x, this.player.y);
+  this.game.time.create(true)
+    .add(100, function () {
+      this.player.body.enable = true;
+      this.player.body.allowGravity = true;
+    }, this)
+    .timer.start();
   this.dead = false;
 };

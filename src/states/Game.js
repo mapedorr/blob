@@ -130,8 +130,7 @@ BasicGame.Game.prototype.create = function () {
     this.inDarkness = true;
     if (this.lifes <= 0) {
       // show the game over screen
-      // this.state.start('GameOver');
-      this.restartLevel();
+      this.restartLevel(true);
     }
   }, this);
 
@@ -142,8 +141,8 @@ BasicGame.Game.prototype.create = function () {
     false);
   this.brightnessTween.onComplete.add(function () {
     // this.eye.eyeStateTimer = this.eye.searchingTime;
-    this.eye.initSearch(true);
     this.isLoadingLevel = false;
+    this.eye.initSearch(true);
     if (this.music.isPlaying === false) {
       // this.music.play();
     }
@@ -277,7 +276,6 @@ BasicGame.Game.prototype.shakeCamera = function () {
 };
 
 BasicGame.Game.prototype.subtractLife = function () {
-  console.log('wtf?');
   var that = this;
 
   // remove one life sprite
@@ -287,15 +285,16 @@ BasicGame.Game.prototype.subtractLife = function () {
 
   var lifeTween = this.game.add.tween(this.lifesGroup.getChildAt(--this.lifes));
   lifeTween.to({alpha: 0},
-    700,
+    300,
     Phaser.Easing.Quadratic.Out,
     true);
 
   if (this.lifes <= 0) {
+    // save the current level
     localStorage.setItem("oh-my-blob", BasicGame.addDeath());
 
-    // notify the PLAYER that is time to show the animation for dead
-    this.player.dieWithDignity();
+    // notify the PLAYER that its time to show the animation for dead
+    this.player.dieImploding();
 
     // notify to the EYE the player has died
     this.eye.rejoice(function () {
@@ -312,13 +311,13 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
 
   var lifeTween = this.game.add.tween(this.lifesGroup);
   lifeTween.to({alpha: 0},
-    700,
+    300,
     Phaser.Easing.Quadratic.Out,
     true);
 
   this.eye.destroyTimers();
   if (destroyPlayer) {
-    this.player.dieWithDignity();
+    this.player.dieImploding();
 
     // create the timer
     var gameOverTimer = this.game.time.create(true);
@@ -327,7 +326,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
     gameOverTimer.add(1000,
       function () {
         // this.state.start('GameOver');
-        this.restartLevel();
+        this.restartLevel(true);
       },
       this);
 
@@ -348,14 +347,17 @@ BasicGame.Game.prototype.getSkyName = function () {
   }
 };
 
-BasicGame.Game.prototype.restartLevel = function () {
+BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {
   // ToDo: 
   // - Position the player in the beginning                                     (d)
   // - Restore all the captured pieces in the level.
   // - ...something else?
-  console.log('wut?');
 
-  this.createLifeIndicators();
+  // restore the alpha for life indicators and lifes group
+  this.lifesGroup.alpha = 1;
+  this.lifesGroup.forEach(function (lifeSprite) {
+    lifeSprite.alpha = 1;
+  });
 
   this.player.restartLevel();
   this.level.restartLevel();
@@ -363,14 +365,16 @@ BasicGame.Game.prototype.restartLevel = function () {
 
   this.lifes = this.LIFES_AMOUNT;
 
-  this.hideDarkness();
+  if (runHideDarkness === true) this.hideDarkness();
 };
 
 BasicGame.Game.prototype.createLifeIndicators = function () {
+  console.log('x');
   for(var i=0; i<this.lifes; i++) {
     var lifeSprite = new Phaser.Sprite(this.game, 0, 0, "player");
     lifeSprite.scale.set(0.5, 0.8);
     lifeSprite.x = (i % 3) * (lifeSprite.width + 6);
+
     this.lifesGroup.addChild(lifeSprite);
   }
 };
