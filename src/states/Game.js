@@ -144,7 +144,7 @@ BasicGame.Game.prototype.create = function(){
     this.eye.initSearch(true);
     this.isLoadingLevel = false;
     if (this.music.isPlaying === false) {
-      this.music.play();
+      // this.music.play();
     }
     this.player.player.body.enable = true;
   }, this);
