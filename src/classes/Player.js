@@ -415,10 +415,10 @@ BasicGame.Player.prototype.update = function () {
 };
 
 BasicGame.Player.prototype.render = function() {
-    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
-    this.game.debug.bodyInfo(this.player, 'rgba(0,255,0,0.4)');
   if (BasicGame.Game.developmentMode === true) {
     // Sprite debug info
+    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
+    this.game.debug.bodyInfo(this.player, 'rgba(0,255,0,0.4)');
   }
 };
 
