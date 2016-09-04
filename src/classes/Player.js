@@ -96,8 +96,11 @@ BasicGame.Player.prototype.create = function (level) {
     this.jumpKey
   ]);
 
-  //Make the player collide with world bounds
+  // make the player collide with world bounds
   this.player.body.collideWorldBounds = true;
+
+  // disable physics in the player's body while the game starts
+  this.player.body.enable = false;
 
   // create a bitmap texture for drawing lines
   this.bitmap = this.game.add.bitmapData(this.game.width, this.game.height);
@@ -174,6 +177,10 @@ BasicGame.Player.prototype.update = function () {
     this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
   }
 
+  if (this.gameObj.isLoadingLevel === true || this.dead === true) {
+    return;
+  }
+
   // check collisions
   if (this.level.hasFloor === true) {
     this.game.physics.arcade.collide(this.player, this.level.ground);
@@ -185,9 +192,12 @@ BasicGame.Player.prototype.update = function () {
   this.game.physics.arcade.overlap(this.player, this.level.pieces,
     function(player, piece) {
       player.touchingPiece = true;
-      piece.destroy();
+      // piece.destroy();
+      piece.body.enable = false;
+      piece.alpha = 0;
+
       (this.piecesSound[this.collectedPieces++]).play();
-      if (!this.level.pieces.children || !this.level.pieces.children.length) {
+      if (this.collectedPieces === this.level.pieces.children.length) {
         // the level has been finished
         this.level.endLevel();
       }
@@ -210,8 +220,6 @@ BasicGame.Player.prototype.update = function () {
       this.game.physics.arcade.overlap(this.player, this.level.spikes,
         function(player, spike) {
           if (this.dead === false) {
-            this.player.body.allowGravity = false;
-            this.player.body.velocity.y = 0;
             this.gameObj.subtractAllLifes(true);
           }
         }, null, this);
@@ -232,7 +240,6 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  
   // handle player movement
   leftPressed = this.leftInputIsActive() === true;
   rightPressed = this.rightInputIsActive() === true;
@@ -374,6 +381,7 @@ BasicGame.Player.prototype.update = function () {
 
   if (upPressed && (this.onTheGround || this.player.body.offset.x != 0)) {
     jumpMul = Math.min(this.currentJumpMultiplier, this.JUMP_MULTIPLIER_MAX);
+    this.player.body.offset.x = 0;
     this.player.body.velocity.y = this.JUMP_SPEED;
     this.player.body.velocity.y += this.JUMP_SPEED * jumpMul;
     this.isJumping = true;
@@ -561,9 +569,14 @@ BasicGame.Player.prototype.updateLevel = function (level) {
     this.level.initPlayerPos.y);
 };
 
-BasicGame.Player.prototype.dieWithDignity = function() {
+BasicGame.Player.prototype.dieImploding = function() {
   this.dead = true;
   this.slideSound.stop();
+
+  this.player.body.enable = false;
+  this.player.body.acceleration.x = 0;
+  this.player.body.velocity.y = 0;
+  this.player.body.allowGravity = false;
 
   var timer = this.game.time.create(true);
   timer.add(100, function() {
@@ -573,4 +586,26 @@ BasicGame.Player.prototype.dieWithDignity = function() {
 
   // play the dead animation
   this.player.animations.play('dying');
+};
+
+BasicGame.Player.prototype.restartLevel = function () {
+  this.collectedPieces = 0;
+  this.player.body.collideWorldBounds = true;
+
+  this.walkSound.stop();
+  this.slideSound.stop();
+
+  this.player.position.set(this.level.initPlayerPos.x,  
+    this.level.initPlayerPos.y);
+
+  this.player.animations.play('normal');
+
+  this.player.body.reset(this.player.x, this.player.y);
+  this.game.time.create(true)
+    .add(100, function () {
+      this.player.body.enable = true;
+      this.player.body.allowGravity = true;
+    }, this)
+    .timer.start();
+  this.dead = false;
 };
