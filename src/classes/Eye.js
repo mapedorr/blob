@@ -171,8 +171,22 @@ BasicGame.Eye.prototype.update = function () {
 };
 
 BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
+  var newViewZone = this.viewZoneSprite.positions['' + this.eye.animations.currentFrame.index];
   if(this.viewZoneSprite.visible === true) {
-    this.viewZoneSprite.x = this.viewZoneSprite.positions['' + this.eye.animations.currentFrame.index];
+    if (newViewZone !== this.viewZoneSprite.x) {
+      // this.viewZoneSprite.x = newViewZone;
+      this.game.add.tween(this.viewZoneSprite)
+        .to({x: newViewZone},
+          40,
+          null,
+          false,
+          0,
+          0,
+          true).start();
+        // .tween.onComplete.addOnce(function (tween) {
+        //     this.stop();
+        //   });
+    }
     return this.game.physics.arcade.overlap(this.PlayerObj.player,
       this.viewZoneSprite);
   }
