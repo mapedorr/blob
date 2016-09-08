@@ -25,19 +25,21 @@ BasicGame.Player = function (game, input, gameObj) {
   this.walkInAirTimer = null;
 
   // define movement constants
-  this.MAX_SPEED = 330; // pixels/second
-  this.ACCELERATION = 1000; // pixels/second/second
+  this.MAX_SPEED = 330;
+  this.ACCELERATION = 2500;
   this.ACCELERATION_WALL = 1000 * 12;
-  this.PLAYER_BODY_OFFSET_X = 10;
-  this.DRAG = 2500; // pixels/second
-  this.GRAVITY = 2600; // pixels/second/second
-  this.JUMP_SPEED = -650; // pixels/second (negative y is up)
-  // this.JUMP_SPEED = -800; // pixels/second (negative y is up)
+  this.PLAYER_BODY_OFFSET_X = 10; // TESTING
+  // this.PLAYER_BODY_OFFSET_X = 0;
+  this.DRAG = 0;
+  this.GRAVITY = 2600;
+  // this.JUMP_SPEED = -650;
+  this.JUMP_SPEED = -850; // original jump speed
   this.JUMP_SPEED_WALL = -830;
   this.SLID_SPEED = 1;
   this.JUMP_TIME = 150;
   this.JUMP_MULTIPLIER_AMOUNT = 0.01;
   this.JUMP_MULTIPLIER_MAX = 0.23;
+  this.JUMP_MULTIPLIER = 0.3;
 
   // define gameplay keys
   this.leftKey = Phaser.Keyboard.LEFT;
@@ -80,9 +82,6 @@ BasicGame.Player.prototype.create = function (level) {
 
   //Set player minimum and maximum movement speed
   this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 20); // x, y
-
-  //Add drag to the player that slows them down when they are not accelerating
-  this.player.body.drag.setTo(this.DRAG, 0); // x, y
 
   //Since we're jumping we need gravity
   this.game.physics.arcade.gravity.y = this.GRAVITY;
@@ -148,13 +147,6 @@ BasicGame.Player.prototype.create = function (level) {
       this.piecesSound.push(this.game.add.sound('piece' + ((i < 10) ? '0' : '') + i, 0.2));
     }
   }
-
-  // create a time to allow the player walk in the air for a while after
-  // leaving a platform
-  this.walkInAirTimer = this.game.time.create();
-  this.walkInAirTimer.add(1000, function () {
-    this.player.body.offset.x = 0;
-  }, this);
 };
 
 BasicGame.Player.prototype.update = function () {
@@ -255,6 +247,8 @@ BasicGame.Player.prototype.update = function () {
   if (this.onTheGround) {
     this.isFalling = false;
     this.isJumping = false;
+
+    if (this.player.body.offset.x !== 0) this.player.body.offset.x = 0;
   }
   else {
     this.walkSound.stop();
@@ -263,23 +257,33 @@ BasicGame.Player.prototype.update = function () {
     // check if the player has left a platform walking, if true, give it a chance
     // (an amount of time) to jump
     if (this.player.body.offset.x === 0) {
-      if (!this.isJumping && this.player.body.velocity.y > 0) {
+      if (!this.isJumping &&
+          this.player.body.velocity.y > 0 &&
+          this.player.body.velocity.y < 44) {
         // replace the body of the player to keep it touching the ground
-        if (leftPressed) {
+
+        if (this.player.body.acceleration.x < 0) {
           this.player.body.offset.x = this.PLAYER_BODY_OFFSET_X;
         }
-        else if (rightPressed) {
+        else if (this.player.body.acceleration.x > 0) {
           this.player.body.offset.x = -this.PLAYER_BODY_OFFSET_X;
         }
+
+        // create a time to allow the player walk in the air for a while after
+        // leaving a platform
+        this.walkInAirTimer = this.game.time.create(true);
+        this.walkInAirTimer.add(1000, function () {
+          this.player.body.offset.x = 0;
+        }, this);
 
         // restart the position of the player's body after an amount of time has
         // passed
         this.walkInAirTimer.start();
       }
     }
-    else if (this.player.body.velocity.y > 0) {
-      this.player.body.offset.x = 0;
-    }
+    // else if (this.player.body.velocity.y > 0) {
+    //   this.player.body.offset.x = 0;
+    // }
   }
 
 
@@ -292,6 +296,8 @@ BasicGame.Player.prototype.update = function () {
 
   // handle behaviour of player on walls
   if (onRightWall || onLeftWall) {
+    if (this.player.body.offset.x !== 0) this.player.body.offset.x = 0;
+
     this.player.body.velocity.y = this.SLID_SPEED;
 
     this.player.body.offset.x = this.currentJumpMultiplier = 0;
@@ -385,11 +391,8 @@ BasicGame.Player.prototype.update = function () {
     this.player.body.velocity.y = this.JUMP_SPEED;
     this.player.body.velocity.y += this.JUMP_SPEED * jumpMul;
     this.isJumping = true;
-
-
     this.player.body.offset.x = 0;
-
-
+    this.jumpMultiplier = this.JUMP_MULTIPLIER;
 
     // jump jump jump
     this.currentJumpMultiplier = 0;
@@ -423,9 +426,9 @@ BasicGame.Player.prototype.update = function () {
 };
 
 BasicGame.Player.prototype.render = function() {
+    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
   if (BasicGame.Game.developmentMode === true) {
     // Sprite debug info
-    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
     this.game.debug.bodyInfo(this.player, 'rgba(0,255,0,0.4)');
   }
 };
