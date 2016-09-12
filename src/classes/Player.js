@@ -24,17 +24,34 @@ BasicGame.Player = function (game, input, gameObj) {
   this.jumpChance = false;
   this.walkInAirTimer = null;
 
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // define movement constants
-  this.MAX_SPEED = 330;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  // speed of movement in X axis
+  this.MAX_SPEED = 300;
+
+  // base speed of movement in X axis when an arrow key (left, right) is pressed
+  // in ground
   this.ACCELERATION = 2500;
-  this.ACCELERATION_WALL = 1000 * 12;
-  this.PLAYER_BODY_OFFSET_X = 10; // TESTING
-  // this.PLAYER_BODY_OFFSET_X = 0;
-  this.DRAG = 0;
+
+  // base speed of movement in X axis when an arrow key (left, right) is pressed
+  // while jumping from a wall
+  this.ACCELERATION_WALL = 12000;
+  
+  // offset in X axis for the body of the character to allow players jump after
+  this.PLAYER_BODY_OFFSET_X = 10;
+  
+  // pixels per second used in character falls
   this.GRAVITY = 2600;
-  // this.JUMP_SPEED = -650;
-  this.JUMP_SPEED = -850; // original jump speed
-  this.JUMP_SPEED_WALL = -830;
+  
+  // base speed used to make the character jump
+  this.JUMP_SPEED = -850;
+
+  // base speed used to make the character jump while is against a wall
+  this.JUMP_SPEED_WALL = -850;
+
+
   this.SLID_SPEED = 1;
   this.JUMP_TIME = 150;
   this.JUMP_MULTIPLIER_AMOUNT = 0.01;
