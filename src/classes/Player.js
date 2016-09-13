@@ -39,9 +39,6 @@ BasicGame.Player = function (game, input, gameObj) {
   // while jumping from a wall
   this.ACCELERATION_WALL = 12000;
   
-  // offset in X axis for the body of the character to allow players jump after
-  this.PLAYER_BODY_OFFSET_X = 10;
-  
   // pixels per second used in character falls
   this.GRAVITY = 2600;
   
@@ -71,7 +68,7 @@ BasicGame.Player = function (game, input, gameObj) {
   this.deathSound = null;
   this.piecesSound = [];
 
-  this.upPressedFlag = false;
+  this.jumpCount = 0;
   this.dead = false;
 
   this.leftFirstPress = false;
@@ -181,27 +178,228 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  if (BasicGame.Game.developmentMode === true) {
-    // clear the bitmap where we are drawing our lines
-    this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
-  }
-
   if (this.gameObj.isLoadingLevel === true || this.dead === true) {
     return;
   }
 
+  if (this.dead === true) {
+    this.player.body.acceleration.x = 0;
+    return;
+  }
+
+  if (this.player.body.onFloor() === true) {
+    this.dead = true;
+    this.player.body.collideWorldBounds = false;
+    this.gameObj.subtractAllLifes();
+    return;
+  }
+
+  // ___________________________________________________________________________
   // check collisions
+  // ___________________________________________________________________________
+
+  this.checkCollisions();
+
+
+  // ___________________________________________________________________________
+  // handle player movement
+  // ___________________________________________________________________________
+
+  leftPressed = this.leftInputIsActive() === true;
+  rightPressed = this.rightInputIsActive() === true;
+  upPressed = this.upInputIsActive() === true;
+
+  if (this.player.touchingPiece === false) {
+    this.onTheGround = this.player.body.touching.down === true;
+    onRightWall = this.player.body.touching.right === true && this.player.body.velocity.y > -500;
+    onLeftWall = this.player.body.touching.left === true && this.player.body.velocity.y > -500;
+    headHit = this.player.body.touching.up === true && this.onTheGround === false;
+  }
+
+  if (this.onTheGround || onRightWall || onLeftWall) {
+    this.jumpCount = 0;
+  }
+
+  // reset some values to default if the player is touching the ground
+  if (this.onTheGround) {
+    this.isFalling = false;
+    this.isJumping = false;
+    if (this.justLeaveGround === true) this.fallSound.play();
+    this.justLeaveGround = false;
+  }
+  else {
+    this.walkSound.stop();
+    this.slideSound.stop();
+
+    // check if the character just left the ground
+    if (this.justLeaveGround === false && this.player.body.velocity.y > 0) {
+      this.justLeaveGround = true;
+
+      // create a time to allow the player walk in the air for a while after
+      // leaving a platform
+      this.walkInAirTimer = this.game.time.create(true);
+      this.walkInAirTimer.add(150, function () {
+        this.jumpCount++;
+      }, this);
+
+      // restart the position of the player's body after an amount of time has
+      // passed
+      this.walkInAirTimer.start();
+    }
+  }
+
+  // handle behaviour of player on walls
+  if (onRightWall || onLeftWall) {
+    this.player.body.velocity.y = this.SLID_SPEED;
+
+    this.currentJumpMultiplier = 0;
+    this.jumpChance = false;
+
+    !this.slideSound.isPlaying && this.slideSound.play();
+  }
+
+  if (leftPressed) {
+    // set the player velocity to move left
+    this.rightFirstPress = false;
+    this.player.body.acceleration.x = -this.ACCELERATION;
+
+    if (this.onTheGround) {
+      if (!this.leftFirstPress) {
+        this.leftFirstPress = true;
+        this.currentJumpMultiplier = 0;
+        this.walkSound.play();
+      }
+      else {
+        this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
+      }
+    }
+    else {
+      if (!onLeftWall) {
+        this.slideSound.stop();
+      }
+      else if (upPressed) {
+        this.player.body.acceleration.x = this.ACCELERATION_WALL;
+        this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+
+        // jump jump jump
+        this.currentJumpMultiplier = 0;
+        this.jumpSound.play();
+      }
+    }
+  }
+  else if (rightPressed) {
+    // If the RIGHT key is down, set the player velocity to move right
+    this.leftFirstPress = false;
+    this.player.body.acceleration.x = this.ACCELERATION;
+
+    if (this.onTheGround) {
+      if (this.rightFirstPress === false) {
+        this.rightFirstPress = true;
+        this.currentJumpMultiplier = 0;
+        this.walkSound.play();
+      }
+      else {
+        this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
+      }
+    }
+    else {
+      if (!onRightWall) {
+        this.slideSound.stop();
+      }
+      else if (upPressed) {
+        this.player.body.acceleration.x = -this.ACCELERATION_WALL;
+        this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+
+        // jump jump jump
+        this.currentJumpMultiplier = 0;
+        this.jumpSound.play();
+      }
+    }
+  }
+  else {
+    // not moving in X direction
+    this.leftFirstPress = this.rightFirstPress = false;
+    this.player.body.acceleration.x = 0;
+    this.player.body.velocity.x = 0;
+    this.currentJumpMultiplier = 0;
+    this.walkSound.stop();
+    this.slideSound.stop();
+  }
+
+  if (upPressed) {
+    jumpMul = Math.min(this.currentJumpMultiplier, this.JUMP_MULTIPLIER_MAX);
+    this.player.body.velocity.y = this.JUMP_SPEED;
+    this.player.body.velocity.y += this.JUMP_SPEED * jumpMul;
+    this.isJumping = true;
+    this.jumpMultiplier = this.JUMP_MULTIPLIER;
+
+    // jump jump jump
+    this.currentJumpMultiplier = 0;
+    this.jumpSound.play();
+  }
+
+  // make the jump a bit higher if the player keeps pressing the jump button
+  // if (this.input.keyboard.downDuration(this.jumpKey, this.JUMP_TIME) === true) {
+  //   this.player.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
+  //   if (this.jumpMultiplier > 0.1)
+  //     this.jumpMultiplier *= 0.95;
+  //   else
+  //     this.jumpMultiplier = 0;
+  // }
+  // else {
+  //   this.jumpMultiplier = 0;
+  // }
+
+  if (headHit && !this.fallSound.isPlaying) {
+    this.fallSound.play();
+  }
+};
+
+BasicGame.Player.prototype.render = function() {
+  if (BasicGame.Game.developmentMode === true) {
+    // Sprite debug info
+    this.game.debug.bodyInfo(this.player, 'rgba(0,255,0,0.4)');
+    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
+  }
+
+  if (BasicGame.Game.developmentMode === true) {
+    // clear the bitmap where we are drawing our lines
+    this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
+  }
+};
+
+BasicGame.Player.prototype.leftInputIsActive = function () {
+  return this.input.keyboard.isDown(this.leftKey);
+};
+
+BasicGame.Player.prototype.rightInputIsActive = function () {
+  return this.input.keyboard.isDown(this.rightKey);
+};
+
+BasicGame.Player.prototype.upInputIsActive = function (duration) {
+  // if (this.input.keyboard.isDown(this.jumpKey) && this.jumpCount === 0) {
+  if (this.input.keyboard.downDuration(this.jumpKey, duration) && this.jumpCount === 0) {
+    this.jumpCount++;
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * Method that checks collisions against walls, the ground and collectable pieces
+ */
+BasicGame.Player.prototype.checkCollisions = function () {
+  this.player.touchingPiece = false;
+
   if (this.level.hasFloor === true) {
     this.game.physics.arcade.collide(this.player, this.level.ground);
   }
-
-  this.player.touchingPiece = false;
 
   // check if the player touches a piece
   this.game.physics.arcade.overlap(this.player, this.level.pieces,
     function(player, piece) {
       player.touchingPiece = true;
-      // piece.destroy();
       piece.body.enable = false;
       piece.alpha = 0;
 
@@ -236,282 +434,41 @@ BasicGame.Player.prototype.update = function () {
   } else {
     this.game.physics.arcade.collide(this.player, this.level.walls);
   }
-
-  if (this.dead === true) {
-    this.player.body.acceleration.x = 0;
-    return;
-  }
-
-  if (this.player.body.onFloor() === true) {
-    this.dead = true;
-    this.player.body.collideWorldBounds = false;
-    this.gameObj.subtractAllLifes();
-    return;
-  }
-
-  // handle player movement
-  leftPressed = this.leftInputIsActive() === true;
-  rightPressed = this.rightInputIsActive() === true;
-  upPressed = this.upInputIsActive() === true;
-  if (this.player.touchingPiece === false) {
-    this.onTheGround = this.player.body.touching.down === true;
-    onRightWall = this.player.body.touching.right === true;
-    onLeftWall = this.player.body.touching.left === true;
-    headHit = this.player.body.touching.up === true && this.onTheGround === false;
-  }
-
-  // reset some values to default if the player is touching the ground
-  if (this.onTheGround) {
-    this.isFalling = false;
-    this.isJumping = false;
-
-    if (this.player.body.offset.x !== 0) this.player.body.offset.x = 0;
-  }
-  else {
-    this.walkSound.stop();
-    this.slideSound.stop();
-
-    // check if the player has left a platform walking, if true, give it a chance
-    // (an amount of time) to jump
-    if (this.player.body.offset.x === 0) {
-      if (!this.isJumping &&
-          this.player.body.velocity.y > 0 &&
-          this.player.body.velocity.y < 44) {
-        // replace the body of the player to keep it touching the ground
-
-        if (this.player.body.acceleration.x < 0) {
-          this.player.body.offset.x = this.PLAYER_BODY_OFFSET_X;
-        }
-        else if (this.player.body.acceleration.x > 0) {
-          this.player.body.offset.x = -this.PLAYER_BODY_OFFSET_X;
-        }
-
-        // create a time to allow the player walk in the air for a while after
-        // leaving a platform
-        this.walkInAirTimer = this.game.time.create(true);
-        this.walkInAirTimer.add(1000, function () {
-          this.player.body.offset.x = 0;
-        }, this);
-
-        // restart the position of the player's body after an amount of time has
-        // passed
-        this.walkInAirTimer.start();
-      }
-    }
-    // else if (this.player.body.velocity.y > 0) {
-    //   this.player.body.offset.x = 0;
-    // }
-  }
-
-
-  // -------------------------------------------------------------------------
-  // REVISAR
-  if (!this.onTheGround && !onRightWall && !onLeftWall &&
-      this.justLeaveGround === false) {
-    this.justLeaveGround = true;
-  }
-
-  // handle behaviour of player on walls
-  if (onRightWall || onLeftWall) {
-    if (this.player.body.offset.x !== 0) this.player.body.offset.x = 0;
-
-    this.player.body.velocity.y = this.SLID_SPEED;
-
-    this.player.body.offset.x = this.currentJumpMultiplier = 0;
-    this.jumpChance = false;
-
-    !this.slideSound.isPlaying && this.slideSound.play();
-
-    // -------------------------------------------------------------------------
-    // REVISAR
-    if (this.justLeaveGround === true) {
-      this.justLeaveGround = false;
-      this.fallSound.play();
-    }
-  }
-
-  if (leftPressed) {
-    // set the player velocity to move left
-    this.rightFirstPress = false;
-    this.player.body.acceleration.x = -this.ACCELERATION;
-
-    if (this.onTheGround || this.player.body.offset.x != 0) {
-      if (!this.leftFirstPress) {
-        this.leftFirstPress = true;
-        this.currentJumpMultiplier = 0;
-        this.walkSound.play();
-      }
-      else {
-        this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
-      }
-    }
-    else {
-      if (!onLeftWall) {
-        this.slideSound.stop();
-      }
-      else if (upPressed) {
-        this.player.body.acceleration.x = this.ACCELERATION_WALL;
-        this.player.body.velocity.y = this.JUMP_SPEED_WALL;
-
-        // jump jump jump
-        this.currentJumpMultiplier = 0;
-        this.jumpSound.play();
-      }
-    }
-  }
-  else if (rightPressed) {
-    // If the RIGHT key is down, set the player velocity to move right
-    this.leftFirstPress = false;
-    this.player.body.acceleration.x = this.ACCELERATION;
-
-    if (this.onTheGround || this.player.body.offset.x != 0) {
-      if (this.rightFirstPress === false) {
-        this.rightFirstPress = true;
-        this.currentJumpMultiplier = 0;
-        this.walkSound.play();
-      }
-      else {
-        this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
-      }
-    }
-    else {
-      if (!onRightWall) {
-        this.slideSound.stop();
-      }
-      else if (upPressed) {
-        this.player.body.acceleration.x = -this.ACCELERATION_WALL;
-        this.player.body.velocity.y = this.JUMP_SPEED_WALL;
-
-        // jump jump jump
-        this.currentJumpMultiplier = 0;
-        this.jumpSound.play();
-      }
-    }
-  }
-  else {
-    // not moving in X direction
-    this.leftFirstPress = this.rightFirstPress = false;
-    this.player.body.acceleration.x = 0;
-    this.player.body.velocity.x = 0;
-    this.currentJumpMultiplier = 0;
-    this.walkSound.stop();
-    this.slideSound.stop();
-
-    // -------------------------------------------------------------------------
-    // ToDo
-    // this.player.body.offset.x = 0;
-  }
-
-  if (upPressed && (this.onTheGround || this.player.body.offset.x != 0)) {
-    jumpMul = Math.min(this.currentJumpMultiplier, this.JUMP_MULTIPLIER_MAX);
-    this.player.body.offset.x = 0;
-    this.player.body.velocity.y = this.JUMP_SPEED;
-    this.player.body.velocity.y += this.JUMP_SPEED * jumpMul;
-    this.isJumping = true;
-    this.player.body.offset.x = 0;
-    this.jumpMultiplier = this.JUMP_MULTIPLIER;
-
-    // jump jump jump
-    this.currentJumpMultiplier = 0;
-    this.jumpSound.play();
-  }
-
-  // make the jump a bit higher if the player keeps pressing the jump button
-  // if (this.input.keyboard.downDuration(this.jumpKey, this.JUMP_TIME) === true) {
-  //   this.player.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
-  //   if (this.jumpMultiplier > 0.1)
-  //     this.jumpMultiplier *= 0.95;
-  //   else
-  //     this.jumpMultiplier = 0;
-  // }
-  // else {
-  //   this.jumpMultiplier = 0;
-  // }
-
-  if (headHit && !this.fallSound.isPlaying) {
-    this.fallSound.play();
-  // if ((headHit === true && this.fallSound.isPlaying === false) ||
-  //     (this.justLeaveGround === true && this.onTheGround === true)) {
-  //   if (this.justLeaveGround === true) {
-  //     console.log('????');
-  //     this.justLeaveGround = false;
-  //   }
-  }
-
-  // This just tells the engine it should update the texture cache
-  this.bitmap.dirty = true;
 };
 
-BasicGame.Player.prototype.render = function() {
-    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
-  if (BasicGame.Game.developmentMode === true) {
-    // Sprite debug info
-    this.game.debug.bodyInfo(this.player, 'rgba(0,255,0,0.4)');
-  }
-};
-
-// This function should return true when the player activates the "go left" control
-// In this case, either holding the right arrow or tapping or clicking on the left
-// side of the screen.
-BasicGame.Player.prototype.leftInputIsActive = function () {
-  return this.input.keyboard.isDown(this.leftKey);
-};
-
-// This function should return true when the player activates the "go right" control
-// In this case, either holding the right arrow or tapping or clicking on the right
-// side of the screen.
-BasicGame.Player.prototype.rightInputIsActive = function () {
-  return this.input.keyboard.isDown(this.rightKey);
-};
-
-// This function should return true when the player activates the "jump" control
-// In this case, either holding the up arrow or tapping or clicking on the center
-// part of the screen.
-BasicGame.Player.prototype.upInputIsActive = function (duration) {
-  if (this.input.keyboard.isDown(this.jumpKey) && this.upPressedFlag == false) {
-  // if (this.input.keyboard.downDuration(this.jumpKey, duration) && this.upPressedFlag == false) {
-    this.upPressedFlag = true;
-    return true;
-  }
-  else if (!this.input.keyboard.isDown(this.jumpKey) && this.upPressedFlag == true) {
-  // else if (!this.input.keyboard.downDuration(this.jumpKey, duration) && this.upPressedFlag == true) {
-    this.upPressedFlag = false;
-  }
-  return false;
-};
 
 //Function that checks if  the player is completely in shadows or not
 BasicGame.Player.prototype.isInShadow = function () {
   //Trace rays toward the light from each corner of the player sprite.
   //If ALL the rays intersects a wall, then the player is in the shadows
   var lightImage = BasicGame.light.lightGroup.getAt(0);
-
-  if (BasicGame.Game.developmentMode === true) {
-    this.drawLinesToLight(lightImage);
-  }
-
   var raysToLight = [];
+  var offset = 8;
   
   // top left corner
-  raysToLight.push(new Phaser.Line(this.player.x + 2,
-    this.player.y + 2,
+  raysToLight.push(new Phaser.Line(this.player.x + offset,
+    this.player.y + offset,
     lightImage.x, lightImage.y));
 
   // top right corner
-  raysToLight.push(new Phaser.Line(this.player.x + this.player.width - 2,
-    this.player.y + 2,
+  raysToLight.push(new Phaser.Line(this.player.x + this.player.width - offset,
+    this.player.y + offset,
     lightImage.x, lightImage.y));
 
   // bottom right corner
-  raysToLight.push(new Phaser.Line(this.player.x + this.player.width - 2,
-    this.player.y + this.player.height - 2,
+  raysToLight.push(new Phaser.Line(this.player.x + this.player.width - offset,
+    this.player.y + this.player.height - offset,
     lightImage.x, lightImage.y));
 
   // bottom left corner
-  raysToLight.push(new Phaser.Line(this.player.x + 2,
-    this.player.y + this.player.height - 2,
+  raysToLight.push(new Phaser.Line(this.player.x + offset,
+    this.player.y + this.player.height - offset,
     lightImage.x,
     lightImage.y));
+
+  if (BasicGame.Game.developmentMode === true) {
+    this.drawLinesToLight(lightImage, raysToLight);
+  }
 
   // Test if any walls intersect the ray
   return this.allRaysIntersectWall(raysToLight);
@@ -555,25 +512,25 @@ BasicGame.Player.prototype.allRaysIntersectWall = function (rays) {
   return (hiddenRays == 4);
 };
 
-BasicGame.Player.prototype.drawLinesToLight = function(lightImage) {
+BasicGame.Player.prototype.drawLinesToLight = function(lightImage, raysToLight) {
   // Draw a line from the eye to the target
   this.bitmap.context.beginPath();
-  this.bitmap.context.moveTo(this.player.x, this.player.y);
+  this.bitmap.context.moveTo(raysToLight[0].right, raysToLight[0].bottom);
   this.bitmap.context.lineTo(lightImage.x, lightImage.y);
   this.bitmap.context.stroke();
 
   this.bitmap.context.beginPath();
-  this.bitmap.context.moveTo(this.player.x + this.player.width, this.player.y);
+  this.bitmap.context.moveTo(raysToLight[1].right, raysToLight[1].bottom);
   this.bitmap.context.lineTo(lightImage.x, lightImage.y);
   this.bitmap.context.stroke();
 
   this.bitmap.context.beginPath();
-  this.bitmap.context.moveTo(this.player.x, this.player.y + this.player.height);
+  this.bitmap.context.moveTo(raysToLight[2].right, raysToLight[2].bottom);
   this.bitmap.context.lineTo(lightImage.x, lightImage.y);
   this.bitmap.context.stroke();
 
   this.bitmap.context.beginPath();
-  this.bitmap.context.moveTo(this.player.x + this.player.width, this.player.y + this.player.height);
+  this.bitmap.context.moveTo(raysToLight[3].right, raysToLight[3].bottom);
   this.bitmap.context.lineTo(lightImage.x, lightImage.y);
   this.bitmap.context.stroke();
 };
