@@ -149,19 +149,19 @@ BasicGame.Game.prototype.create = function () {
     this.player.player.body.enable = true;
   }, this);
 
-  // create the tween for shaking the camera
-  this.shakeTween = this.game.add.tween(this.game.camera)
-  this.shakeTween.to({y: -5},
-    40,
-    Phaser.Easing.Sinusoidal.InOut,
-    false,
-    0,
-    4,
-    true);
-  this.shakeTween.onComplete.add(function () {
-    // set the camera position to its initial position
-    this.game.camera.setPosition(0, 0);
-  }, this);
+  // create flash sprite
+  this.flashGroup = this.add.group();
+  var flashBitmap = new Phaser.BitmapData(this.game,
+    'flash',
+    this.game.width,
+    this.game.height);
+  flashBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
+  flashBitmap.ctx.fillStyle = '#fff';
+  flashBitmap.ctx.fill();
+
+  var flashSprite = new Phaser.Sprite(this.game, 0, 0, flashBitmap);
+  flashSprite.alpha = 0;
+  this.flashGroup.addChild(flashSprite);
 
   // show FPS
   if (BasicGame.Game.developmentMode) {
@@ -269,10 +269,26 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
 
 BasicGame.Game.prototype.shakeCamera = function () {
   // shake the camera by moving it up and down 5 times really fast
-  this.game.camera.y = 5;
-  if (!this.shakeTween.isRunning) {
-    this.shakeTween.start();
-  }
+  this.game.camera.y = 10;
+  this.game.camera.x = 10;
+
+  // create the tween for shaking the camera
+  this.shakeTween = this.game.add.tween(this.game.camera)
+  this.shakeTween.to({y: -5, x: -5},
+    40,
+    Phaser.Easing.Sinusoidal.InOut,
+    false,
+    0,
+    4,
+    true);
+
+  this.shakeTween.onComplete.add(function () {
+    // set the camera position to its initial position
+    this.game.camera.setPosition(0, 0);
+    this.shakeTween.stop();
+  }, this);
+
+  this.shakeTween.start();
 };
 
 BasicGame.Game.prototype.subtractLife = function () {
@@ -288,6 +304,22 @@ BasicGame.Game.prototype.subtractLife = function () {
     300,
     Phaser.Easing.Quadratic.Out,
     true);
+
+  // create the tween for shaking the camera
+  this.flashTween = this.game.add.tween(this.flashGroup.getChildAt(0));
+  this.flashTween.to({alpha: 1},
+    40,
+    Phaser.Easing.Sinusoidal.InOut,
+    false,
+    0,
+    4,
+    true);
+
+  this.flashTween.onComplete.add(function () {
+    this.flashTween.stop();
+  }, this);
+
+  this.flashTween.start();
 
   if (this.lifes <= 0) {
     // save the current level

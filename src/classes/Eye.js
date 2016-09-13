@@ -28,7 +28,6 @@ BasicGame.Eye = function (game, gameObj) {
 
   // 20 seconds searching the player before going crazy
   this.searchingTime = 19000;
-  this.originalSearchSpeed = 2;
   this.zoneSize = this.game.world.width / 3;
 
   // view zone
@@ -56,7 +55,7 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.eye.anchor.setTo(0.5, 0.5);
 
   // set the animations for THE EYE
-  this.eye.animations.add('search', [0,1,2,3,3,3,2,1,0,4,5,6,6,6,5,4], this.originalSearchSpeed, true);
+  this.eye.animations.add('search', [0,1,2,3,3,3,2,1,0,4,5,6,6,6,5,4], 2, true);
   this.eye.animations.add('angry', [7], 1, false);
   this.eye.animations.add('tired', [8], 1, false);
   this.eye.animations.add('happy', [9], 1, false);
@@ -259,9 +258,9 @@ BasicGame.Eye.prototype.getMad = function () {
   this.shake();
 
   // intensify search speed
-  if (this.eye.animations.getAnimation("search").speed < 3) {
-    this.eye.animations.getAnimation("search").speed += 1;
-  }
+  // if (this.eye.animations.getAnimation("search").speed < 3) {
+  //   this.eye.animations.getAnimation("search").speed += 1;
+  // }
 
   this.searchAgain = this.game.time.create(true);
   this.searchAgain.add(1600,
@@ -332,9 +331,6 @@ BasicGame.Eye.prototype.drawLinesToTarget = function (target) {
 BasicGame.Eye.prototype.updateLevel = function (level) {
   this.level = level;
   this.anger = false;
-
-  // restore the searching speed to its default
-  this.eye.animations.getAnimation("search").speed = this.originalSearchSpeed;
 };
 
 BasicGame.Eye.prototype.rejoice = function (callback) {
@@ -411,6 +407,5 @@ BasicGame.Eye.prototype.restartLevel = function () {
   this.viewZoneSprite.x = this.viewZoneSprite.positions['0'];
   this.eye.animations.play('search');
   this.searching = true;
-  this.eye.animations.getAnimation("search").speed = this.originalSearchSpeed;
   this.eyeStateTimer = this.searchingTime;
 };
