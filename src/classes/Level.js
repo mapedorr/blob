@@ -7,7 +7,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+*/
 
 var BasicGame = BasicGame || {};
 
@@ -101,6 +101,7 @@ BasicGame.Level.prototype.destroyCurrentLevel = function () {
   this.walls.destroy();
   if(this.hasSpikes) {
     this.spikes.forEach(function (spikeSprite) {
+      if (!spikeSprite || !spikeSprite.showTween || !spikeSprite.hideTween) return;
       spikeSprite.showTween.stop();
       spikeSprite.hideTween.stop();
     });
@@ -300,11 +301,11 @@ BasicGame.Level.prototype.addWidthSpike = function (platformSprite, inBottom) {
       {y: spikeSprite.desY}, 100, 300);
 
     var hideSpikeTween = this.game.add.tween(spikeSprite)
-      .to({y: spikeSprite.oriY},
-        300,
-        Phaser.Easing.Exponential.Out,
-        false,
-        1000);
+    .to({y: spikeSprite.oriY},
+      300,
+      Phaser.Easing.Exponential.Out,
+      false,
+      1000);
     hideSpikeTween.onComplete.add(function () {
       this.isHidden = true;
       this.parent.openedSpikes--;
@@ -351,11 +352,11 @@ BasicGame.Level.prototype.addHeightSpike = function (platformSprite, side) {
     {x: spikeSprite.desX}, 100, 500);
 
   var hideSpikeTween = this.game.add.tween(spikeSprite)
-    .to({x: spikeSprite.oriX},
-      300,
-      Phaser.Easing.Exponential.Out,
-      false,
-      1000);
+  .to({x: spikeSprite.oriX},
+    300,
+    Phaser.Easing.Exponential.Out,
+    false,
+    1000);
   hideSpikeTween.onComplete.add(function () {
     this.isHidden = true;
     this.parent.openedSpikes--;
@@ -375,11 +376,11 @@ BasicGame.Level.prototype.addHeightSpike = function (platformSprite, side) {
 BasicGame.Level.prototype.createShowSpikeTween = function (spikeSprite, properties, duration, delay) {
   var _self = this;
   var showSpikeTween = this.game.add.tween(spikeSprite)
-    .to(properties,
-      duration,
-      null,
-      false,
-      delay);
+  .to(properties,
+    duration,
+    null,
+    false,
+    delay);
 
   showSpikeTween.onComplete.add(function () {
     this.isHidden = false;

@@ -2,7 +2,7 @@
 // 4 (free space for testing jumps)
 var BasicGame = BasicGame || {
   language: "en",
-  currentLevel: 5,
+  currentLevel: 29,
   deaths: 0,
   rest: 0,
   setDay: function(n) {
@@ -24,6 +24,7 @@ var BasicGame = BasicGame || {
     if (code.length < 4) return;
 
     this.currentLevel = parseInt(code.slice(code.length -2, code.length));
+    if (this.currentLevel === 29) this.currentLevel++;
     this.deaths = parseInt(code.slice(1, code.length - 2));
     this.rest = parseInt(code.charAt(0));
   },
