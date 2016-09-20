@@ -218,7 +218,7 @@ BasicGame.Level.prototype.createLevel = function (num) {
 BasicGame.Level.prototype.render = function () {
   if(BasicGame.Game.developmentMode === true) {
     var _self = this;
-    this.pieces.forEach(function (pieceSprite) {
+    this.spikes.forEach(function (pieceSprite) {
       _self.game.debug.body(pieceSprite, 'rgba(0,0,255,0.8)');
     });
   }
@@ -320,6 +320,17 @@ BasicGame.Level.prototype.addWidthSpike = function (platformSprite, inBottom) {
   spikeSprite.body.immovable = true;
   spikeSprite.body.allowGravity = false;
 
+
+  var numofspikes = platformSprite.width / 32;
+  spikeSprite.body.width = platformSprite.width * (numofspikes / (numofspikes + 0.5));
+  spikeSprite.body.height = 8;
+  spikeSprite.body.offset.x = (platformSprite.width / 2) - (spikeSprite.body.width / 2);
+  
+  if(!inBottom)
+    spikeSprite.body.offset.y = 8;
+  else
+    spikeSprite.body.offset.y = 0;
+
   return spikeSprite;
 };
 
@@ -369,6 +380,16 @@ BasicGame.Level.prototype.addHeightSpike = function (platformSprite, side) {
   this.game.physics.arcade.enable(spikeSprite);
   spikeSprite.body.immovable = true;
   spikeSprite.body.allowGravity = false;
+
+  var numofspikes = platformSprite.height / 32;
+  spikeSprite.body.width = 8;
+  spikeSprite.body.height = platformSprite.height * (numofspikes / (numofspikes + 0.5));
+  spikeSprite.body.offset.y = (platformSprite.height / 2) - (spikeSprite.body.height / 2);
+  
+  if (side === 'r')
+    spikeSprite.body.offset.x = 0;
+  else
+    spikeSprite.body.offset.x = 8;
 
   return spikeSprite;
 };

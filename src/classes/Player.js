@@ -7,7 +7,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+*/
 
 var BasicGame = BasicGame || {};
 
@@ -107,7 +107,7 @@ BasicGame.Player.prototype.create = function (level) {
     this.leftKey,
     this.rightKey,
     this.jumpKey
-  ]);
+    ]);
 
   // make the player collide with world bounds
   this.player.body.collideWorldBounds = true;
@@ -358,8 +358,8 @@ BasicGame.Player.prototype.update = function () {
 BasicGame.Player.prototype.render = function() {
   if (BasicGame.Game.developmentMode === true) {
     // Sprite debug info
-    this.game.debug.bodyInfo(this.player, 'rgba(0,255,0,0.4)');
     this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
+    this.game.debug.bodyInfo(this.player, 'rgba(0,255,0,0.4)');
   }
 
   if (BasicGame.Game.developmentMode === true) {
@@ -378,18 +378,18 @@ BasicGame.Player.prototype.rightInputIsActive = function () {
 
 BasicGame.Player.prototype.upInputIsActive = function (duration) {
   // if (this.input.keyboard.isDown(this.jumpKey) && this.jumpCount === 0) {
-  if (this.input.keyboard.downDuration(this.jumpKey, duration) && this.jumpCount === 0) {
-    this.jumpCount++;
-    return true;
-  }
+    if (this.input.keyboard.downDuration(this.jumpKey, duration) && this.jumpCount === 0) {
+      this.jumpCount++;
+      return true;
+    }
 
-  return false;
-};
+    return false;
+  };
 
 /**
  * Method that checks collisions against walls, the ground and collectable pieces
  */
-BasicGame.Player.prototype.checkCollisions = function () {
+ BasicGame.Player.prototype.checkCollisions = function () {
   this.player.touchingPiece = false;
 
   if (this.level.hasFloor === true) {
@@ -486,10 +486,10 @@ BasicGame.Player.prototype.allRaysIntersectWall = function (rays) {
       if (!intersect) {
         // Create an array of lines that represent the four edges of each wall
         var lines = [
-          new Phaser.Line(wall.x, wall.y, wall.x + wall.width, wall.y),
-          new Phaser.Line(wall.x, wall.y, wall.x, wall.y + wall.height),
-          new Phaser.Line(wall.x + wall.width, wall.y, wall.x + wall.width, wall.y + wall.height),
-          new Phaser.Line(wall.x, wall.y + wall.height, wall.x + wall.width, wall.y + wall.height)
+        new Phaser.Line(wall.x, wall.y, wall.x + wall.width, wall.y),
+        new Phaser.Line(wall.x, wall.y, wall.x, wall.y + wall.height),
+        new Phaser.Line(wall.x + wall.width, wall.y, wall.x + wall.width, wall.y + wall.height),
+        new Phaser.Line(wall.x, wall.y + wall.height, wall.x + wall.width, wall.y + wall.height)
         ];
 
         // Test each of the edges in this wall against the ray.
@@ -579,10 +579,10 @@ BasicGame.Player.prototype.restartLevel = function () {
 
   this.player.body.reset(this.player.x, this.player.y);
   this.game.time.create(true)
-    .add(100, function () {
-      this.player.body.enable = true;
-      this.player.body.allowGravity = true;
-    }, this)
-    .timer.start();
+  .add(100, function () {
+    this.player.body.enable = true;
+    this.player.body.allowGravity = true;
+  }, this)
+  .timer.start();
   this.dead = false;
 };
