@@ -58,7 +58,7 @@ BasicGame.Player = function (game, input, gameObj) {
   // define gameplay keys
   this.leftKey = Phaser.Keyboard.LEFT;
   this.rightKey = Phaser.Keyboard.RIGHT;
-  this.jumpKey = Phaser.Keyboard.SPACEBAR;
+  this.jumpKey = Phaser.Keyboard.Z;
 
   this.jumpSound = null;
   this.walkSound = null;

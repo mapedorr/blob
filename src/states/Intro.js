@@ -6,7 +6,7 @@ var BasicGame = BasicGame || {};
 
 BasicGame.Intro = function (game) {
   this.background = null;
-  this.skipKey = Phaser.Keyboard.SPACEBAR;
+  this.skipKey = Phaser.Keyboard.Z;
   
   this.fontId = 'font';
   this.textColors = {
@@ -67,8 +67,8 @@ BasicGame.Intro = function (game) {
   this.skipGroup = null;
   this.skipBitmap = null;
   this.skipText = {
-    "es": "Saltar (Barra espaciadora)",
-    "en": "Skip (Spacebar)"
+    "es": "Siguiente (Z)",
+    "en": "Next (Z)"
   };
   this.sPressedFlag = false;
 
