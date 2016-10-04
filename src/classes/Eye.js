@@ -252,7 +252,6 @@ BasicGame.Eye.prototype.initSearch = function (delay) {
     }.bind(this);
     iterator(index);
 
-
     this.eye.animations.play('search');
     this.pupil.alpha = 1;
     this.searching = true;
@@ -296,6 +295,8 @@ BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
 };
 
 BasicGame.Eye.prototype.shootPlayer = function (target) {
+  var tweensInPause = false;
+
   //- - - | DEVELOPMENT MODE | - - -
   if(BasicGame.Game.developmentMode === true) {
     this.drawLinesToTarget(target);
@@ -308,6 +309,14 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
     this.eye.animations.play('angry');
     this.lightning.shoot(target);
 
+    // pause the current tweens, if any, for the pupil and the viewzone
+    if (this.viewZoneTween.isRunning === true ||
+        this.pupilTween.isRunning === true) {
+      tweensInPause = true;
+      this.viewZoneTween.pause();
+      this.pupilTween.pause();
+    }
+
     this.destroyTimers(this.getTiredTimer, this.getMadTimer, this.searchAgain);
 
     // init the timer that will make the EYE calm down again and restart the
@@ -315,7 +324,17 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
     this.calmDownTimer = this.game.time.create(true);
     this.calmDownTimer.add(3000,
       function () {
-        this.initSearch();
+        if (tweensInPause === true) {
+          console.log('boilá!');
+          this.eye.animations.play('search');
+          this.pupil.alpha = 1;
+          this.searching = true;
+          this.viewZoneTween.resume();
+          this.pupilTween.resume();
+        }
+        else {
+          this.initSearch();
+        }
 
         var _self = this;
         setTimeout(function () {_self.shooting = false}, 200);
