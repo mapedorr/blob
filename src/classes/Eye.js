@@ -35,9 +35,9 @@ BasicGame.Eye = function (game, gameObj) {
 
   this.laughSound = null;
   this.angerSound = null;
-};
 
-BasicGame.Eye.prototype.preload = function () {};
+  this.currentPattern = -1;
+};
 
 BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.PlayerObj = playerObj;
@@ -117,7 +117,8 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.patterns = [
     [[0,3,2], [3, 6, 4], [6, 0, 2]],
     [[0,1,0.5], [1, 4, 1], [4, 2, 1], [2, 5, 2], [5, 0, 1]],
-    [[0,3,0.2], [3, 6, 0.4], [6, 0, 0.2]]
+    [[0,3,0.2], [3, 6, 0.4], [6, 0, 0.2]],
+    [[0,4,0.5], [4, 1, 1], [1, 5, 1], [5, 2, 2], [2, 0, 1]]
   ];
 
   if (!this.laughSound) {
@@ -192,61 +193,9 @@ BasicGame.Eye.prototype.update = function () {
   this.bitmap.dirty = true;
 };
 
-BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
-  var newViewZone = this.viewZoneSprite.positions['' + this.eye.animations.currentFrame.index];
-  if(this.viewZoneSprite.visible === true) {
-    if (newViewZone !== this.viewZoneSprite.x) {
-      // this.viewZoneSprite.x = newViewZone;
-      // this.game.add.tween(this.viewZoneSprite)
-      //   .to({x: newViewZone},
-      //     40,
-      //     null,
-      //     false,
-      //     0,
-      //     0,
-      //     true).start();
-        // .tween.onComplete.addOnce(function (tween) {
-        //     this.stop();
-        //   });
-    }
-    return this.game.physics.arcade.overlap(this.PlayerObj.player,
-      this.viewZoneSprite);
-  }
-  return false;
-};
-
-BasicGame.Eye.prototype.shootPlayer = function (target) {
-  //- - - | DEVELOPMENT MODE | - - -
-  if(BasicGame.Game.developmentMode === true) {
-    this.drawLinesToTarget(target);
-    this.PlayerObj.player.tint = 0x00ff00;
-  }
-
-  if (this.shooting === false) {
-    this.shooting = true;
-    this.searching = false;
-    this.eye.animations.play('angry');
-    this.lightning.shoot(target);
-
-    this.destroyTimers(this.getTiredTimer, this.getMadTimer, this.searchAgain);
-
-    // init the timer that will make the EYE calm down again and restart the
-    // search
-    this.calmDownTimer = this.game.time.create(true);
-    this.calmDownTimer.add(3000,
-      function () {
-        this.initSearch();
-
-        var _self = this;
-        setTimeout(function () {_self.shooting = false}, 200);
-      },
-      this);
-
-    this.calmDownTimer.start();
-  }
-};
-
 BasicGame.Eye.prototype.initSearch = function (delay) {
+  var newPatternIndex = -1;
+  var intent = 0;
   var pattern = null;
   var patternReversed = null;
   var initialX = 0;
@@ -257,12 +206,18 @@ BasicGame.Eye.prototype.initSearch = function (delay) {
 
     if (delay === true) {
       var _self = this;
-      setTimeout(function () {_self.initSearch();}, 500);
+      setTimeout(function () {
+        _self.initSearch();
+      }, 500);
       return;
     }
 
-    // pick a pattern for searching
-    this.currentPattern = Math.floor(Math.random()*(this.patterns.length));
+    // pick a pattern for searching in the array of available patterns
+    do {
+      newPatternIndex = Math.floor(Math.random()*(this.patterns.length));
+      intent++;
+    } while (this.currentPattern === newPatternIndex || intent > 5);
+    this.currentPattern = newPatternIndex;
     patternReversed = Math.random() > 0.5 ? true : false;
     pattern = this.patterns[this.currentPattern];
     index = !patternReversed ? 0 : pattern.length - 1
@@ -301,18 +256,6 @@ BasicGame.Eye.prototype.initSearch = function (delay) {
     this.eye.animations.play('search');
     this.pupil.alpha = 1;
     this.searching = true;
-
-    // init the timer that will make the EYE change its search pattern
-    // this.getTiredTimer = this.game.time.create(true);
-    // this.getTiredTimer.add(16100,
-    //   function () {
-    //     if (this.shooting === true) return;
-    //     this.searching = false;
-    //     this.getTired();
-    //   },
-    //   this);
-    // this.getTiredTimer.start();
-
   }
 };
 
@@ -342,6 +285,45 @@ BasicGame.Eye.prototype.tweenEye = function (target, timeInSecs, callback) {
     tween.stop();
   });
   this.pupilTween.start();
+};
+
+BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
+  if(this.viewZoneSprite.visible === true) {
+    return this.game.physics.arcade.overlap(this.PlayerObj.player,
+      this.viewZoneSprite);
+  }
+  return false;
+};
+
+BasicGame.Eye.prototype.shootPlayer = function (target) {
+  //- - - | DEVELOPMENT MODE | - - -
+  if(BasicGame.Game.developmentMode === true) {
+    this.drawLinesToTarget(target);
+    this.PlayerObj.player.tint = 0x00ff00;
+  }
+
+  if (this.shooting === false) {
+    this.shooting = true;
+    this.searching = false;
+    this.eye.animations.play('angry');
+    this.lightning.shoot(target);
+
+    this.destroyTimers(this.getTiredTimer, this.getMadTimer, this.searchAgain);
+
+    // init the timer that will make the EYE calm down again and restart the
+    // search
+    this.calmDownTimer = this.game.time.create(true);
+    this.calmDownTimer.add(3000,
+      function () {
+        this.initSearch();
+
+        var _self = this;
+        setTimeout(function () {_self.shooting = false}, 200);
+      },
+      this);
+
+    this.calmDownTimer.start();
+  }
 };
 
 BasicGame.Eye.prototype.getTired = function () {
