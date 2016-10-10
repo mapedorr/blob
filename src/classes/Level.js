@@ -262,7 +262,7 @@ BasicGame.Level.prototype.showDay = function () {
 
   // set the timer to stop showing the day
   var currentDayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
-  dayTimer.add(currentDayObj.waitTime || 2000,
+  dayTimer.add((currentDayObj.waitTime || 2) * 1000,
     function () {
       this.levelTextGroup.alpha = 0;
       this.isShowingDays = false;
