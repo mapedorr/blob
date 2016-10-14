@@ -235,6 +235,7 @@ BasicGame.Level.prototype.endLevel = function () {
   this.endTimer.add(secondsToEnd * 1000,
     function () {
       // enable the flag that indicates the other objects the level is finished
+      this.endTimer = undefined;
       this.isEnded = true;
     },
     this);

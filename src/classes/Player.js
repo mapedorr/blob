@@ -186,6 +186,8 @@ BasicGame.Player.prototype.update = function () {
 
   if (this.player.y > this.game.world.height) {
     this.dead = true;
+    this.player.body.velocity.y = 0;
+    this.player.body.allowGravity = false;
     this.gameObj.subtractAllLifes();
     return;
   }
@@ -357,8 +359,8 @@ BasicGame.Player.prototype.update = function () {
 BasicGame.Player.prototype.render = function() {
   if (BasicGame.Game.developmentMode === true) {
     // Sprite debug info
-    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
     this.game.debug.bodyInfo(this.player, 0, 100, 'rgba(0,255,0,0.4)');
+    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
   }
 
   if (BasicGame.Game.developmentMode === true) {
@@ -541,8 +543,10 @@ BasicGame.Player.prototype.updateLevel = function (level) {
   this.level = level;
   this.justLeaveGround = false;
   this.slideSound.stop();
-  this.player.position.set(this.level.initPlayerPos.x,
-    this.level.initPlayerPos.y);
+  this.player.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
+  this.player.body.enable = true;
+  this.player.body.allowGravity = true;
+  this.dead = false;
 };
 
 BasicGame.Player.prototype.dieImploding = function() {
