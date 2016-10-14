@@ -59,7 +59,11 @@ BasicGame.Lightning.prototype.update = function () {
     this.game.physics.arcade.overlap(this.player.player, this.fakeThing,
       function(){
         this.gameObj.subtractLife();
+
+        // shake and flash the world
+        this.gameObj.shakeCamera();
         this.fakeThing.x = this.fakeThing.y = -10;
+
         this.lightningSound.play();
       },
       null,
@@ -102,9 +106,6 @@ BasicGame.Lightning.prototype.shoot = function (target) {
     .to({alpha: 1.0}, 100, Phaser.Easing.Bounce.Out)
     .to({alpha: 0}, 250, Phaser.Easing.Cubic.In)
     .start();
-
-  // shake the world
-  this.gameObj.shakeCamera();
 
   this.fakeThing.x = targetPos.x + 16;
   this.fakeThing.y = targetPos.y + 16;

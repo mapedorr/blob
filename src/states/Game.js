@@ -142,7 +142,14 @@ BasicGame.Game.prototype.create = function () {
   this.brightnessTween.onComplete.add(function () {
     // this.eye.eyeStateTimer = this.eye.searchingTime;
     this.isLoadingLevel = false;
+
+    this.lifes = this.LIFES_AMOUNT;
+    // restore the alpha for life indicators and lifes group
+    this.showLifes();
+
+    // make the EYE seek for the player
     this.eye.initSearch(true);
+
     if (this.music.isPlaying === false) {
       // this.music.play();
     }
@@ -264,7 +271,7 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
   this.game.world.bringToTop(this.light.lightBitmap);
   this.game.world.bringToTop(this.level.pieces);
 
-  localStorage.setItem("oh-my-blob", BasicGame.setDay(levelNumber));
+  // localStorage.setItem("oh-my-blob", BasicGame.setDay(levelNumber));
 };
 
 BasicGame.Game.prototype.shakeCamera = function () {
@@ -293,6 +300,9 @@ BasicGame.Game.prototype.shakeCamera = function () {
 
 BasicGame.Game.prototype.subtractLife = function () {
   var that = this;
+
+  // if the player collected all the pieces, don't kill him
+  if (this.level.endTimer) return;
 
   // remove one life sprite
   if (this.lifes <= 0) {
@@ -323,7 +333,7 @@ BasicGame.Game.prototype.subtractLife = function () {
 
   if (this.lifes <= 0) {
     // save the current level
-    localStorage.setItem("oh-my-blob", BasicGame.addDeath());
+    // localStorage.setItem("oh-my-blob", BasicGame.addDeath());
 
     // notify the PLAYER that its time to show the animation for dead
     this.player.dieImploding();
@@ -337,7 +347,12 @@ BasicGame.Game.prototype.subtractLife = function () {
 
 
 BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
-  localStorage.setItem("oh-my-blob", BasicGame.addDeath());
+  // if the player collected all the pieces, don't kill him
+  if (this.level.endTimer) {
+    return;
+  }
+
+  // localStorage.setItem("oh-my-blob", BasicGame.addDeath());
 
   this.lifes = 0;
 
@@ -386,10 +401,7 @@ BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {
   // - ...something else?
 
   // restore the alpha for life indicators and lifes group
-  this.lifesGroup.alpha = 1;
-  this.lifesGroup.forEach(function (lifeSprite) {
-    lifeSprite.alpha = 1;
-  });
+  this.showLifes();
 
   this.player.restartLevel();
   this.level.restartLevel();
@@ -408,4 +420,11 @@ BasicGame.Game.prototype.createLifeIndicators = function () {
 
     this.lifesGroup.addChild(lifeSprite);
   }
+};
+
+BasicGame.Game.prototype.showLifes = function () {
+  this.lifesGroup.alpha = 1;
+  this.lifesGroup.forEach(function (lifeSprite) {
+    lifeSprite.alpha = 1;
+  });
 };

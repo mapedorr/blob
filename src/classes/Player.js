@@ -109,9 +109,6 @@ BasicGame.Player.prototype.create = function (level) {
     this.jumpKey
     ]);
 
-  // make the player collide with world bounds
-  this.player.body.collideWorldBounds = true;
-
   // disable physics in the player's body while the game starts
   this.player.body.enable = false;
 
@@ -187,9 +184,10 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  if (this.player.body.onFloor() === true) {
+  if (this.player.y > this.game.world.height) {
     this.dead = true;
-    this.player.body.collideWorldBounds = false;
+    this.player.body.velocity.y = 0;
+    this.player.body.allowGravity = false;
     this.gameObj.subtractAllLifes();
     return;
   }
@@ -258,7 +256,10 @@ BasicGame.Player.prototype.update = function () {
     !this.slideSound.isPlaying && this.slideSound.play();
   }
 
-  if (leftPressed) {
+  if (this.player.x < 0) this.player.x = 0;
+  if (this.player.right > this.game.world.width) this.player.x = this.game.world.width - this.player.width;
+
+  if (leftPressed && this.player.x > 0) {
     // set the player velocity to move left
     this.rightFirstPress = false;
     this.player.body.acceleration.x = -this.ACCELERATION;
@@ -287,7 +288,7 @@ BasicGame.Player.prototype.update = function () {
       }
     }
   }
-  else if (rightPressed) {
+  else if (rightPressed && this.player.right < this.game.world.width) {
     // If the RIGHT key is down, set the player velocity to move right
     this.leftFirstPress = false;
     this.player.body.acceleration.x = this.ACCELERATION;
@@ -358,8 +359,8 @@ BasicGame.Player.prototype.update = function () {
 BasicGame.Player.prototype.render = function() {
   if (BasicGame.Game.developmentMode === true) {
     // Sprite debug info
+    this.game.debug.bodyInfo(this.player, 0, 100, 'rgba(0,255,0,0.4)');
     this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
-    this.game.debug.bodyInfo(this.player, 'rgba(0,255,0,0.4)');
   }
 
   if (BasicGame.Game.developmentMode === true) {
@@ -542,8 +543,10 @@ BasicGame.Player.prototype.updateLevel = function (level) {
   this.level = level;
   this.justLeaveGround = false;
   this.slideSound.stop();
-  this.player.position.set(this.level.initPlayerPos.x,
-    this.level.initPlayerPos.y);
+  this.player.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
+  this.player.body.enable = true;
+  this.player.body.allowGravity = true;
+  this.dead = false;
 };
 
 BasicGame.Player.prototype.dieImploding = function() {
@@ -567,7 +570,6 @@ BasicGame.Player.prototype.dieImploding = function() {
 
 BasicGame.Player.prototype.restartLevel = function () {
   this.collectedPieces = 0;
-  this.player.body.collideWorldBounds = true;
 
   this.walkSound.stop();
   this.slideSound.stop();

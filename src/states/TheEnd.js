@@ -48,7 +48,7 @@ BasicGame.TheEnd = function (game) {
       },
       {
         character: 'B',
-        text: 'Creo que empiezo a entender la forma de pensar de Hub.',
+        text: 'Creo que empiezo a entender la forma de pensar de mi hermano.',
         bips: 3,
         waitTime: 3
       }
@@ -86,7 +86,7 @@ BasicGame.TheEnd = function (game) {
       },
       {
         character: 'B',
-        text: 'I think I start to understand the way Hub thinks.',
+        text: 'I think I start to understand the way my brother thinks.',
         bips: 3,
         waitTime: 3
       }
