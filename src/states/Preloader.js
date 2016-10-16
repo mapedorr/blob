@@ -64,6 +64,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('end_scene', 'assets/images/end_scene.png');
   this.load.image('sun_light', 'assets/images/sun_light.png')
   this.load.image('credits', 'assets/images/credits.png');
+  this.load.image('pupil', 'assets/images/pupil.png');
 
   this.load.spritesheet('player','assets/sprites/player.png', 32, 32);
   this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);

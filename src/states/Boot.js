@@ -24,7 +24,6 @@ var BasicGame = BasicGame || {
     if (code.length < 4) return;
 
     this.currentLevel = parseInt(code.slice(code.length -2, code.length));
-    if (this.currentLevel === 29) this.currentLevel++;
     this.deaths = parseInt(code.slice(1, code.length - 2));
     this.rest = parseInt(code.charAt(0));
   },
@@ -32,9 +31,9 @@ var BasicGame = BasicGame || {
     return this.deaths;
   },
   reset: function() {
-    this.currentLevel = 1,
-    this.deaths = 0,
-    this.rest = 0
+    this.currentLevel = 1;
+    this.deaths = 0;
+    this.rest = 0;
   }
 };
 

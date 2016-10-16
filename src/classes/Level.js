@@ -66,7 +66,7 @@ BasicGame.Level.prototype.create = function () {
     '',
     72,
     this.levelTextGroup);
-  this.dayNumberTextBitmap.anchor.set(.5, .5);
+  this.dayNumberTextBitmap.anchor.set(0.5, 0.5);
   this.dayNumberTextBitmap.align = "center";
   this.dayNumberTextBitmap.tint = 0x1e3137;
   this.dayNumberTextBitmap.oriY = this.dayNumberTextBitmap.y;
@@ -82,8 +82,6 @@ BasicGame.Level.prototype.create = function () {
   this.dayPhraseTextBitmap.align = "center";
   this.dayPhraseTextBitmap.tint = 0x515151;
 
-  this.createLevel(parseInt(BasicGame.currentLevel));
-
   if (!this.daySound) {
     this.daySound = this.game.add.sound('day', 0.15);
   }
@@ -91,6 +89,8 @@ BasicGame.Level.prototype.create = function () {
   if (!this.spikeSound) {
     this.spikeSound = this.game.add.sound('spike', 0.2);
   }
+
+  this.createLevel(parseInt(BasicGame.currentLevel));
 };
 
 BasicGame.Level.prototype.destroyCurrentLevel = function () {
@@ -181,7 +181,7 @@ BasicGame.Level.prototype.createLevel = function (num) {
     this.pieces, Phaser.Sprite, false);
 
   this.pieces.forEach(function (pieceSprite) {
-    pieceSprite.anchor.set(.5, .5);
+    pieceSprite.anchor.set(0.5, 0.5);
     _self.game.physics.arcade.enableBody(pieceSprite);
     pieceSprite.body.allowGravity = false;
     pieceSprite.body.immovable = false;
@@ -211,7 +211,7 @@ BasicGame.Level.prototype.createLevel = function (num) {
   // set the level as not ended
   this.isEnded = false;
 
-  // set the level as ready
+  // TODO: remove this property
   this.isReady = true;
 };
 
@@ -237,6 +237,8 @@ BasicGame.Level.prototype.endLevel = function () {
       // enable the flag that indicates the other objects the level is finished
       this.endTimer = undefined;
       this.isEnded = true;
+
+      this.gameObj.levelEnded();
     },
     this);
 
@@ -245,7 +247,7 @@ BasicGame.Level.prototype.endLevel = function () {
 };
 
 BasicGame.Level.prototype.showDay = function () {
-  if(this.isShowingDays == true) {
+  if(this.isShowingDays === true) {
     return;
   }
 
