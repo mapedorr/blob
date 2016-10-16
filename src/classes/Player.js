@@ -60,11 +60,12 @@ BasicGame.Player = function (game, input, gameObj) {
   this.rightKey = Phaser.Keyboard.RIGHT;
   this.jumpKey = Phaser.Keyboard.Z;
 
+  this.justLeaveGround = false;
+
   this.jumpSound = null;
   this.walkSound = null;
   this.slideSound = null;
   this.fallSound = null;
-  this.justLeaveGround = false;
   this.deathSound = null;
   this.piecesSound = [];
 
@@ -551,7 +552,12 @@ BasicGame.Player.prototype.updateLevel = function (level) {
 
 BasicGame.Player.prototype.dieImploding = function() {
   this.dead = true;
+
+  // stop sounds
   this.slideSound.stop();
+  this.jumpSound.stop();
+  this.walkSound.stop();
+  this.fallSound.stop();
 
   this.player.body.enable = false;
   this.player.body.acceleration.x = 0;

@@ -42,9 +42,9 @@ BasicGame.Lightning.prototype.create = function(eye, player, level){
   this.fakeThing.width = this.fakeThing.height = 16;
   this.fakeThing.alpha = 0;
   
-  this.game.physics.arcade.enable(this.fakeThing);
-  this.fakeThing.body.immovable = true;
-  this.fakeThing.body.allowGravity = false;
+  // this.game.physics.arcade.enable(this.fakeThing);
+  // this.fakeThing.body.immovable = true;
+  // this.fakeThing.body.allowGravity = false;
 
   this.lightningTimer = 0;
 
@@ -55,19 +55,17 @@ BasicGame.Lightning.prototype.create = function(eye, player, level){
 
 BasicGame.Lightning.prototype.update = function () {
   // check if the ray hits the player
-  if(this.player.player && this.fakeThing){
-    this.game.physics.arcade.overlap(this.player.player, this.fakeThing,
-      function(){
-        this.gameObj.subtractLife();
-
-        // shake and flash the world
-        this.gameObj.shakeCamera();
-        this.fakeThing.x = this.fakeThing.y = -10;
-
-        this.lightningSound.play();
-      },
-      null,
-      this);
+  if (this.player.player && this.fakeThing)
+  {
+    if (this.fakeThing.left > this.player.player.left &&
+        this.fakeThing.right < this.player.player.right &&
+        this.fakeThing.top > this.player.player.top &&
+        this.fakeThing.bottom < this.player.player.bottom)
+    {
+      this.gameObj.subtractLife();
+      this.gameObj.shakeCamera();
+    }
+    this.fakeThing.x = this.fakeThing.y = -10;
   }
 };
 
@@ -109,6 +107,8 @@ BasicGame.Lightning.prototype.shoot = function (target) {
 
   this.fakeThing.x = targetPos.x + 16;
   this.fakeThing.y = targetPos.y + 16;
+
+  this.lightningSound.play();
 };
 
 // This function creates a texture that looks like a lightning bolt
