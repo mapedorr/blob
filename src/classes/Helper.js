@@ -16,3 +16,16 @@ BasicGame.Helper.prototype.timer = function (delay, callback, context) {
     .add(delay, callback, context || this)
     .timer.start(100);
 };
+
+BasicGame.Helper.prototype.randomColor = function () {
+  var letters = '0123456789ABCDEF';
+  var color = '0x';
+  for (var i = 0; i < 6; i++ ) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
+BasicGame.Helper.prototype.randomNumber = function (max, min) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};

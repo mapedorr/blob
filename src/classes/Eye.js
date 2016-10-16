@@ -35,6 +35,7 @@ BasicGame.Eye = function (game, gameObj) {
   this.angerSound = null;
   this.currentPattern = -1;
   this.levelEnded = null;
+  this.usedPatterns = null;
 };
 
 /**
@@ -52,6 +53,7 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.shooting = false;
   this.searching = false;
   this.levelEnded = false;
+  this.usedPatterns = 0;
 
   // add the sprite of the eye
   this.eye = this.game.add.sprite(this.game.world.width / 2, 64, 'eye', 0);
@@ -223,7 +225,6 @@ BasicGame.Eye.prototype.initSearch = function (delay) {
   if (delay === true) {
     this.gameObj.helper.timer(500,
       function () {
-        console.log(224);
         this.initSearch();
       },
       this);
@@ -237,11 +238,18 @@ BasicGame.Eye.prototype.initSearch = function (delay) {
   this.pupil.alpha = 1;
 
   // pick a pattern for searching in the array of available patterns
-  do {
-    newPatternIndex = Math.floor(Math.random()*(this.patterns.length));
-    intent++;
-  } while (this.currentPattern === newPatternIndex || intent > 5);
-  this.currentPattern = newPatternIndex;
+  if (this.usedPatterns !== 0) {
+    do {
+      newPatternIndex = Math.floor(Math.random()*(this.patterns.length));
+      intent++;
+    } while (this.currentPattern === newPatternIndex || intent > 5);
+    this.currentPattern = newPatternIndex;
+  }
+  else
+  {
+    this.currentPattern = '0';
+  }
+  this.usedPatterns++;
 
   // define if the pattern will be used reversed
   patternReversed = Math.random() > 0.5 ? true : false;
@@ -354,6 +362,9 @@ BasicGame.Eye.prototype.tweenEye = function (target, timeInSecs, callback) {
 BasicGame.Eye.prototype.getTired = function () {
   this.eye.animations.play('tired');
 
+  this.pupil.alpha = 0;
+  this.viewZoneSprite.alpha = 0;
+
   this.getMadTimer = this.game.time.create(true);
   this.getMadTimer.add(1200,
     function () {
@@ -381,7 +392,6 @@ BasicGame.Eye.prototype.getMad = function () {
   this.searchAgain.add(1600,
     function () {
       this.eye.x = this.eye.originalX;
-      console.log(378);
       this.initSearch();
     },
     this);
@@ -444,7 +454,6 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
           }
         }
         else {
-          console.log(435);
           this.initSearch();
         }
 
@@ -487,6 +496,10 @@ BasicGame.Eye.prototype.endLevel = function (levelCompleted) {
 
   this.viewZoneTween.onComplete.removeAll();
   this.pupilTween.onComplete.removeAll();
+
+  if (levelCompleted === true) {
+    this.pupil.alpha = 0;
+  }
 };
 
 BasicGame.Eye.prototype.gameInDarkness = function () {
@@ -551,6 +564,7 @@ BasicGame.Eye.prototype.rejoice = function (callback) {
 BasicGame.Eye.prototype.updateLevel = function (level) {
   this.level = level;
   this.anger = false;
+  this.usedPatterns = 0;
 
   this.stopEyeTweens();
 };

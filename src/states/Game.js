@@ -89,7 +89,7 @@ BasicGame.Game.prototype.create = function () {
   this.player.create(this.level);
 
   if (this.level.spikes) {
-   this.game.world.bringToTop(this.level.spikes);
+    this.game.world.bringToTop(this.level.spikes);
     this.game.world.bringToTop(this.level.walls);
   }
 
@@ -187,13 +187,14 @@ BasicGame.Game.prototype.update = function () {
 };
 
 BasicGame.Game.prototype.levelReady = function () {
-  // TODO: remove next line
   this.level.isReady = false;
 
-  if (BasicGame.isRetrying === false) {
-   this.level.showDay();
+  if (BasicGame.isRetrying === false)
+  {
+    this.level.showDay();
   }
-  else {
+  else
+  {
     this.level.levelTextGroup.alpha = 0;
     this.hideDarkness();
   }
@@ -201,17 +202,15 @@ BasicGame.Game.prototype.levelReady = function () {
 
 BasicGame.Game.prototype.levelEnded = function () {
   if (this.inDarkness === false) {
-    console.log('nos jodimos');
+    this.helper.timer(100, this.levelEnded.bind(this));
     return;
   }
 
   // notify to the eye that the level was ended
-  this.eye.endLevel();
+  this.eye.endLevel(true);
 
   this.isLoadingLevel = true;
   this.loadLevel(++BasicGame.currentLevel);
-  this.game.world.bringToTop(this.lifesGroup);
-  this.game.world.bringToTop(this.darknessGroup);
 };
 
 BasicGame.Game.prototype.render = function () {
@@ -246,6 +245,13 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
 
   this.game.world.bringToTop(this.light.lightBitmap);
   this.game.world.bringToTop(this.level.pieces);
+  this.game.world.bringToTop(this.lifesGroup);
+  this.game.world.bringToTop(this.darknessGroup);
+
+  if (this.level.isReady === true) {
+    BasicGame.isRetrying = false;
+    this.levelReady();
+  }
 
   // localStorage.setItem("oh-my-blob", BasicGame.setDay(levelNumber));
 };
@@ -312,14 +318,12 @@ BasicGame.Game.prototype.subtractLife = function () {
     // localStorage.setItem("oh-my-blob", BasicGame.addDeath());
 
     // notify the PLAYER that its time to show the animation for dead
-    this.player.dieImploding();
+    this.player.explote();
 
     // notify to the EYE the player has died
     this.eye.rejoice(function () {
       that.showDarkness(200);
     });
-    // that.showDarkness(1700);
-    // console.log('this.eye.shakeTween.totalDurationt', this.eye.shakeTween.totalDuration);
   }
 };
 
@@ -343,7 +347,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
 
   if (destroyPlayer) {
     // play the animation of death of the player
-    this.player.dieImploding();
+    this.player.explote();
 
     // create the timer to give the player die animation time to be played
     this.helper.timer(1000,
@@ -364,7 +368,10 @@ BasicGame.Game.prototype.showDarkness = function (durationInMS) {
 
 BasicGame.Game.prototype.darknessTweenCompleted = function () {
   this.inDarkness = true;
+
   this.eye.gameInDarkness();
+  this.player.gameInDarkness();
+
   this.showLifes();
   if (this.lifes <= 0) {
     this.restartLevel(true);

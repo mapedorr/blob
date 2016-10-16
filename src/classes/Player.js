@@ -74,12 +74,17 @@ BasicGame.Player = function (game, input, gameObj) {
 
   this.leftFirstPress = false;
   this.rightFirstPress = false;
-};
 
-BasicGame.Player.prototype.preload = function () {
+  this.particlesGroup = null;
+  this.PARTICLES_AMOUNT = 4;
 };
 
 BasicGame.Player.prototype.create = function (level) {
+  var particle = null,
+      particleX = null,
+      particleY = null,
+      increaseAmount = null;
+
   //Save the walls in the level
   this.level = level;
 
@@ -159,6 +164,36 @@ BasicGame.Player.prototype.create = function (level) {
       this.piecesSound.push(this.game.add.sound('piece' + ((i < 10) ? '0' : '') + i, 0.2));
     }
   }
+
+  // create the group that will contain the particles that will be used during
+  // player death
+  this.particlesGroup = this.game.add.group();
+
+  particleX = 0;
+  particleY = 0;
+  increaseAmount = this.player.width / this.PARTICLES_AMOUNT;
+
+  while (this.particlesGroup.children.length < Math.pow(this.PARTICLES_AMOUNT,2)) {
+    particle = this.game.add.sprite(particleX, particleY, 'player');
+    // particle.tint = this.gameObj.helper.randomColor();
+    particle.width = particle.height = increaseAmount;
+    particle.originalX = particle.x;
+    particle.originalY = particle.y;
+
+    this.game.physics.arcade.enable(particle);
+    particle.body.allowGravity = false;
+
+    this.particlesGroup.addChild(particle);
+
+    particleX += particle.width;
+    if (particleX >= this.player.width) {
+      particleX = 0;
+      particleY += particle.height;
+    }
+  }
+
+  this.particlesGroup.x = -100;
+  this.particlesGroup.y = -100;
 };
 
 BasicGame.Player.prototype.update = function () {
@@ -177,11 +212,21 @@ BasicGame.Player.prototype.update = function () {
   }
 
   if (this.gameObj.isLoadingLevel === true || this.dead === true) {
-    return;
-  }
-
-  if (this.dead === true) {
-    this.player.body.acceleration.x = 0;
+    if (this.dead === true) {
+      this.player.body.acceleration.x = 0;
+      
+      // check if a particle is out of the world to disable its gravity
+      this.particlesGroup.forEach(function (particle) {
+        var particleX = this.particlesGroup.x + particle.x;
+        var particleY = this.particlesGroup.y + particle.y;
+        if (particleX < 0 || particleX > this.game.world.width ||
+            particleY > this.game.world.height) {
+          particle.body.allowGravity = false;
+          particle.body.acceleration.x = 0;
+          particle.body.velocity.y = 0;
+        }
+      }, this);
+    }
     return;
   }
 
@@ -254,7 +299,7 @@ BasicGame.Player.prototype.update = function () {
     this.currentJumpMultiplier = 0;
     this.jumpChance = false;
 
-    !this.slideSound.isPlaying && this.slideSound.play();
+    if (!this.slideSound.isPlaying) this.slideSound.play();
   }
 
   if (this.player.x < 0) this.player.x = 0;
@@ -550,7 +595,9 @@ BasicGame.Player.prototype.updateLevel = function (level) {
   this.dead = false;
 };
 
-BasicGame.Player.prototype.dieImploding = function() {
+BasicGame.Player.prototype.explote = function() {
+  var timer;
+
   this.dead = true;
 
   // stop sounds
@@ -564,14 +611,29 @@ BasicGame.Player.prototype.dieImploding = function() {
   this.player.body.velocity.y = 0;
   this.player.body.allowGravity = false;
 
-  var timer = this.game.time.create(true);
+  timer = this.game.time.create(true);
   timer.add(100, function() {
     this.deathSound.play();
   }, this);
   timer.start();
 
-  // play the dead animation
-  this.player.animations.play('dying');
+  this.player.alpha = 0;
+
+  this.particlesGroup.x = this.player.x;
+  this.particlesGroup.y = this.player.y;
+
+  this.particlesGroup.forEach(function (particle) {
+    particle.x = particle.originalX;
+    particle.y = particle.originalY;
+    particle.body.allowGravity = true;
+    particle.body.velocity.y = -50 * this.gameObj.helper.randomNumber(10, 20);
+    if (this.gameObj.helper.randomNumber(1, 10) > 5) {
+      particle.body.acceleration.x = -this.gameObj.helper.randomNumber(100, 200);
+    }
+    else {
+      particle.body.acceleration.x = this.gameObj.helper.randomNumber(100, 200);
+    }
+  }, this);
 };
 
 BasicGame.Player.prototype.restartLevel = function () {
@@ -580,8 +642,7 @@ BasicGame.Player.prototype.restartLevel = function () {
   this.walkSound.stop();
   this.slideSound.stop();
 
-  this.player.position.set(this.level.initPlayerPos.x,  
-    this.level.initPlayerPos.y);
+  this.player.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
 
   this.player.animations.play('normal');
 
@@ -593,4 +654,8 @@ BasicGame.Player.prototype.restartLevel = function () {
   }, this)
   .timer.start();
   this.dead = false;
+};
+
+BasicGame.Player.prototype.gameInDarkness = function () {
+  this.player.alpha = 1;
 };

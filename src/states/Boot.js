@@ -2,7 +2,7 @@
 // 4 (free space for testing jumps)
 var BasicGame = BasicGame || {
   language: "en",
-  currentLevel: 18,
+  currentLevel: 3,
   deaths: 0,
   rest: 0,
   setDay: function(n) {
@@ -32,9 +32,9 @@ var BasicGame = BasicGame || {
     return this.deaths;
   },
   reset: function() {
-    this.currentLevel = 1,
-    this.deaths = 0,
-    this.rest = 0
+    this.currentLevel = 1;
+    this.deaths = 0;
+    this.rest = 0;
   }
 };
 
