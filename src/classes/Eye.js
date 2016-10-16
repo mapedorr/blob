@@ -114,10 +114,12 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.eye.animations.add('irritated', [10], 1, false);
 
   // create a bitmap texture for drawing lines
-  this.bitmap = this.game.add.bitmapData(this.game.width, this.game.height);
-  this.bitmap.context.fillStyle = 'rgb(255, 255, 255)';
-  this.bitmap.context.strokeStyle = 'rgb(255, 255, 255)';
-  this.game.add.image(0, 0, this.bitmap);
+  if(BasicGame.Game.developmentMode === true) { // [ development mode ]
+    this.bitmap = this.game.add.bitmapData(this.game.width, this.game.height);
+    this.bitmap.context.fillStyle = 'rgb(255, 255, 255)';
+    this.bitmap.context.strokeStyle = 'rgb(255, 255, 255)';
+    this.game.add.image(0, 0, this.bitmap);
+  }
 
   // create the lightning for killing the player
   this.lightning.create(this.eye,this.playerObj,this.level);
@@ -141,7 +143,10 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
  * Method that runs each time the game runs the update method.
  */
 BasicGame.Eye.prototype.update = function () {
-  if(BasicGame.Game.developmentMode === true) {
+  var checkLeft = false,
+      checkRight = false;
+
+  if(BasicGame.Game.developmentMode === true) { // [ development mode ]
     // clear the bitmap where we are drawing our lines
     this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
   }
@@ -163,42 +168,57 @@ BasicGame.Eye.prototype.update = function () {
   // test if the target can see the eye by casting a ray (a line) towards the eye.
   // if the ray intersects any walls before it intersects the eye then the wall
   // is in the way.
-  var attack = false;
+  if (BasicGame.Game.developmentMode === true) { // [ development mode ]
+    if (this.isPlayerInsideViewZone() === true) {
+      this.playerObj.player.tint = 0x990000;
+    }
+    else {
+      this.playerObj.player.tint = 0xFFFFFF;
+    }
+  }
 
   // check if the player is in the side of vision of the EYE
-  if(this.searching === true && this.isPlayerInsideViewZone() === true) {
-    // define the lines that connects the target to the eye
-    // this isn't drawn on screen.
-    var rays = [];
-    rays[0] = new Phaser.Line(this.playerObj.player.x, this.playerObj.player.y, this.eye.x, this.eye.y);
-    rays[1] = new Phaser.Line(this.playerObj.player.x + this.playerObj.player.width, this.playerObj.player.y, this.eye.x, this.eye.y);
-    rays[3] = new Phaser.Line(this.playerObj.player.x + this.playerObj.player.width, this.playerObj.player.y + this.playerObj.player.height - 0.1, this.eye.x, this.eye.y);
-    rays[2] = new Phaser.Line(this.playerObj.player.x, this.playerObj.player.y + this.playerObj.player.height - 0.1, this.eye.x, this.eye.y);
-
-    // check if any walls intersect the ray
-    // var wallIntersect = this.getWallIntersection(rays);
-
-    // check if the player is in the shadows
-    var playerInShadow = this.playerObj.isInShadow();
-
-    // if(!wallIntersect && !playerInShadow) {
-    if(!playerInShadow) {
-      attack = true;
+  if (this.searching === true && this.isPlayerInsideViewZone() === true) {
+    // check which of the points in the player should be used for "in shadow"
+    // evaluation
+    if (this.playerObj.player.left > this.viewZoneSprite.left) {
+      checkLeft = true;
     }
 
-    if (attack === false) {
-      if(BasicGame.Game.developmentMode === true) {
-        //- - - | DEVELOPMENT MODE | - - -
-        this.playerObj.player.tint = 0xffffff;
+    if (this.playerObj.player.right < this.viewZoneSprite.right) {
+      checkRight = true;
+    }
+
+    if (this.playerObj.isInShadow(checkLeft, checkRight) === false) {
+      if (BasicGame.Game.developmentMode === true) { // [ development mode ]
+        this.playerObj.player.tint = 0xEECC00;
       }
-    } else if (attack === true) {
-      // shoot the player
+
+      // shoot to the player
       this.shootPlayer(this.playerObj.player);
+    }
+    else {
+      if (BasicGame.Game.developmentMode === true) { // [ development mode ]
+        this.playerObj.player.tint = 0x990000;
+      }
     }
   }
 
   // This just tells the engine it should update the texture cache
-  // this.bitmap.dirty = true;
+  if(BasicGame.Game.developmentMode === true) { // [ development mode ]
+    this.bitmap.dirty = true;
+  }
+};
+
+/**
+ * Method that checks if the player is inside the view zone of the EYE.
+ */
+BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
+  if (this.viewZoneSprite.alpha > 0) {
+    return (this.playerObj.player.left > this.viewZoneSprite.left || this.playerObj.player.right > this.viewZoneSprite.left) &&
+           (this.playerObj.player.right < this.viewZoneSprite.right || this.playerObj.player.left < this.viewZoneSprite.right);
+  }
+  return false;
 };
 
 /**
@@ -398,22 +418,10 @@ BasicGame.Eye.prototype.getMad = function () {
   this.searchAgain.start();
 };
 
-/**
- * Method that checks if the player is inside the view zone of the EYE.
- */
-BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
-  if(this.viewZoneSprite.visible === true) {
-    return this.playerObj.player.left > this.viewZoneSprite.left &&
-           this.playerObj.player.right < this.viewZoneSprite.right;
-  }
-  return false;
-};
-
 BasicGame.Eye.prototype.shootPlayer = function (target) {
   var tweensInPause = false;
 
-  //- - - | DEVELOPMENT MODE | - - -
-  if(BasicGame.Game.developmentMode === true) {
+  if(BasicGame.Game.developmentMode === true) { // [ development mode ]
     this.drawLinesToTarget(target);
     this.playerObj.player.tint = 0x00ff00;
   }
@@ -583,7 +591,7 @@ BasicGame.Eye.prototype.stopEyeTweens = function () {
 };
 
 BasicGame.Eye.prototype.drawLinesToTarget = function (target) {
-  // Draw a line from the eye to the target
+  // draw a line from the eye to the target
   this.bitmap.context.beginPath();
   this.bitmap.context.moveTo(target.x, target.y);
   this.bitmap.context.lineTo(this.eye.x, this.eye.y);

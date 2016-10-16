@@ -119,10 +119,12 @@ BasicGame.Player.prototype.create = function (level) {
   this.player.body.enable = false;
 
   // create a bitmap texture for drawing lines
-  this.bitmap = this.game.add.bitmapData(this.game.width, this.game.height);
-  this.bitmap.context.fillStyle = 'rgb(0, 0, 255)';
-  this.bitmap.context.strokeStyle = 'rgb(0, 0, 255)';
-  this.game.add.image(0, 0, this.bitmap);
+  if (BasicGame.Game.developmentMode === true) { // [ development mode ]
+    this.bitmap = this.game.add.bitmapData(this.game.width, this.game.height);
+    this.bitmap.context.fillStyle = 'rgb(0, 0, 255)';
+    this.bitmap.context.strokeStyle = 'rgb(0, 0, 255)';
+    this.game.add.image(0, 0, this.bitmap);
+  }
 
   if (!this.jumpSound) {
     this.jumpSound = this.game.add.sound('jump', 0.2);
@@ -400,16 +402,20 @@ BasicGame.Player.prototype.update = function () {
   if (headHit && !this.fallSound.isPlaying) {
     this.fallSound.play();
   }
+
+  if (BasicGame.Game.developmentMode === true) { // [ development mode ]
+    this.bitmap.dirty = true;
+  }
 };
 
 BasicGame.Player.prototype.render = function() {
-  if (BasicGame.Game.developmentMode === true) {
+  if (BasicGame.Game.developmentMode === true) { // [ development mode ]
     // Sprite debug info
     this.game.debug.bodyInfo(this.player, 0, 100, 'rgba(0,255,0,0.4)');
     this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
   }
 
-  if (BasicGame.Game.developmentMode === true) {
+  if (BasicGame.Game.developmentMode === true) { // [ development mode ]
     // clear the bitmap where we are drawing our lines
     this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
   }
@@ -436,7 +442,7 @@ BasicGame.Player.prototype.upInputIsActive = function (duration) {
 /**
  * Method that checks collisions against walls, the ground and collectable pieces
  */
- BasicGame.Player.prototype.checkCollisions = function () {
+BasicGame.Player.prototype.checkCollisions = function () {
   this.player.touchingPiece = false;
 
   if (this.level.hasFloor === true) {
@@ -485,35 +491,41 @@ BasicGame.Player.prototype.upInputIsActive = function (duration) {
 
 
 //Function that checks if  the player is completely in shadows or not
-BasicGame.Player.prototype.isInShadow = function () {
+BasicGame.Player.prototype.isInShadow = function (checkLeft, checkRight) {
   //Trace rays toward the light from each corner of the player sprite.
   //If ALL the rays intersects a wall, then the player is in the shadows
   var lightImage = BasicGame.light.lightGroup.getAt(0);
   var raysToLight = [];
   var offset = 8;
   
-  // top left corner
-  raysToLight.push(new Phaser.Line(this.player.x + offset,
-    this.player.y + offset,
-    lightImage.x, lightImage.y));
+  if (checkLeft === true) {
+    // top left corner
+    raysToLight.push(new Phaser.Line(this.player.x + offset,
+      this.player.y + offset,
+      lightImage.x,
+      lightImage.y));
 
-  // top right corner
-  raysToLight.push(new Phaser.Line(this.player.x + this.player.width - offset,
-    this.player.y + offset,
-    lightImage.x, lightImage.y));
+    // bottom left corner
+    raysToLight.push(new Phaser.Line(this.player.x + offset,
+      this.player.y + this.player.height - offset,
+      lightImage.x,
+      lightImage.y));
+  }
 
-  // bottom right corner
-  raysToLight.push(new Phaser.Line(this.player.x + this.player.width - offset,
-    this.player.y + this.player.height - offset,
-    lightImage.x, lightImage.y));
+  if (checkRight === true) {
+    // top right corner
+    raysToLight.push(new Phaser.Line(this.player.x + this.player.width - offset,
+      this.player.y + offset,
+      lightImage.x, lightImage.y));
 
-  // bottom left corner
-  raysToLight.push(new Phaser.Line(this.player.x + offset,
-    this.player.y + this.player.height - offset,
-    lightImage.x,
-    lightImage.y));
+    // bottom right corner
+    raysToLight.push(new Phaser.Line(this.player.x + this.player.width - offset,
+      this.player.y + this.player.height - offset,
+      lightImage.x, lightImage.y));
+  }
 
   if (BasicGame.Game.developmentMode === true) {
+    // [ development mode ]
     this.drawLinesToLight(lightImage, raysToLight);
   }
 
@@ -522,28 +534,28 @@ BasicGame.Player.prototype.isInShadow = function () {
 };
 
 BasicGame.Player.prototype.allRaysIntersectWall = function (rays) {
-  //Check intersections for each ray
-  //If at least one ray has no intersection with a wall, then the player isn't in shadow
+  // check intersections for each ray
+  // (!) if at least one ray has no intersection with a wall, then the player isn't in shadow
   var hiddenRays = 0;
   rays.forEach(function (ray) {
     var intersect = null;
 
-    //For each of the walls...
+    //for each of the walls...
     this.level.walls.forEach(function (wall) {
       if (!intersect) {
-        // Create an array of lines that represent the four edges of each wall
+        // create an array of lines that represent the four edges of each wall
         var lines = [
-        new Phaser.Line(wall.x, wall.y, wall.x + wall.width, wall.y),
-        new Phaser.Line(wall.x, wall.y, wall.x, wall.y + wall.height),
-        new Phaser.Line(wall.x + wall.width, wall.y, wall.x + wall.width, wall.y + wall.height),
-        new Phaser.Line(wall.x, wall.y + wall.height, wall.x + wall.width, wall.y + wall.height)
+          new Phaser.Line(wall.x, wall.y, wall.x + wall.width, wall.y),
+          new Phaser.Line(wall.x, wall.y, wall.x, wall.y + wall.height),
+          new Phaser.Line(wall.x + wall.width, wall.y, wall.x + wall.width, wall.y + wall.height),
+          new Phaser.Line(wall.x, wall.y + wall.height, wall.x + wall.width, wall.y + wall.height)
         ];
 
-        // Test each of the edges in this wall against the ray.
-        // If the ray intersects any of the edges then the wall must be in the way.
+        // test each of the edges in the wall against the ray from the player to the light
         for (var i = 0; i < lines.length; i++) {
           intersect = Phaser.Line.intersects(ray, lines[i]);
           if (intersect) {
+            // if there is an intersect, the wall must be in the way
             break;
           }
         }
@@ -551,35 +563,22 @@ BasicGame.Player.prototype.allRaysIntersectWall = function (rays) {
     }, this);
 
     if (intersect) {
-      //This edge is hidden. :D
+      // this edge is hidden. :D
       hiddenRays++;
     }
   },this);
 
-  return (hiddenRays == 4);
+  return (hiddenRays === rays.length);
 };
 
 BasicGame.Player.prototype.drawLinesToLight = function(lightImage, raysToLight) {
-  // Draw a line from the eye to the target
-  this.bitmap.context.beginPath();
-  this.bitmap.context.moveTo(raysToLight[0].right, raysToLight[0].bottom);
-  this.bitmap.context.lineTo(lightImage.x, lightImage.y);
-  this.bitmap.context.stroke();
-
-  this.bitmap.context.beginPath();
-  this.bitmap.context.moveTo(raysToLight[1].right, raysToLight[1].bottom);
-  this.bitmap.context.lineTo(lightImage.x, lightImage.y);
-  this.bitmap.context.stroke();
-
-  this.bitmap.context.beginPath();
-  this.bitmap.context.moveTo(raysToLight[2].right, raysToLight[2].bottom);
-  this.bitmap.context.lineTo(lightImage.x, lightImage.y);
-  this.bitmap.context.stroke();
-
-  this.bitmap.context.beginPath();
-  this.bitmap.context.moveTo(raysToLight[3].right, raysToLight[3].bottom);
-  this.bitmap.context.lineTo(lightImage.x, lightImage.y);
-  this.bitmap.context.stroke();
+  // draw a line from the light to the targets
+  for (var i = 0; i < raysToLight.length; i++) {
+    this.bitmap.context.beginPath();
+    this.bitmap.context.moveTo(raysToLight[i].start.x, raysToLight[i].start.y);
+    this.bitmap.context.lineTo(lightImage.x, lightImage.y);
+    this.bitmap.context.stroke();
+  }
 };
 
 BasicGame.Player.prototype.updateLevel = function (level) {

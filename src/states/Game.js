@@ -6,7 +6,7 @@ var BasicGame = BasicGame || {};
 
 BasicGame.Game = function (game) {
   // CONSTANTS
-  this.LIFES_AMOUNT = 1;
+  this.LIFES_AMOUNT = 3;
 
   this.days = null;
   this.player = null;
