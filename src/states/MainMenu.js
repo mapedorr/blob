@@ -19,12 +19,26 @@ BasicGame.MainMenu = function (game) {
 };
 
 BasicGame.MainMenu.prototype.create = function(){
+  var _self = this;
+
   // set stage background
   this.background = this.game.add.tileSprite(0, 0,
     this.game.world.width, this.game.world.height, 'sky01');
 
+  // add the fake zone of view for the splash screen
+  this.fakeViewZone = this.game.add.image(this.game.world.width / 2, 0, 'splash_view');
+  this.fakeViewZone.anchor.set(0.5, 0);
+  this.fakeViewZone.alpha = 0;
+  this.fakeViewZone.tint = 0xFFFC19;
+
+  // add the fake EYE
+  this.fakeEye = this.game.add.sprite(this.game.world.width / 2, 64, 'eye', 10);
+  this.fakeEye.anchor.set(0.5, 0.5);
+  this.pupil = this.game.add.image(this.fakeEye.x, this.fakeEye.y, 'pupil');
+  this.pupil.anchor.set(0.5, 0.5);
+  this.pupil.alpha = 0;
+
   // draw floors and platforms
-  var _self = this;
   this.map = this.game.add.tilemap('splash_lvl');
   this.ground = this.game.add.group();
   this.map.createFromObjects("floor", "", 'platform', 0, true, false,
@@ -38,10 +52,6 @@ BasicGame.MainMenu.prototype.create = function(){
     this.map.objects.player_pos[0].y,
     'player');
   this.movingPlayer = false;
-
-  // this.gameTitleBack = this.game.add.image(this.game.world.width / 2 - 5,
-  //   this.game.world.height / 2 + 150, 'title02');
-  // this.gameTitleBack.anchor.set(0.5, 0.5);
 
   // add light and generate shadows
   this.light = new BasicGame.Light(this.game, this);
@@ -62,15 +72,19 @@ BasicGame.MainMenu.prototype.create = function(){
   this.jugarButton.scale.setTo(0.5, 0.5);
   this.jugarButton.alpha = 0.8;
 
+  // create the credits button
   this.creditsTextBitmap = this.add.bitmapText(this.game.world.width / 2,
     this.game.world.height - 32,
     this.fontId,
     '(C) Credits/Créditos',
     36);
   this.creditsTextBitmap.align = "center";
-  this.creditsTextBitmap.anchor.set(.5, 0);
+  this.creditsTextBitmap.anchor.set(0.5, 0);
+
 
   if (BasicGame.currentLevel > 1) {
+    // TODO: do not play the menu animation
+
     this.restartTextBitmap = this.add.bitmapText((this.game.world.width / 2) + 10,
       this.game.world.height - 32,
       this.fontId,
@@ -89,15 +103,6 @@ BasicGame.MainMenu.prototype.create = function(){
     this.buttons.addChild(this.restartTextBitmap);
   }
   this.buttons.alpha = 0;
-
-  // add the zone of view for the splash screen
-  this.zoneView = this.game.add.image(this.game.world.width / 2, 0, 'splash_view');
-  this.zoneView.anchor.set(0.5, 0);
-  this.zoneView.alpha = 0;
-
-  // add the fake EYE
-  this.fakeEye = this.game.add.sprite(this.game.world.width / 2, 64, 'eye', 10);
-  this.fakeEye.anchor.set(0.5, 0.5);
 
   // add the game title
   this.gameTitle = this.game.add.image(this.game.world.width / 2 - 5,
@@ -137,30 +142,35 @@ BasicGame.MainMenu.prototype.create = function(){
   }
 
   // DARKNESS
-  this.darknessGroup = this.add.group();
-  var darknessBitmap = new Phaser.BitmapData(this.game,
-    'darkness_main',
-    this.game.width,
-    this.game.height);
-  darknessBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
-  darknessBitmap.ctx.fillStyle = '#000';
-  darknessBitmap.ctx.fill();
-  var darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
-  this.darknessGroup.addChild(darknessSprite);
+  if (BasicGame.currentLevel === 1) {
+    this.darknessGroup = this.add.group();
+    var darknessBitmap = new Phaser.BitmapData(this.game,
+      'darkness_main',
+      this.game.width,
+      this.game.height);
+    darknessBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
+    darknessBitmap.ctx.fillStyle = '#000';
+    darknessBitmap.ctx.fill();
+    var darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
+    this.darknessGroup.addChild(darknessSprite);
 
-  this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-  this.darknessTween.to({alpha: 0},
-    5000,
-    Phaser.Easing.Quadratic.Out,
-    true,
-    4500);
-  this.darknessTween.onComplete.add(function(){
+    this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
+    this.darknessTween.to({alpha: 0},
+      5000,
+      Phaser.Easing.Quadratic.Out,
+      true,
+      4500);
+    this.darknessTween.onComplete.add(function(){
+      this.showButtons();
+    }, this);
+  }
+  else {
     this.showButtons();
-  }, this);
+  }
 };
 
 BasicGame.MainMenu.prototype.update = function(){
-  if (this.listenKeys == false ||
+  if (this.listenKeys === false ||
       this.movingPlayer === true) {
     return;
   }
@@ -182,7 +192,7 @@ BasicGame.MainMenu.prototype.update = function(){
   }
   else if (this.input.keyboard.isDown(Phaser.Keyboard.C)) {
     // load the credits scene
-    this.listenKeys == false;
+    this.listenKeys = false;
     this.splash_music.stop();
     this.state.start('Credits');
   }
@@ -219,7 +229,8 @@ BasicGame.MainMenu.prototype.showButtons = function () {
       false);
   showButtonsTween.onComplete.add(function(){
     this.fakeEye.frame = 0;
-    this.zoneView.alpha = 1;
+    this.pupil.alpha = 1;
+    this.fakeViewZone.alpha = 0.1;
     this.listenKeys = true;
   }, this);
   showButtonsTween.start();

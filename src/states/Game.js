@@ -1,7 +1,3 @@
-/* COLORCOMBO
- * http://www.colorcombos.com/color-schemes/6343/ColorCombo6343.html
- */
-
 var BasicGame = BasicGame || {};
 
 BasicGame.Game = function (game) {
@@ -88,10 +84,6 @@ BasicGame.Game.prototype.create = function () {
   // create the player
   this.player.create(this.level);
 
-  if (this.level.spikes) {
-    this.game.world.bringToTop(this.level.spikes);
-    this.game.world.bringToTop(this.level.walls);
-  }
 
   // create the group of sprites for lifes
   this.lifesGroup = this.game.add.group();
@@ -107,8 +99,14 @@ BasicGame.Game.prototype.create = function () {
   // create THE EYE
   this.eye.create(this.player, this.level, this.lightning);
 
-  // bring to top the pieces
+  // bring to top some things so the game looks better
+  if (this.level.spikes) {
+    this.game.world.bringToTop(this.level.spikes);
+  }
+  this.game.world.bringToTop(this.level.walls);
+  this.game.world.bringToTop(this.light.lightBitmap);
   this.game.world.bringToTop(this.level.pieces);
+  this.game.world.bringToTop(this.lifesGroup);
 
   // create the darkness
   this.darknessGroup = this.add.group();
@@ -201,13 +199,13 @@ BasicGame.Game.prototype.levelReady = function () {
 };
 
 BasicGame.Game.prototype.levelEnded = function () {
+  // notify to the eye that the level was ended
+  this.eye.endLevel(true);
+
   if (this.inDarkness === false) {
     this.helper.timer(100, this.levelEnded.bind(this));
     return;
   }
-
-  // notify to the eye that the level was ended
-  this.eye.endLevel(true);
 
   this.isLoadingLevel = true;
   this.loadLevel(++BasicGame.currentLevel);
