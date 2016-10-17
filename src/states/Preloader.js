@@ -11,6 +11,7 @@ BasicGame.Preloader = function (game) {
 };
 
 BasicGame.Preloader.prototype.preload = function(){
+  var i = 0;
   //These are the assets we loaded in Boot.js
   //A nice sparkly background and a loading progress bar
   this.background = this.add.sprite(0, 0, 'preloaderBackground');
@@ -26,7 +27,6 @@ BasicGame.Preloader.prototype.preload = function(){
       0,
       -1,
       true);
-
 
   //This sets the preloadBar sprite as a loader sprite.
   //What that does is automatically crop the sprite from 0 to full-width
@@ -62,7 +62,7 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('spike-l', 'assets/images/spike-l.png');
   this.load.image('spike-d', 'assets/images/spike-d.png');
   this.load.image('end_scene', 'assets/images/end_scene.png');
-  this.load.image('sun_light', 'assets/images/sun_light.png')
+  this.load.image('sun_light', 'assets/images/sun_light.png');
   this.load.image('credits', 'assets/images/credits.png');
   this.load.image('pupil', 'assets/images/pupil.png');
 
@@ -91,13 +91,13 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.audio('credits', 'assets/music/credits.ogg', true);
 
   // load the sounds for the pieces
-  for(var i = 1; i <= 20; i++){
-    if(i < 10){
+  for (i = 1; i <= 20; i++) {
+    if (i < 10) {
       this.load.audio('piece0' + i,
         'assets/soundfx/piece0' + i + '.wav',
         true);
     }
-    else{
+    else {
       this.load.audio('piece' + i,
         'assets/soundfx/piece' + i + '.wav',
         true);
@@ -112,13 +112,13 @@ BasicGame.Preloader.prototype.preload = function(){
         null, Phaser.Tilemap.TILED_JSON);
 
   // load the tilemaps of each level
-  for(var i = 1; i <= 31; i++){
-    if(i < 10){
+  for (i = 1; i <= 31; i++) {
+    if (i < 10) {
       this.game.load.tilemap('lvl0' + i,
         'assets/tilemaps/maps/level0' + i + '.json',
         null, Phaser.Tilemap.TILED_JSON);
     }
-    else{
+    else {
       this.game.load.tilemap('lvl' + i,
         'assets/tilemaps/maps/level' + i + '.json',
         null, Phaser.Tilemap.TILED_JSON);
@@ -133,8 +133,8 @@ BasicGame.Preloader.prototype.create = function(){
 
 BasicGame.Preloader.prototype.update = function(){
   //this.cache.isSoundDecoded('mainMenuMusic')
-  if (this.ready == false) {
+  if (this.ready === false) {
     this.ready = true;
-    this.state.start('Game');
+    this.state.start('MainMenu');
   }
 };

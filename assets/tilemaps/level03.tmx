@@ -21,6 +21,6 @@
   <object id="22" x="1008" y="464" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="player_pos">
-  <object id="6" name="plyr" x="0" y="416" width="32" height="8"/>
+  <object id="6" name="plyr" x="0" y="448" width="32" height="8"/>
  </objectgroup>
 </map>

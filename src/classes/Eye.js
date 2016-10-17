@@ -80,7 +80,7 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
 
   // create the view zones
   this.viewZoneSprite = this.game.add.sprite(this.eye.position.x - this.zoneSize / 2, 0, 'view_zone', 0);
-  this.viewZoneSprite.tint = 0x274245;
+  this.viewZoneSprite.tint = 0xFFFC19;
   this.viewZoneSprite.alpha = 0;
   this.viewZoneSprite.width = this.zoneSize;
   this.viewZoneSprite.height = this.game.world.height;
@@ -122,7 +122,7 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   }
 
   // create the lightning for killing the player
-  this.lightning.create(this.eye,this.playerObj,this.level);
+  this.lightning.create(this.eye, this.playerObj, this.level);
   this.lightningTimer = 0;
 
   // the EYE starts calm
@@ -151,7 +151,8 @@ BasicGame.Eye.prototype.update = function () {
     this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
   }
 
-  if(this.eye.animations.currentAnim.name === 'happy') {
+  if (this.eye.animations.currentAnim.name === 'happy' ||
+      this.levelEnded === true) {
     // the player is dead, I'm the happiest EYE in the hole universe
     return;
   }
@@ -253,7 +254,7 @@ BasicGame.Eye.prototype.initSearch = function (delay) {
 
   // set the defaults for the pupil and the view zone
   this.viewZoneSprite.x = this.viewZoneSprite.positions['0'];
-  this.viewZoneSprite.alpha = 0.1;
+  this.viewZoneSprite.alpha = 0.05;
   this.pupil.x = this.pupilImagePositions['0'];
   this.pupil.alpha = 1;
 
@@ -490,12 +491,13 @@ BasicGame.Eye.prototype.shake = function () {
 
 BasicGame.Eye.prototype.levelStart = function () {
   this.levelEnded = false;
-  this.levelEnded = false;
   this.shooting = false;
   this.initSearch();
 };
 
 BasicGame.Eye.prototype.endLevel = function (levelCompleted) {
+  if (this.levelEnded === true) return;
+
   this.levelEnded = true;
 
   this.destroyTimers();
