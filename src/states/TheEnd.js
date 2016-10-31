@@ -101,6 +101,10 @@ BasicGame.TheEnd = function (game) {
   this.music = null;
 };
 
+BasicGame.TheEnd.prototype.preload = function() {
+  this.load.audio('the_end', 'assets/music/the_end.ogg', true);
+};
+
 BasicGame.TheEnd.prototype.create = function() {
   // set the background for the scene
   // this.game.stage.backgroundColor = 0x000000;

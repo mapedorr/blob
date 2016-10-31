@@ -13,6 +13,11 @@ BasicGame.Credits = function (game) {
   this.showCreditsTimer = null;
 };
 
+BasicGame.Credits.prototype.preloader = function(){
+  this.load.image('credits', 'assets/images/credits.png');
+  this.load.audio('credits_music', 'assets/music/credits.ogg', true);
+};
+
 BasicGame.Credits.prototype.create = function(){
   var _self = this;
 
@@ -51,7 +56,7 @@ BasicGame.Credits.prototype.create = function(){
 
   // add the credits music
   if (!this.creditsMusic) {
-    this.creditsMusic = this.game.add.sound('credits', 0.8, false);
+    this.creditsMusic = this.game.add.sound('credits_music', 0.8, false);
     this.creditsMusic.play("", 63);
   }
 
