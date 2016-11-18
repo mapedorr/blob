@@ -102,6 +102,9 @@ BasicGame.TheEnd = function (game) {
 };
 
 BasicGame.TheEnd.prototype.preload = function() {
+  this.load.image('end_scene', 'assets/images/end_scene-min.png');
+  this.load.image('sun_light', 'assets/images/sun_light-min.png');
+  this.load.atlas('clouds', 'assets/sprites/clouds.png', 'assets/sprites/clouds.xml', null, Phaser.Loader.TEXTURE_ATLAS_XML_STARLING);
   this.load.audio('the_end', 'assets/music/the_end.ogg', true);
 };
 

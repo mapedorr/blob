@@ -78,12 +78,12 @@ BasicGame.Preloader.prototype.preload = function(){
 
   // it will not be necessary to load this one if the player already passed the
   // first part of the game
-  this.load.image('sky01', 'assets/images/sky01.png');
+  this.load.image('sky01', 'assets/images/sky01-min.png');
 
   // load this two if the current level stored requires it, otherwise load them
   // when the player is near the end of the corresponding chapter
-  // this.load.image('sky02', 'assets/images/sky02.png');
-  // this.load.image('sky03', 'assets/images/sky03.png');
+  // this.load.image('sky02', 'assets/images/sky02-min.png');
+  // this.load.image('sky03', 'assets/images/sky03-min.png');
 
   
   // load this if the current level stored requires it, otherwise load it
@@ -96,12 +96,12 @@ BasicGame.Preloader.prototype.preload = function(){
   // this.load.audio('spike', 'assets/soundfx/spike.wav', true);
 
   // load this two when the player reaches the last level
-  // this.load.image('end_scene', 'assets/images/end_scene.png');
-  // this.load.image('sun_light', 'assets/images/sun_light.png');
+  // this.load.image('end_scene', 'assets/images/end_scene-min.png');
+  // this.load.image('sun_light', 'assets/images/sun_light-min.png');
   // this.load.atlas('clouds', 'assets/sprites/clouds.png', 'assets/sprites/clouds.xml', null, Phaser.Loader.TEXTURE_ATLAS_XML_STARLING);
 
   // load this one only if the player selects the Credits option
-  // this.load.image('credits', 'assets/images/credits.png');
+  // this.load.image('credits', 'assets/images/credits-min.png');
 
   // load this two when the player reaches the last level
   // this.load.audio('the_end', 'assets/music/the_end.ogg', true);
