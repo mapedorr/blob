@@ -12,15 +12,19 @@ BasicGame.Preloader = function (game) {
 
 BasicGame.Preloader.prototype.preload = function(){
   var i = 0;
+
   // these are the assets we loaded in Boot.js
   // a nice sparkly background and a loading progress bar
   this.background = this.add.sprite(0, 0, 'preloaderBackground');
-  this.banner = this.add.image(this.game.world.width / 2, this.game.world.height - 40, 'loading_banner');
+  this.banner = this.add.image(this.game.world.width / 2,
+    this.game.world.height - 40,
+    'loading_banner');
   this.banner.anchor.set(0.5, 0);
   this.preloadBar = this.add.sprite(0, 0, 'preloaderBar');
 
   // set the preloadBar sprite as a loader sprite.
-  // automatically crop the sprite from 0 to full-width as the files below are loaded in.
+  // automatically crop the sprite from 0 to full-width as the
+  // files below are loaded in.
   this.load.setPreloadSprite(this.preloadBar, 1);
 
   //  ---| load the assets for the Main menu
@@ -32,11 +36,10 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.spritesheet('continuarButton','assets/sprites/continuar_button.png', 400, 256);
   this.load.image('pupil', 'assets/images/pupil.png');
   this.load.audio('splash_music', 'assets/music/splash_music.ogg', true);
-  this.load.audio('en-lang', 'assets/soundfx/en.wav', true);
-  this.load.audio('es-lang', 'assets/soundfx/es.wav', true);
-  // load the tilemap for the splash screen
+  this.load.audio('en-lang', 'assets/soundfx/en.ogg', true);
+  this.load.audio('es-lang', 'assets/soundfx/es.ogg', true);
   this.game.load.tilemap('splash_lvl', 'assets/tilemaps/maps/splash.json',
-        null, Phaser.Tilemap.TILED_JSON);
+    null, Phaser.Tilemap.TILED_JSON);
 
   //  ---| load the assets for the Game
   this.load.image('light', 'assets/images/light.png');
@@ -45,47 +48,29 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.image('platform', 'assets/images/platform.png');
   this.load.spritesheet('player','assets/sprites/player.png', 32, 32);
   this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);
-  this.load.audio('b', 'assets/soundfx/b.wav', true);
-  this.load.audio('h', 'assets/soundfx/h.wav', true);
-  this.load.audio('jump', 'assets/soundfx/jump.wav', true);
-  this.load.audio('walk', 'assets/soundfx/walk.wav', true);
-  this.load.audio('slide', 'assets/soundfx/slide.wav', true);
-  this.load.audio('fall', 'assets/soundfx/fall.wav', true);
-  this.load.audio('death', 'assets/soundfx/death.wav', true);
-  this.load.audio('day', 'assets/soundfx/day.wav', true);
-  this.load.audio('ray', 'assets/soundfx/ray.wav', true);
-  this.load.audio('eye', 'assets/soundfx/eye.wav', true);
-  this.load.audio('eye-anger', 'assets/soundfx/anger.wav', true);
+  this.load.audio('b', 'assets/soundfx/b.ogg', true);
+  this.load.audio('h', 'assets/soundfx/h.ogg', true);
+  this.load.audio('jump', 'assets/soundfx/jump.ogg', true);
+  this.load.audio('walk', 'assets/soundfx/walk.ogg', true);
+  this.load.audio('slide', 'assets/soundfx/slide.ogg', true);
+  this.load.audio('fall', 'assets/soundfx/fall.ogg', true);
+  this.load.audio('death', 'assets/soundfx/death.ogg', true);
+  this.load.audio('day', 'assets/soundfx/day.ogg', true);
+  this.load.audio('ray', 'assets/soundfx/ray.ogg', true);
+  this.load.audio('eye', 'assets/soundfx/eye.ogg', true);
+  this.load.audio('eye-anger', 'assets/soundfx/anger.ogg', true);
   this.load.audio('level_music', 'assets/music/levels_music.ogg', true);
-  this.load.bitmapFont('font','assets/fonts/teko-light_0.png','assets/fonts/teko-light.fnt', null, 5);
+  this.load.bitmapFont('font','assets/fonts/teko-light_0.png',
+    'assets/fonts/teko-light.fnt', null, 5);
 
   // load the sound for pieces
-  this.load.audio('piece', 'assets/soundfx/piece01.wav', true);
-
-  // load the sounds for the pieces (MAYBE JUST ONE WILL BE FINE)
-  // for (i = 1; i <= 20; i++) {
-  //   if (i < 10) {
-  //     this.load.audio('piece0' + i,
-  //       'assets/soundfx/piece0' + i + '.wav',
-  //       true);
-  //   }
-  //   else {
-  //     this.load.audio('piece' + i,
-  //       'assets/soundfx/piece' + i + '.wav',
-  //       true);
-  //   }
-  // }
+  this.load.audio('piece', 'assets/soundfx/piece01.ogg', true);
 
   // it will not be necessary to load this one if the player already passed the
   // first part of the game
-  this.load.image('sky01', 'assets/images/sky01-min.png');
+  var skyName = BasicGame.Helper.prototype.getSkyName(BasicGame.currentLevel);
+  this.load.image(skyName, 'assets/images/' + skyName + '-min.png');
 
-  // load this two if the current level stored requires it, otherwise load them
-  // when the player is near the end of the corresponding chapter
-  // this.load.image('sky02', 'assets/images/sky02-min.png');
-  // this.load.image('sky03', 'assets/images/sky03-min.png');
-
-  
   // load this if the current level stored requires it, otherwise load it
   // when the player is near the end of the corresponding chapter
   // this.load.image('spike-platform', 'assets/images/spike-platform.png');
@@ -93,7 +78,7 @@ BasicGame.Preloader.prototype.preload = function(){
   // this.load.image('spike-r', 'assets/images/spike-r.png');
   // this.load.image('spike-l', 'assets/images/spike-l.png');
   // this.load.image('spike-d', 'assets/images/spike-d.png');
-  // this.load.audio('spike', 'assets/soundfx/spike.wav', true);
+  // this.load.audio('spike', 'assets/soundfx/spike.ogg', true);
 
   // load this two when the player reaches the last level
   // this.load.image('end_scene', 'assets/images/end_scene-min.png');
@@ -109,23 +94,12 @@ BasicGame.Preloader.prototype.preload = function(){
   // load this one if the player selects the Credits option
   // this.load.audio('credits', 'assets/music/credits.ogg', true);
 
+  var levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);
+  this.game.load.tilemap(levelData.id,
+    'assets/tilemaps/maps/' + levelData.name + '.json',
+    null,
+    Phaser.Tilemap.TILED_JSON);
 
-  
-
-  // load the tilemaps of each level (MAYBE LOAD JUST 10 AND THEN LOAD THE OTHERS
-  // DYNAMICALLY)
-  for (i = 1; i <= 31; i++) {
-    if (i < 10) {
-      this.game.load.tilemap('lvl0' + i,
-        'assets/tilemaps/maps/level0' + i + '.json',
-        null, Phaser.Tilemap.TILED_JSON);
-    }
-    else {
-      this.game.load.tilemap('lvl' + i,
-        'assets/tilemaps/maps/level' + i + '.json',
-        null, Phaser.Tilemap.TILED_JSON);
-    }
-  }
 };
 
 BasicGame.Preloader.prototype.create = function(){

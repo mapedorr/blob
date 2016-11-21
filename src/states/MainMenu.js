@@ -19,11 +19,13 @@ BasicGame.MainMenu = function (game) {
 };
 
 BasicGame.MainMenu.prototype.create = function(){
+  console.log('xxx');
   var _self = this;
 
   // set stage background
   this.background = this.game.add.tileSprite(0, 0,
-    this.game.world.width, this.game.world.height, 'sky01');
+    this.game.world.width, this.game.world.height,
+    BasicGame.Helper.prototype.getSkyName(BasicGame.currentLevel));
 
   // add the fake zone of view for the splash screen
   this.fakeViewZone = this.game.add.image(this.game.world.width / 2, 0, 'splash_view');
@@ -83,8 +85,6 @@ BasicGame.MainMenu.prototype.create = function(){
 
 
   if (BasicGame.currentLevel > 1) {
-    // TODO: do not play the menu animation
-
     this.restartTextBitmap = this.add.bitmapText((this.game.world.width / 2) + 10,
       this.game.world.height - 32,
       this.fontId,
@@ -197,6 +197,7 @@ BasicGame.MainMenu.prototype.update = function(){
     this.state.start('Credits');
   }
   else if (this.input.keyboard.isDown(Phaser.Keyboard.R)) {
+
     // clean the localStorage, then set the currrent level to 1, show intro
     this.listenKeys = false;
     localStorage.removeItem("oh-my-blob");

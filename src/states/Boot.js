@@ -2,7 +2,7 @@
 // 4 (free space for testing jumps)
 var BasicGame = BasicGame || {
   language: "en",
-  currentLevel: 3,
+  currentLevel: 10,
   deaths: 0,
   rest: 0,
   setDay: function(n) {

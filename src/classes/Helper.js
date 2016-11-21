@@ -29,3 +29,24 @@ BasicGame.Helper.prototype.randomColor = function () {
 BasicGame.Helper.prototype.randomNumber = function (max, min) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+BasicGame.Helper.prototype.getLevelIdAndName = function (levelNumber) {
+  var postfix = (levelNumber < 10) ? '0' : '';
+  return {
+    id: 'lvl' + postfix + levelNumber,
+    name: 'level' + postfix + levelNumber
+  };
+};
+
+BasicGame.Helper.prototype.getSkyName = function (levelNumber) {
+  if (levelNumber <= 10) {
+    console.log('sky01');
+    return 'sky01';
+  } else if (levelNumber <= 20) {
+    console.log('sky02');
+    return 'sky02';
+  } else {
+    console.log('sky03');
+    return 'sky03';
+  }
+};
