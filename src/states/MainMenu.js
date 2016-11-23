@@ -1,7 +1,3 @@
-/* COLORCOMBO
- * http://www.colorcombos.com/color-schemes/5897/ColorCombo5897.html
- */
-
 var BasicGame = BasicGame || {};
 
 BasicGame.MainMenu = function (game) {
@@ -19,7 +15,6 @@ BasicGame.MainMenu = function (game) {
 };
 
 BasicGame.MainMenu.prototype.create = function(){
-  console.log('xxx');
   var _self = this;
 
   // set stage background

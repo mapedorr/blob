@@ -1,7 +1,3 @@
-/* COLORCOMBO
- * http://www.colorcombos.com/color-schemes/5897/ColorCombo5897.html
- */
-
 var BasicGame = BasicGame || {};
 
 BasicGame.Preloader = function (game) {
@@ -80,26 +76,11 @@ BasicGame.Preloader.prototype.preload = function(){
   // this.load.image('spike-d', 'assets/images/spike-d.png');
   // this.load.audio('spike', 'assets/soundfx/spike.ogg', true);
 
-  // load this two when the player reaches the last level
-  // this.load.image('end_scene', 'assets/images/end_scene-min.png');
-  // this.load.image('sun_light', 'assets/images/sun_light-min.png');
-  // this.load.atlas('clouds', 'assets/sprites/clouds.png', 'assets/sprites/clouds.xml', null, Phaser.Loader.TEXTURE_ATLAS_XML_STARLING);
-
-  // load this one only if the player selects the Credits option
-  // this.load.image('credits', 'assets/images/credits-min.png');
-
-  // load this two when the player reaches the last level
-  // this.load.audio('the_end', 'assets/music/the_end.ogg', true);
-
-  // load this one if the player selects the Credits option
-  // this.load.audio('credits', 'assets/music/credits.ogg', true);
-
   var levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);
   this.game.load.tilemap(levelData.id,
     'assets/tilemaps/maps/' + levelData.name + '.json',
     null,
     Phaser.Tilemap.TILED_JSON);
-
 };
 
 BasicGame.Preloader.prototype.create = function(){
