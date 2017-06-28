@@ -67,7 +67,8 @@ BasicGame.Player = function (game, input, gameObj) {
   this.slideSound = null;
   this.fallSound = null;
   this.deathSound = null;
-  this.piecesSound = [];
+  // this.piecesSound = [];
+  this.pieceSound = null;
 
   this.jumpCount = 0;
   this.dead = false;
@@ -161,11 +162,14 @@ BasicGame.Player.prototype.create = function (level) {
   }
 
   // load the audio for pieces
-  if (!this.piecesSound || this.piecesSound.length === 0) {
-    for(var i = 1; i <= 20; i++) {
-      this.piecesSound.push(this.game.add.sound('piece' + ((i < 10) ? '0' : '') + i, 0.2));
-    }
+  if (!this.pieceSound) {
+    this.pieceSound = this.game.add.sound('piece', 0.2);
   }
+  // if (!this.piecesSound || this.piecesSound.length === 0) {
+  //   for(var i = 1; i <= 20; i++) {
+  //     this.piecesSound.push(this.game.add.sound('piece' + ((i < 10) ? '0' : '') + i, 0.2));
+  //   }
+  // }
 
   // create the group that will contain the particles that will be used during
   // player death
@@ -456,7 +460,10 @@ BasicGame.Player.prototype.checkCollisions = function () {
       piece.body.enable = false;
       piece.alpha = 0;
 
-      (this.piecesSound[this.collectedPieces++]).play();
+      // (this.piecesSound[this.collectedPieces++]).play();
+      this.collectedPieces++;
+      this.pieceSound.play();
+
       if (this.collectedPieces === this.level.pieces.children.length) {
         // the level has been finished
         this.level.endLevel();

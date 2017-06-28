@@ -1,10 +1,3 @@
-/* COLORCOMBO
- * http://www.colorcombos.com/color-schemes/6343/ColorCombo6343.html
- *
- * this is the end
- * my     friend        this is    the end
- */
-
 var BasicGame = BasicGame || {};
 
 BasicGame.TheEnd = function (game) {
@@ -99,6 +92,13 @@ BasicGame.TheEnd = function (game) {
   this.cloudsLimit = 9;
 
   this.music = null;
+};
+
+BasicGame.TheEnd.prototype.preload = function() {
+  this.load.image('end_scene', 'assets/images/end_scene-min.png');
+  this.load.image('sun_light', 'assets/images/sun_light-min.png');
+  this.load.atlas('clouds', 'assets/sprites/clouds.png', 'assets/sprites/clouds.xml', null, Phaser.Loader.TEXTURE_ATLAS_XML_STARLING);
+  this.load.audio('the_end', 'assets/music/the_end.ogg', true);
 };
 
 BasicGame.TheEnd.prototype.create = function() {

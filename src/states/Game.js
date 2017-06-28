@@ -229,27 +229,44 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
     return;
   }
 
-  if (this.background.key != this.getSkyName()) {
-    this.background.loadTexture(this.getSkyName());
-  }
-
   this.level.destroyCurrentLevel();
-  this.level.createLevel(levelNumber);
 
-  this.player.updateLevel(this.level);
-  this.light.updateWalls(this.level);
-  this.eye.updateLevel(this.level);
-  this.lightning.updateLevel(this.level);
-
-  this.game.world.bringToTop(this.light.lightBitmap);
-  this.game.world.bringToTop(this.level.pieces);
-  this.game.world.bringToTop(this.lifesGroup);
-  this.game.world.bringToTop(this.darknessGroup);
-
-  if (this.level.isReady === true) {
-    BasicGame.isRetrying = false;
-    this.levelReady();
+  var skyName = this.getSkyName();
+  if (this.background.key != skyName) {
+    this.load.image(skyName,
+      'assets/images/' + skyName + '-min.png');
   }
+
+  this.game.load.onLoadComplete.addOnce(function () {
+    if (this.background.key != skyName) {
+      this.background.loadTexture(skyName);
+    }
+
+    this.level.createLevel(levelNumber);
+
+    this.player.updateLevel(this.level);
+    this.light.updateWalls(this.level);
+    this.eye.updateLevel(this.level);
+    this.lightning.updateLevel(this.level);
+
+    this.game.world.bringToTop(this.light.lightBitmap);
+    this.game.world.bringToTop(this.level.pieces);
+    this.game.world.bringToTop(this.lifesGroup);
+    this.game.world.bringToTop(this.darknessGroup);
+
+    if (this.level.isReady === true) {
+      BasicGame.isRetrying = false;
+      this.levelReady();
+    }
+  }, this);
+
+  var levelData = this.helper.getLevelIdAndName(levelNumber);
+  this.game.load.tilemap(levelData.id,
+    'assets/tilemaps/maps/' + levelData.name + '.json',
+    null,
+    Phaser.Tilemap.TILED_JSON);
+
+  this.game.load.start();
 
   // localStorage.setItem("oh-my-blob", BasicGame.setDay(levelNumber));
 };
@@ -430,11 +447,5 @@ BasicGame.Game.prototype.showLifes = function () {
 };
 
 BasicGame.Game.prototype.getSkyName = function () {
-  if (BasicGame.currentLevel <= 10) {
-    return 'sky01';
-  } else if (BasicGame.currentLevel <= 20) {
-    return 'sky02';
-  } else {
-    return 'sky03';
-  }
+  return this.helper.getSkyName(BasicGame.currentLevel);
 };

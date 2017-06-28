@@ -2,7 +2,7 @@
 // 4 (free space for testing jumps)
 var BasicGame = BasicGame || {
   language: "en",
-  currentLevel: 3,
+  currentLevel: 10,
   deaths: 0,
   rest: 0,
   setDay: function(n) {
@@ -42,7 +42,7 @@ BasicGame.Boot = function (game) {
 
 BasicGame.Boot.prototype.preload = function () {
   //  Here we load the assets required for our preloader (in this case a background and a loading bar)
-  this.load.image('preloaderBackground', 'assets/images/preloader_background.png');
+  this.load.image('preloaderBackground', 'assets/images/preloader_background-min.png');
   this.load.image('preloaderBar', 'assets/images/preloader_bar.png');
   this.load.image('loading_banner', 'assets/images/loading_banner.png');
 };

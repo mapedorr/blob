@@ -1,11 +1,7 @@
-/* COLORCOMBO
- * http://www.colorcombos.com/color-schemes/6544/ColorCombo6544.html 
- */
-
 var BasicGame = BasicGame || {};
 
 BasicGame.Credits = function (game) {
-  this.mainMenuKey = Phaser.Keyboard.SPACEBAR;
+  this.mainMenuKey = Phaser.Keyboard.Z;
   this.goingToMainMenu = false;
   this.fontId = 'font';
   this.creditsImage = null;
@@ -13,15 +9,22 @@ BasicGame.Credits = function (game) {
   this.showCreditsTimer = null;
 };
 
+BasicGame.Credits.prototype.preload = function(){
+  this.load.image('credits', 'assets/images/credits-min.png');
+};
+
 BasicGame.Credits.prototype.create = function(){
   var _self = this;
+
+  // set the default values for some properties of the state
+  this.goingToGame = false;
 
   // set the backgound color
   this.game.stage.backgroundColor = 0x000000;
 
   // load the image that has the credits
   this.creditsImage = this.game.add.image(0,
-    this.game.world.height,
+    this.game.world.height - 200,
     'credits');
 
   // add the game title
@@ -42,7 +45,7 @@ BasicGame.Credits.prototype.create = function(){
   this.mainmenuBitmapText = this.add.bitmapText(this.game.world.width - 20,
     this.game.world.height - 20,
     this.fontId,
-    "(Spacebar) Main menu / (Barra espaciadora) Menú principal",
+    "(Z) Main menu / (Z) Menú principal",
     32,
     this.textBitmapsGroup);
   this.mainmenuBitmapText.align = "left";
@@ -51,8 +54,11 @@ BasicGame.Credits.prototype.create = function(){
 
   // add the credits music
   if (!this.creditsMusic) {
-    this.creditsMusic = this.game.add.sound('credits', 0.8, false);
-    this.creditsMusic.play("", 63);
+    this.creditsMusic = this.game.add.sound('splash_music', 0.8, false);
+    this.creditsMusic.play();
+  }
+  else {
+    this.creditsMusic.play();
   }
 
   this.scrollTween = this.game.add.tween(this.creditsImage);
@@ -70,6 +76,7 @@ BasicGame.Credits.prototype.create = function(){
       null,
       true);
   }, this);
+
   this.scrollTween.start();
 };
 
