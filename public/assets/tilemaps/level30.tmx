@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="308">
+ <properties>
+  <property name="day" value="2"/>
+ </properties>
+ <objectgroup name="floor" visible="0"/>
+ <objectgroup name="platforms">
+  <object id="210" x="928" y="608" width="32" height="32"/>
+  <object id="301" x="960" y="128" width="32" height="32"/>
+  <object id="304" x="32" y="384" width="32" height="32"/>
+  <object id="306" x="0" y="352" width="32" height="32"/>
+  <object id="307" x="736" y="288" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup color="#ffa0a4" name="spikes">
+  <object id="200" x="960" y="0" width="32" height="32">
+   <properties>
+    <property name="spike-down" value="1"/>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="225" x="736" y="480" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="266" x="512" y="544" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="267" x="320" y="480" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="268" x="128" y="576" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="269" x="640" y="256" width="32" height="32">
+   <properties>
+    <property name="spike-down" value="1"/>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="270" x="448" y="320" width="32" height="32">
+   <properties>
+    <property name="spike-down" value="1"/>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="272" x="160" y="288" width="32" height="32">
+   <properties>
+    <property name="spike-down" value="1"/>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="276" x="32" y="416" width="32" height="96">
+   <properties>
+    <property name="spike-platform" value="1"/>
+    <property name="spike-side" value="r"/>
+   </properties>
+  </object>
+  <object id="278" x="416" y="256" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="279" x="128" y="224" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+    <property name="spike-side" value="l"/>
+   </properties>
+  </object>
+  <object id="280" x="0" y="96" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+    <property name="spike-side" value="r"/>
+   </properties>
+  </object>
+  <object id="281" x="192" y="160" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="286" x="736" y="320" width="32" height="32">
+   <properties>
+    <property name="spike-down" value="1"/>
+    <property name="spike-platform" value="1"/>
+   </properties>
+  </object>
+  <object id="287" x="960" y="448" width="32" height="64">
+   <properties>
+    <property name="spike-platform" value="1"/>
+    <property name="spike-side" value="l"/>
+   </properties>
+  </object>
+  <object id="293" x="608" y="128" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+    <property name="spike-side" value="l"/>
+   </properties>
+  </object>
+  <object id="296" x="960" y="256" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+    <property name="spike-side" value="l"/>
+   </properties>
+  </object>
+  <object id="297" x="960" y="160" width="32" height="32">
+   <properties>
+    <property name="spike-platform" value="1"/>
+    <property name="spike-side" value="l"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="pieces">
+  <object id="125" x="528" y="528" width="16" height="16"/>
+  <object id="246" x="816" y="368" width="16" height="16"/>
+  <object id="260" x="752" y="464" width="16" height="16"/>
+  <object id="261" x="336" y="464" width="16" height="16"/>
+  <object id="274" x="144" y="560" width="16" height="16"/>
+  <object id="275" x="912" y="208" width="16" height="16"/>
+  <object id="282" x="112" y="464" width="16" height="16"/>
+  <object id="283" x="80" y="176" width="16" height="16"/>
+  <object id="284" x="144" y="48" width="16" height="16"/>
+  <object id="289" x="432" y="240" width="16" height="16"/>
+  <object id="294" x="656" y="80" width="16" height="16"/>
+  <object id="300" x="976" y="112" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="player_pos">
+  <object id="8" name="plyr" x="928" y="576" width="32" height="8"/>
+ </objectgroup>
+</map>

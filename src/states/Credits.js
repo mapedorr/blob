@@ -1,5 +1,3 @@
-var BasicGame = BasicGame || {};
-
 BasicGame.Credits = function (game) {
   this.mainMenuKey = Phaser.Keyboard.Z;
   this.goingToMainMenu = false;

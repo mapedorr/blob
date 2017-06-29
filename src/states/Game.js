@@ -1,5 +1,3 @@
-var BasicGame = BasicGame || {};
-
 BasicGame.Game = function (game) {
   // CONSTANTS
   this.LIFES_AMOUNT = 3;

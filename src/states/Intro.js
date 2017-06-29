@@ -2,8 +2,6 @@
  * http://www.colorcombos.com/color-schemes/6544/ColorCombo6544.html 
  */
 
-var BasicGame = BasicGame || {};
-
 BasicGame.Intro = function (game) {
   this.background = null;
   this.skipKey = Phaser.Keyboard.Z;

@@ -1,4 +1,3 @@
-var BasicGame = BasicGame || {};
 BasicGame.Days = function () {
   this.days = {
     1:  { "number": 387,

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TextureAtlas imagePath="clouds.png">
+	<!--
+	Created with ShoeBox
+	http://renderhjs.net/shoebox/
+	-->
+	<SubTexture name="cloud01.png"	x="570"	y="350"	width="161"	height="112" frameX="-0" frameY="-0" frameWidth="161" frameHeight="112"/>
+	<SubTexture name="cloud02.png"	x="657"	y="0"	width="183"	height="191" frameX="-0" frameY="-0" frameWidth="183" frameHeight="191"/>
+	<SubTexture name="cloud03.png"	x="354"	y="0"	width="198"	height="48" frameX="-0" frameY="-0" frameWidth="198" frameHeight="48"/>
+	<SubTexture name="cloud04.png"	x="0"	y="0"	width="353"	height="163" frameX="-0" frameY="-0" frameWidth="353" frameHeight="163"/>
+	<SubTexture name="cloud05.png"	x="0"	y="357"	width="327"	height="154" frameX="-0" frameY="-0" frameWidth="327" frameHeight="154"/>
+	<SubTexture name="cloud06.png"	x="348"	y="164"	width="308"	height="185" frameX="-0" frameY="-0" frameWidth="308" frameHeight="185"/>
+	<SubTexture name="cloud07.png"	x="354"	y="49"	width="165"	height="112" frameX="-0" frameY="-0" frameWidth="165" frameHeight="112"/>
+	<SubTexture name="cloud08.png"	x="328"	y="357"	width="241"	height="123" frameX="-0" frameY="-0" frameWidth="241" frameHeight="123"/>
+	<SubTexture name="cloud09.png"	x="0"	y="164"	width="347"	height="192" frameX="-0" frameY="-0" frameWidth="347" frameHeight="192"/>
+</TextureAtlas>

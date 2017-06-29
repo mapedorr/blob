@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="14">
+ <objectgroup name="floor">
+  <object id="1" x="0" y="608" width="1024" height="32">
+   <properties>
+    <property name="gid" value="p2"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="platforms">
+  <object id="2" x="160" y="512" width="32" height="96"/>
+  <object id="3" x="832" y="512" width="32" height="96"/>
+  <object id="4" x="416" y="512" width="96" height="32"/>
+  <object id="5" x="0" y="64" width="64" height="32"/>
+ </objectgroup>
+ <objectgroup name="pieces">
+  <object id="6" x="208" y="592" width="16" height="16"/>
+  <object id="7" x="656" y="592" width="16" height="16"/>
+  <object id="8" x="1008" y="592" width="16" height="16"/>
+  <object id="9" x="16" y="592" width="16" height="16"/>
+  <object id="10" x="848" y="400" width="16" height="16"/>
+  <object id="11" x="528" y="400" width="16" height="16"/>
+  <object id="12" x="176" y="400" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="player_pos">
+  <object id="13" name="plyr" x="0" y="32" width="32" height="8"/>
+ </objectgroup>
+</map>

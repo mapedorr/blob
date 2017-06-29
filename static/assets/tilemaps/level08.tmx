@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="32" tileheight="32" nextobjectid="18">
+ <objectgroup name="floor">
+  <object id="1" x="0" y="608" width="1024" height="32">
+   <properties>
+    <property name="gid" value="p2"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="platforms">
+  <object id="2" x="160" y="320" width="32" height="288"/>
+  <object id="4" x="160" y="192" width="736" height="32"/>
+  <object id="5" x="480" y="320" width="32" height="288"/>
+  <object id="16" x="768" y="320" width="32" height="288"/>
+ </objectgroup>
+ <objectgroup name="pieces">
+  <object id="8" x="912" y="432" width="16" height="16"/>
+  <object id="9" x="144" y="432" width="16" height="16"/>
+  <object id="12" x="496" y="240" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="player_pos">
+  <object id="13" name="plyr" x="0" y="576" width="32" height="8"/>
+ </objectgroup>
+</map>
