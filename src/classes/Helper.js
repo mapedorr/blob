@@ -1,3 +1,5 @@
+var BasicGame = require('BasicGame');
+
 /**
  * Method that set the default values for the properties of the Helper object.
  * 

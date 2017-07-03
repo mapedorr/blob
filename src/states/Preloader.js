@@ -1,3 +1,5 @@
+var BasicGame = require('BasicGame');
+
 BasicGame.Preloader = function (game) {
   this.background = null;
   this.preloadBar = null;

@@ -1,6 +1,4 @@
-/* COLORCOMBO
- * http://www.colorcombos.com/color-schemes/6544/ColorCombo6544.html 
- */
+var BasicGame = require('BasicGame');
 
 BasicGame.GameOver = function(game){
   this.fontId = 'font';

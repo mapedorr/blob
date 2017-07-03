@@ -11,7 +11,7 @@ var exorcist = require('exorcist');
 var babelify = require('babelify');
 var browserify = require('browserify');
 var browserSync = require('browser-sync');
-var glob = require('glob');
+// var glob = require('glob');
 
 // path to the Phaser build folder, change if using Bower or other package managers.
 var PHASER_PATH = './node_modules/phaser/build/';
@@ -104,23 +104,41 @@ function copyPhaser() {
  * but have different task dependencies.
  */
 function build() {
-    var entryFiles = glob.sync('./src/**/*.js');
+    // var entryFiles = glob.sync('./src/**/*.js');
     var sourcemapPath = SCRIPTS_PATH + '/' + OUTPUT_FILE + '.map';
     logBuildMode();
 
     return browserify({
             paths: [path.join(__dirname, 'src')],
-            entries: entryFiles,
+            entries: [
+              './src/states/Boot.js',
+              './src/states/Credits.js',
+              './src/states/Game.js',
+              './src/states/GameOver.js',
+              './src/states/Intro.js',
+              './src/states/MainMenu.js',
+              './src/states/Preloader.js',
+              './src/states/TheEnd.js',
+              './src/classes/Days.js',
+              './src/classes/Eye.js',
+              './src/classes/Helper.js',
+              './src/classes/Level.js',
+              './src/classes/Light.js',
+              './src/classes/Lightning.js',
+              './src/classes/Player.js',
+              './src/index.js',
+              './src/basicGame.js'
+            ],
             debug: true,
-            transform: [
-                [
-                    babelify, {
-                        presets: ["es2015"]
-                    }
-                ]
-            ]
+            // transform: [
+            //     [
+            //         babelify, {
+            //             presets: ["es2015"]
+            //         }
+            //     ]
+            // ]
         })
-        .transform(babelify)
+        // .transform(babelify)
         .bundle().on('error', function(error) {
             gutil.log(gutil.colors.red('[Build Error]', error.message));
             this.emit('end');

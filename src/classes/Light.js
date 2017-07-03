@@ -1,3 +1,5 @@
+var BasicGame = require('BasicGame');
+
 /**
 The MIT License (MIT)
 Copyright (c) <year> <copyright holders>

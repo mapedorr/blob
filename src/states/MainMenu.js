@@ -1,3 +1,5 @@
+var BasicGame = require('BasicGame');
+
 BasicGame.MainMenu = function (game) {
   this.splash_music = null;
   this.playButton = null;

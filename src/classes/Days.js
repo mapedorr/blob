@@ -1,3 +1,7 @@
+// levels for testing:
+// 4 (free space for testing jumps)
+var BasicGame = require('BasicGame');
+
 BasicGame.Days = function () {
   this.days = {
     1:  { "number": 387,

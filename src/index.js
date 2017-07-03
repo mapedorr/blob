@@ -1,7 +1,12 @@
 // Color combos:
 // - http://www.colorcombos.com/color-schemes/6343/ColorCombo6343.html
 // - http://www.colorcombos.com/color-schemes/5897/ColorCombo5897.html
+var BasicGame = require('BasicGame');
 window.onload = function () {
+
+    console.log('- - - - - - - - - - -');
+    console.log(BasicGame);
+
     //Create your Phaser game and inject it into the gameContainer div.
     //We did it in a window.onload event, but you can do it anywhere (requireJS load, anonymous function, jQuery dom ready, - whatever floats your boat)
     var game = new Phaser.Game(1024, 640, Phaser.CANVAS, 'gameContainer');

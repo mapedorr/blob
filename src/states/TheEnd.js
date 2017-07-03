@@ -1,3 +1,5 @@
+var BasicGame = require('BasicGame');
+
 BasicGame.TheEnd = function (game) {
   this.background = null;
   this.fontId = 'font';
