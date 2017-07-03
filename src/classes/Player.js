@@ -58,7 +58,8 @@ BasicGame.Player = function (game, input, gameObj) {
   // define gameplay keys
   this.leftKey = Phaser.Keyboard.LEFT;
   this.rightKey = Phaser.Keyboard.RIGHT;
-  this.jumpKey = Phaser.Keyboard.Z;
+  this.jumpKey1 = Phaser.Keyboard.Z;
+  this.jumpKey2 = Phaser.Keyboard.SPACEBAR;
 
   this.justLeaveGround = false;
 
@@ -113,8 +114,9 @@ BasicGame.Player.prototype.create = function (level) {
   this.game.input.keyboard.addKeyCapture([
     this.leftKey,
     this.rightKey,
-    this.jumpKey
-    ]);
+    this.jumpKey1,
+    this.jumpKey2
+  ]);
 
   // disable physics in the player's body while the game starts
   this.player.body.enable = false;
@@ -392,7 +394,9 @@ BasicGame.Player.prototype.update = function () {
   }
 
   // make the jump a bit higher if the player keeps pressing the jump button
-  // if (this.input.keyboard.downDuration(this.jumpKey, this.JUMP_TIME) === true) {
+  // if (this.input.keyboard.downDuration(this.jumpKey1, this.JUMP_TIME) === true ||
+  //     this.input.keyboard.downDuration(this.jumpKey2, this.JUMP_TIME)
+  // ) {
   //   this.player.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
   //   if (this.jumpMultiplier > 0.1)
   //     this.jumpMultiplier *= 0.95;
@@ -434,14 +438,14 @@ BasicGame.Player.prototype.rightInputIsActive = function () {
 };
 
 BasicGame.Player.prototype.upInputIsActive = function (duration) {
-  // if (this.input.keyboard.isDown(this.jumpKey) && this.jumpCount === 0) {
-    if (this.input.keyboard.downDuration(this.jumpKey, duration) && this.jumpCount === 0) {
-      this.jumpCount++;
-      return true;
-    }
+  if ((this.input.keyboard.downDuration(this.jumpKey1, duration) ||
+       this.input.keyboard.downDuration(this.jumpKey2, duration)) && this.jumpCount === 0) {
+    this.jumpCount++;
+    return true;
+  }
 
-    return false;
-  };
+  return false;
+};
 
 /**
  * Method that checks collisions against walls, the ground and collectable pieces

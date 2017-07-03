@@ -14,9 +14,9 @@ var browserSync = require('browser-sync');
 // var glob = require('glob');
 
 // path to the Phaser build folder, change if using Bower or other package managers.
-var PHASER_PATH = './node_modules/phaser/build/';
+var PHASER_PATH = './node_modules/phaser-ce/build/';
 // your build folder's path, change it if you wish to rename the default folder
-var BUILD_PATH = './public';
+var BUILD_PATH = './build';
 // should be contained inside the build folder, used to store Javascript files.
 var SCRIPTS_PATH = BUILD_PATH + '/js';
 // your source code folder's path (the place where all your ES6 files are located).

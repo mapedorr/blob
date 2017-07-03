@@ -1,7 +1,8 @@
 var BasicGame = require('BasicGame');
 
 BasicGame.Credits = function (game) {
-  this.mainMenuKey = Phaser.Keyboard.Z;
+  this.mainMenuKey1 = Phaser.Keyboard.Z;
+  this.mainMenuKey2 = Phaser.Keyboard.SPACEBAR;
   this.goingToMainMenu = false;
   this.fontId = 'font';
   this.creditsImage = null;
@@ -85,7 +86,9 @@ BasicGame.Credits.prototype.update = function(){
     return;
   }
 
-  if (this.input.keyboard.isDown(this.mainMenuKey)) {
+  if (this.input.keyboard.isDown(this.mainMenuKey1) ||
+      this.input.keyboard.isDown(this.mainMenuKey1)
+  ) {
     this.goingToGame = true;
     this.creditsMusic.stop();
     this.scrollTween.stop();

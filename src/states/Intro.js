@@ -2,7 +2,8 @@ var BasicGame = require('BasicGame');
 
 BasicGame.Intro = function (game) {
   this.background = null;
-  this.skipKey = Phaser.Keyboard.Z;
+  this.skipKey1 = Phaser.Keyboard.Z;
+  this.skipKey2 = Phaser.Keyboard.SPACEBAR;
   
   this.fontId = 'font';
   this.textColors = {
@@ -109,7 +110,8 @@ BasicGame.Intro.prototype.create = function(){
 
   // add the keyboard listener for Skip
   this.game.input.keyboard.addKeyCapture([
-    this.skipKey
+    this.skipKey1,
+    this.skipKey2
   ]);
 
   // create the tween to use in the dialog
@@ -128,23 +130,26 @@ BasicGame.Intro.prototype.create = function(){
 };
 
 BasicGame.Intro.prototype.update = function(){
-  if(this.goingToGame === true){
+  if (this.goingToGame === true){
     return;
   }
 
-  if(this.input.keyboard.isDown(this.skipKey)
-      && this.sPressedFlag == false){
+  if ((this.input.keyboard.isDown(this.skipKey1) ||
+      this.input.keyboard.isDown(this.skipKey2)) && this.sPressedFlag == false){
     this.sPressedFlag = true;
     this.dialogTween.onComplete.dispatch(this.dialogTween.target, this.dialogTween);
     // this.dialogTextBitmap.alpha = 1;
     this.updateDialog();
-  }else if(!this.input.keyboard.isDown(this.skipKey) && this.sPressedFlag == true){
+  }
+  else if ((!this.input.keyboard.isDown(this.skipKey1) ||
+            !this.input.keyboard.isDown(this.skipKey2)) && this.sPressedFlag == true
+  ){
     this.sPressedFlag = false;
   }
 };
 
 BasicGame.Intro.prototype.updateDialog = function(){
-  if(this.dialogNumber <= this.dialogs[BasicGame.language].length - 1){
+  if (this.dialogNumber <= this.dialogs[BasicGame.language].length - 1){
     var dialogObj = this.dialogs[BasicGame.language][this.dialogNumber];
     // there are still dialogs to be shown
     var currentDialogLine = dialogObj.text;
