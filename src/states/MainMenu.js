@@ -14,8 +14,11 @@ BasicGame.MainMenu = function (game) {
   this.restartTextBitmap = null;
 };
 
-BasicGame.MainMenu.prototype.create = function(){
+BasicGame.MainMenu.prototype.create = function () {
   var _self = this;
+
+  // Add the plugin for debugging
+  // this.game.add.plugin(Phaser.Plugin.Debug);
 
   // set stage background
   this.background = this.game.add.tileSprite(0, 0,
@@ -122,7 +125,7 @@ BasicGame.MainMenu.prototype.create = function(){
   // create the go-to-next-state timer
   this.showIntroTimer = this.game.time.create(true);
   this.showIntroTimer.add(200,
-    function(){
+    function () {
       this.showIntro();
     },
     this);
@@ -130,7 +133,7 @@ BasicGame.MainMenu.prototype.create = function(){
   // add the splash_music
   if (!this.splash_music) {
     this.splash_music = this.game.add.sound('splash_music', 0.2, true);
-    this.splash_music.onFadeComplete.addOnce(function(soundObj) {
+    this.splash_music.onFadeComplete.addOnce(function (soundObj) {
       soundObj.stop();
     }, this);
     this.splash_music.play();
@@ -150,12 +153,12 @@ BasicGame.MainMenu.prototype.create = function(){
     this.darknessGroup.addChild(darknessSprite);
 
     this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-    this.darknessTween.to({alpha: 0},
+    this.darknessTween.to({ alpha: 0 },
       5000,
       Phaser.Easing.Quadratic.Out,
       true,
       4500);
-    this.darknessTween.onComplete.add(function(){
+    this.darknessTween.onComplete.add(function () {
       this.showButtons();
     }, this);
   }
@@ -164,9 +167,9 @@ BasicGame.MainMenu.prototype.create = function(){
   }
 };
 
-BasicGame.MainMenu.prototype.update = function(){
+BasicGame.MainMenu.prototype.update = function () {
   if (this.listenKeys === false ||
-      this.movingPlayer === true) {
+    this.movingPlayer === true) {
     return;
   }
 
@@ -177,7 +180,7 @@ BasicGame.MainMenu.prototype.update = function(){
     this.playButton.alpha = 1;
     this.moveFakePlayer(-32);
   }
-  else if(this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
+  else if (this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
     // this.world.bringToTop(this.jugarButton);
     this.esSound.play();
     this.jugarButton.frame = 1;
@@ -207,11 +210,11 @@ BasicGame.MainMenu.prototype.moveFakePlayer = function (targetX) {
   this.splash_music.fadeOut(1480);
   this.movingPlayer = true;
   var moveTween = this.game.add.tween(this.fakeplayer)
-    .to({x: targetX},
+    .to({ x: targetX },
       1500,
       null,
       false);
-  moveTween.onComplete.add(function(){
+  moveTween.onComplete.add(function () {
     this.showIntro();
   }, this);
   moveTween.start();
@@ -219,11 +222,11 @@ BasicGame.MainMenu.prototype.moveFakePlayer = function (targetX) {
 
 BasicGame.MainMenu.prototype.showButtons = function () {
   var showButtonsTween = this.game.add.tween(this.buttons)
-    .to({alpha: 1},
+    .to({ alpha: 1 },
       1000,
       null,
       false);
-  showButtonsTween.onComplete.add(function(){
+  showButtonsTween.onComplete.add(function () {
     this.fakeEye.frame = 0;
     this.pupil.alpha = 1;
     this.fakeViewZone.alpha = 0.1;
@@ -232,6 +235,6 @@ BasicGame.MainMenu.prototype.showButtons = function () {
   showButtonsTween.start();
 };
 
-BasicGame.MainMenu.prototype.showIntro = function(){
+BasicGame.MainMenu.prototype.showIntro = function () {
   this.state.start((BasicGame.currentLevel === 1) ? 'Intro' : 'Game');
 };

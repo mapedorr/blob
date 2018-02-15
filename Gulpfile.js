@@ -13,8 +13,9 @@ var browserify = require('browserify');
 var browserSync = require('browser-sync');
 // var glob = require('glob');
 
+var keepFiles = false;
 // path to the Phaser build folder, change if using Bower or other package managers.
-var PHASER_PATH = './node_modules/phaser-ce/build/';
+var PHASER_PATH = './node_modules/phaser/build/';
 // your build folder's path, change it if you wish to rename the default folder
 var BUILD_PATH = './build';
 // should be contained inside the build folder, used to store Javascript files.
@@ -27,8 +28,8 @@ var STATIC_PATH = './static';
 // var ENTRY_FILES = [SOURCE_PATH + '/**/*.js'];
 // the name of the output transpiled file.
 var OUTPUT_FILE = 'itsgame.js';
-
-var keepFiles = false;
+// Plugin for debugging and performance
+var PHASER_DEBUG_PATH = './node_modules/phaser-debug/dist/';
 
 /**
  * Simple way to check for development/production mode.
@@ -41,7 +42,7 @@ function isProduction() {
  * Logs the current build mode on the console.
  */
 function logBuildMode() {
-    
+
     if (isProduction()) {
         gutil.log(gutil.colors.green('Running production build...'));
     } else {
@@ -80,18 +81,32 @@ function copyStatic() {
 function copyPhaser() {
 
     var srcList = ['phaser.min.js'];
-    
+
     if (!isProduction()) {
         srcList.push('phaser.map', 'phaser.js');
     }
-    
-    srcList = srcList.map(function(file) {
+
+    srcList = srcList.map(function (file) {
         return PHASER_PATH + file;
     });
-        
+
     return gulp.src(srcList)
         .pipe(gulp.dest(SCRIPTS_PATH));
 
+}
+
+/**
+ * Copy Phaser Debug plugin to './build/scripts'.
+ */
+function copyPhaserDebug() {
+    var srcList = ['phaser-debug.js'];
+
+    srcList = srcList.map(function (file) {
+        return PHASER_DEBUG_PATH + file;
+    });
+
+    return gulp.src(srcList)
+        .pipe(gulp.dest(SCRIPTS_PATH));
 }
 
 /**
@@ -109,37 +124,37 @@ function build() {
     logBuildMode();
 
     return browserify({
-            paths: [path.join(__dirname, 'src')],
-            entries: [
-              './src/states/Boot.js',
-              './src/states/Credits.js',
-              './src/states/Game.js',
-              './src/states/GameOver.js',
-              './src/states/Intro.js',
-              './src/states/MainMenu.js',
-              './src/states/Preloader.js',
-              './src/states/TheEnd.js',
-              './src/classes/Days.js',
-              './src/classes/Eye.js',
-              './src/classes/Helper.js',
-              './src/classes/Level.js',
-              './src/classes/Light.js',
-              './src/classes/Lightning.js',
-              './src/classes/Player.js',
-              './src/index.js',
-              './src/basicGame.js'
-            ],
-            debug: true,
-            // transform: [
-            //     [
-            //         babelify, {
-            //             presets: ["es2015"]
-            //         }
-            //     ]
-            // ]
-        })
+        paths: [path.join(__dirname, 'src')],
+        entries: [
+            './src/states/Boot.js',
+            './src/states/Credits.js',
+            './src/states/Game.js',
+            './src/states/GameOver.js',
+            './src/states/Intro.js',
+            './src/states/MainMenu.js',
+            './src/states/Preloader.js',
+            './src/states/TheEnd.js',
+            './src/classes/Days.js',
+            './src/classes/Eye.js',
+            './src/classes/Helper.js',
+            './src/classes/Level.js',
+            './src/classes/Light.js',
+            './src/classes/Lightning.js',
+            './src/classes/Player.js',
+            './src/index.js',
+            './src/basicGame.js'
+        ],
+        debug: true,
+        // transform: [
+        //     [
+        //         babelify, {
+        //             presets: ["es2015"]
+        //         }
+        //     ]
+        // ]
+    })
         // .transform(babelify)
-        .bundle().on('error', function(error) {
+        .bundle().on('error', function (error) {
             gutil.log(gutil.colors.red('[Build Error]', error.message));
             this.emit('end');
         })
@@ -155,21 +170,21 @@ function build() {
  * Watches for file changes in the 'src' folder.
  */
 function serve() {
-    
+
     var options = {
         server: {
             baseDir: BUILD_PATH
         },
         open: true // Change it to true if you wish to allow Browsersync to open a browser window.
     };
-    
+
     browserSync(options);
-    
+
     // Watches for changes in files inside the './src' folder.
     gulp.watch(SOURCE_PATH + '/**/*.js', ['watch-js']);
-    
+
     // Watches for changes in files inside the './static' folder. Also sets 'keepFiles' to true (see cleanBuild()).
-    gulp.watch(STATIC_PATH + '/**/*', ['watch-static']).on('change', function() {
+    gulp.watch(STATIC_PATH + '/**/*', ['watch-static']).on('change', function () {
         keepFiles = true;
     });
 }
@@ -177,7 +192,8 @@ function serve() {
 
 gulp.task('cleanBuild', cleanBuild);
 gulp.task('copyStatic', ['cleanBuild'], copyStatic);
-gulp.task('copyPhaser', ['copyStatic'], copyPhaser);
+gulp.task('copyPhaserDebug', [], copyPhaserDebug);
+gulp.task('copyPhaser', ['copyStatic', 'copyPhaserDebug'], copyPhaser);
 gulp.task('build', ['copyPhaser'], build);
 gulp.task('fastBuild', build);
 gulp.task('serve', ['build'], serve);
