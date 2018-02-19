@@ -70,7 +70,7 @@ BasicGame.Game.prototype.create = function () {
     this.game.world.width, this.game.world.height, this.getSkyName());
 
   // configure the camera for shaking
-  this.game.camera.setSize(this.game.world.width/2, this.game.world.height/2);
+  this.game.camera.setSize(this.game.world.width / 2, this.game.world.height / 2);
   this.game.camera.setPosition(0, 0);
 
   // add the music
@@ -90,8 +90,8 @@ BasicGame.Game.prototype.create = function () {
 
   this.createLifeIndicators();
 
-  this.lifesGroup.x = 15;
-  this.lifesGroup.y = 0;
+  this.lifesGroup.x = 16;
+  this.lifesGroup.y = 16;
 
   // create the light
   this.light.create(this.level);
@@ -100,11 +100,11 @@ BasicGame.Game.prototype.create = function () {
   this.eye.create(this.player, this.level, this.lightning);
 
   // bring to top some things so the game looks better
+  this.game.world.bringToTop(this.light.lightBitmap);
   if (this.level.spikes) {
     this.game.world.bringToTop(this.level.spikes);
   }
   this.game.world.bringToTop(this.level.walls);
-  this.game.world.bringToTop(this.light.lightBitmap);
   this.game.world.bringToTop(this.level.pieces);
   this.game.world.bringToTop(this.lifesGroup);
 
@@ -124,7 +124,7 @@ BasicGame.Game.prototype.create = function () {
 
   // create the darkness tween
   this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-  this.darknessTween.to({alpha: 1},
+  this.darknessTween.to({ alpha: 1 },
     this.countdownDuration * 1000,
     Phaser.Easing.Quadratic.Out,
     false);
@@ -132,7 +132,7 @@ BasicGame.Game.prototype.create = function () {
 
   // create the brightness tween
   this.brightnessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-  this.brightnessTween.to({alpha: 0},
+  this.brightnessTween.to({ alpha: 0 },
     700,
     null,
     false);
@@ -187,12 +187,10 @@ BasicGame.Game.prototype.update = function () {
 BasicGame.Game.prototype.levelReady = function () {
   this.level.isReady = false;
 
-  if (BasicGame.isRetrying === false)
-  {
+  if (BasicGame.isRetrying === false) {
     this.level.showDay();
   }
-  else
-  {
+  else {
     this.level.levelTextGroup.alpha = 0;
     this.hideDarkness();
   }
@@ -262,7 +260,7 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
 
   var levelData = this.helper.getLevelIdAndName(levelNumber);
   this.game.load.tilemap(levelData.id,
-    'assets/tilemaps/maps/' + levelData.name + '.json',
+    'assets/levels/' + levelData.name + '.json',
     null,
     Phaser.Tilemap.TILED_JSON);
 
@@ -278,7 +276,7 @@ BasicGame.Game.prototype.shakeCamera = function () {
 
   // create the tween for shaking the camera
   this.shakeTween = this.game.add.tween(this.game.camera);
-  this.shakeTween.to({y: -5, x: -5},
+  this.shakeTween.to({ y: -5, x: -5 },
     40,
     Phaser.Easing.Sinusoidal.InOut,
     false,
@@ -307,14 +305,14 @@ BasicGame.Game.prototype.subtractLife = function () {
   }
 
   var lifeTween = this.game.add.tween(this.lifesGroup.getChildAt(--this.lifes));
-  lifeTween.to({alpha: 0},
+  lifeTween.to({ alpha: 0 },
     300,
     Phaser.Easing.Quadratic.Out,
     true);
 
   // create the tween for shaking the camera
   this.flashTween = this.game.add.tween(this.flashGroup.getChildAt(0));
-  this.flashTween.to({alpha: 1},
+  this.flashTween.to({ alpha: 1 },
     40,
     Phaser.Easing.Sinusoidal.InOut,
     false,
@@ -353,7 +351,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
   this.lifes = 0;
 
   var lifeTween = this.game.add.tween(this.lifesGroup);
-  lifeTween.to({alpha: 0},
+  lifeTween.to({ alpha: 0 },
     180,
     Phaser.Easing.Quadratic.Out,
     true);
@@ -430,9 +428,9 @@ BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {
 };
 
 BasicGame.Game.prototype.createLifeIndicators = function () {
-  for (var i=0; i<this.lifes; i++) {
-    var lifeSprite = new Phaser.Sprite(this.game, 0, 0, "player");
-    lifeSprite.scale.set(0.5, 0.8);
+  for (var i = 0; i < this.lifes; i++) {
+    var lifeSprite = new Phaser.Sprite(this.game, 0, 0, "life");
+    // lifeSprite.scale.set(0.5, 0.8);
     lifeSprite.x = (i % 3) * (lifeSprite.width + 6);
 
     this.lifesGroup.addChild(lifeSprite);

@@ -17,19 +17,16 @@ BasicGame.MainMenu = function (game) {
 BasicGame.MainMenu.prototype.create = function () {
   var _self = this;
 
-  // Add the plugin for debugging
-  // this.game.add.plugin(Phaser.Plugin.Debug);
-
   // set stage background
   this.background = this.game.add.tileSprite(0, 0,
     this.game.world.width, this.game.world.height,
     BasicGame.Helper.prototype.getSkyName(BasicGame.currentLevel));
 
   // add the fake zone of view for the splash screen
-  this.fakeViewZone = this.game.add.image(this.game.world.width / 2, 0, 'splash_view');
+  this.fakeViewZone = this.game.add.image(this.game.world.width / 2, 0, 'view_zone');
   this.fakeViewZone.anchor.set(0.5, 0);
   this.fakeViewZone.alpha = 0;
-  this.fakeViewZone.tint = 0xFFFC19;
+  // this.fakeViewZone.tint = 0xFFFC19;
 
   // add the fake EYE
   this.fakeEye = this.game.add.sprite(this.game.world.width / 2, 64, 'eye', 10);
@@ -80,7 +77,6 @@ BasicGame.MainMenu.prototype.create = function () {
     36);
   this.creditsTextBitmap.align = "center";
   this.creditsTextBitmap.anchor.set(0.5, 0);
-
 
   if (BasicGame.currentLevel > 1) {
     this.restartTextBitmap = this.add.bitmapText((this.game.world.width / 2) + 10,
@@ -229,7 +225,7 @@ BasicGame.MainMenu.prototype.showButtons = function () {
   showButtonsTween.onComplete.add(function () {
     this.fakeEye.frame = 0;
     this.pupil.alpha = 1;
-    this.fakeViewZone.alpha = 0.1;
+    this.fakeViewZone.alpha = 1;
     this.listenKeys = true;
   }, this);
   showButtonsTween.start();

@@ -8,6 +8,9 @@ BasicGame.Boot.prototype.preload = function () {
   this.load.image('preloaderBackground', 'assets/images/preloader_background-min.png');
   this.load.image('preloaderBar', 'assets/images/preloader_bar.png');
   this.load.image('loading_banner', 'assets/images/loading_banner.png');
+
+  // Add the plugin for debugging
+  // this.game.add.plugin(Phaser.Plugin.Debug);
 };
 
 BasicGame.Boot.prototype.create = function () {
