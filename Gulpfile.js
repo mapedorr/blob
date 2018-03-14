@@ -15,7 +15,7 @@ var browserSync = require('browser-sync');
 
 var keepFiles = false;
 // path to the Phaser build folder, change if using Bower or other package managers.
-var PHASER_PATH = './node_modules/phaser/build/';
+var PHASER_PATH = './node_modules/phaser-ce/build/';
 // your build folder's path, change it if you wish to rename the default folder
 var BUILD_PATH = './build';
 // should be contained inside the build folder, used to store Javascript files.
