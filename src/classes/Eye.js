@@ -36,6 +36,7 @@ BasicGame.Eye = function (game, gameObj) {
   this.currentPattern = -1;
   this.levelEnded = null;
   this.usedPatterns = null;
+  this.PUPIL_SPEED = 60;
 };
 
 /**
@@ -62,44 +63,29 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.eye.anchor.setTo(0.5, 0.5);
 
   // add the  sprite of the pupil
-  this.pupil = this.game.add.image(this.eye.x, this.eye.y + 25, 'pupil');
+  this.pupil = this.game.add.sprite(this.eye.x, this.eye.y + 25, 'pupil');
   this.pupil.alpha = 0;
   this.pupil.anchor.setTo(0.5, 0.5);
+  this.game.physics.arcade.enable(this.pupil);
 
+  // create the mask for the pupil
   var mask = this.game.add.graphics(this.eye.x - 95.77, this.eye.y);
   mask.beginFill(0xff0000);
-  // mask.bezierCurveTo(0, 48.27, 222, 51.11, 191.55, 0);
   mask.bezierCurveTo(0, 1, 90, 111, 193, 0);
   mask.bezierCurveTo(193, 0, 110, -106, 0, -1);
   this.pupil.mask = mask;
-  // // // mask.drawEllipse(0, 0, 90, 55);
-  // mask.arc(0, 0, 120, 0, 3.14, false);
-  // mask.height = 49;
-  // mask.width = 150;
-  // mask.angle = 33.5;
-  // var pupil_mask = this.game.add.image(0, 0, 'pupil_mask');
-  // pupil_mask.anchor.setTo(0.5, 0.5);
-  // mask.addChild(pupil_mask);
-  // mask.endFill();
-
-  // this.pupil_mask = this.game.make.image(this.eye.x, this.eye.y + 1, 'pupil_mask');
-  // this.pupil_mask.anchor.setTo(0.5, 0.5);
-  // // // Create a new bitmap data the same size as our picture
-  // var bmd = this.game.make.bitmapData(64, 64);
-  // bmd.alphaMask('pupil', 'pupil_mask');
-  // this.game.add.image(this.eye.x, this.eye.y, bmd).anchor.set(0.5, 0.5);
 
   // create the array of key positions for the pupil (this will be linked to
   // the position of the view zone)
-  this.pupilImagePositions = {
-    '3': this.eye.x - 16 * 3,
-    '2': this.eye.x - 16 * 2,
-    '1': this.eye.x - 16 * 1,
-    '0': this.eye.x,
-    '4': this.eye.x + 16 * 1,
-    '5': this.eye.x + 16 * 2,
-    '6': this.eye.x + 16 * 3
-  };
+  // this.pupilImagePositions = {
+  //   '3': this.eye.x - 16 * 3,
+  //   '2': this.eye.x - 16 * 2,
+  //   '1': this.eye.x - 16 * 1,
+  //   '0': this.eye.x,
+  //   '4': this.eye.x + 16 * 1,
+  //   '5': this.eye.x + 16 * 2,
+  //   '6': this.eye.x + 16 * 3
+  // };
 
   // create the view zones
   this.viewZoneSprite = this.game.add.sprite(this.eye.position.x - this.zoneSize / 2, 0, 'view_zone', 0);
@@ -167,6 +153,9 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
 BasicGame.Eye.prototype.update = function () {
   var checkLeft = false,
     checkRight = false;
+
+  this.pupil.body.velocity.x = Math.cos(this.pupil.rotation) * this.PUPIL_SPEED;
+  this.pupil.body.velocity.y = Math.sin(this.pupil.rotation) * this.PUPIL_SPEED;
 
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
     // clear the bitmap where we are drawing our lines
@@ -277,7 +266,7 @@ BasicGame.Eye.prototype.initSearch = function (delay) {
   // set the defaults for the pupil and the view zone
   this.viewZoneSprite.x = this.viewZoneSprite.positions['0'];
   this.viewZoneSprite.alpha = 1;
-  this.pupil.x = this.pupilImagePositions['0'];
+  // this.pupil.x = this.eye.x;
   this.pupil.alpha = 1;
 
   // pick a pattern for searching in the array of available patterns
@@ -310,7 +299,6 @@ BasicGame.Eye.prototype.initSearch = function (delay) {
       // set the initial X position of the EYE and the view zone
       positionIndex = pattern[index][!patternReversed ? 0 : 1];
       this.viewZoneSprite.x = this.viewZoneSprite.positions[positionIndex];
-      this.pupil.x = this.pupilImagePositions[positionIndex];
 
       // setup the tweens that will move the pupil and the view zone
       // TODO: replace tweens by basic calculations
@@ -384,18 +372,6 @@ BasicGame.Eye.prototype.tweenEye = function (target, timeInSecs, callback) {
     callback();
   }, this);
   this.viewZoneTween.start();
-
-  this.pupilTween = this.game.add.tween(this.pupil)
-    .to({ x: this.pupilImagePositions[target] },
-      timeInSecs * 1000,
-      null,
-      false,
-      0,
-      0);
-  this.pupilTween.onComplete.add(function (sprite, tween) {
-    tween.stop();
-  }, this);
-  this.pupilTween.start();
 };
 
 /**
@@ -433,7 +409,7 @@ BasicGame.Eye.prototype.getMad = function () {
   this.searchAgain = this.game.time.create(true);
   this.searchAgain.add(1600,
     function () {
-      this.eye.x = this.eye.originalX;
+      // this.eye.x = this.eye.originalX;
       this.initSearch();
     },
     this);
@@ -498,7 +474,7 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
 };
 
 BasicGame.Eye.prototype.shake = function () {
-  this.shakeTween = this.shakeTween || this.game.add.tween(this.eye);
+  this.shakeTween = this.game.add.tween(this.eye);
   this.shakeTween.to({ x: this.eye.originalX + 10 },
     40,
     Phaser.Easing.Sinusoidal.InOut,
@@ -507,6 +483,8 @@ BasicGame.Eye.prototype.shake = function () {
     4,
     true).start();
   this.shakeTween.onComplete.add(function () {
+    console.log('aquí se jode');
+    this.shakeTween.stop();
   }, this);
 };
 
@@ -526,7 +504,7 @@ BasicGame.Eye.prototype.endLevel = function (levelCompleted) {
   this.shooting = false;
 
   this.viewZoneTween.onComplete.removeAll();
-  this.pupilTween.onComplete.removeAll();
+  // this.pupilTween.onComplete.removeAll();
 
   if (levelCompleted === true) {
     this.pupil.alpha = 0;
@@ -537,7 +515,6 @@ BasicGame.Eye.prototype.gameInDarkness = function () {
   this.eye.animations.play('search');
   this.viewZoneSprite.x = this.viewZoneSprite.positions['0'];
   this.viewZoneSprite.alpha = 0;
-  this.pupil.x = this.pupilImagePositions['0'];
   this.pupil.alpha = 1;
 };
 
@@ -610,7 +587,7 @@ BasicGame.Eye.prototype.restartLevel = function () {
 
 BasicGame.Eye.prototype.stopEyeTweens = function () {
   this.viewZoneTween.stop();
-  this.pupilTween.stop();
+  // this.pupilTween.stop();
 };
 
 BasicGame.Eye.prototype.drawLinesToTarget = function (target) {
