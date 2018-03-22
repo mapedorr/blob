@@ -18,29 +18,40 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  * @param {Object} gameObj The Object of BasicGame.Game
  */
 BasicGame.Eye = function (game, gameObj) {
+  // constants
+  this.ZONE_SIZE = game.world.width / 3;
+  // X radius >> horizontal half-size of the eyelid fill
+  this.LATERAL_CANTHUS_DISTANCE = (191 / 2) * 0.9;
+  // Y radius >> vertical half-size of the eyelid fill
+  this.LOWER_EYELID_DISTANCE = (96 / 2) * 0.9;
+  this.searchingTime = 19000;
+
+  // destroyable objects
+  this.eye = null;
+  this.viewZone = null;
+  this.pupil = null;
+  this.bitmap = null;
+  this.laughSound = null;
+  this.angerSound = null;
+
+  // global properties
   this.game = game;
   this.gameObj = gameObj;
-  this.eye = null;
-  this.playerObj = null;
-  this.level = null;
-  this.lightning = null;
-  this.bitmap = null;
   this.anger = null;
   this.shooting = null;
   this.searching = null;
-  this.searchingTime = 19000;
-  this.zoneSize = this.game.world.width / 3;
-  this.viewZoneSprite = null;
-  this.laughSound = null;
-  this.angerSound = null;
   this.levelEnded = null;
-
   this.currentPatternId = -1;
   this.usedPatterns = 0;
-  // X radius >> horizontal half-size of the eyelid fill
-  this.LATERAL_CANTHUS_DISTANCE = (191 / 2);
-  // Y radius >> vertical half-size of the eyelid fill
-  this.LOWER_EYELID_DISTANCE = (96 / 2);
+  this.movementTime = null;
+  this.xDistanceMax = null;
+  this.eyeCenterYOffset = null;
+
+  // things I can take from this.game ═╗
+  this.playerObj = null;
+  this.level = null;
+  this.lightning = null;
+  // ╚═════════════════════════════════╝
 };
 
 /**
@@ -55,10 +66,6 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.playerObj = playerObj;
   this.level = level;
   this.lightning = lightning;
-  this.shooting = false;
-  this.searching = false;
-  this.levelEnded = false;
-  this.usedPatterns = 0;
 
   // add the sprite of the eye
   this.eye = this.game.add.sprite(this.game.world.width / 2, 84, 'eye', 0);
@@ -82,48 +89,52 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   // create the array of key positions for the pupil (this will be linked to
   // the position of the view zone)
   this.pupilImagePositions = {
-    '3': this.eye.centerX - this.LATERAL_CANTHUS_DISTANCE,
-    '2': this.eye.centerX - this.LATERAL_CANTHUS_DISTANCE / 2,
-    '1': this.eye.centerX - this.LATERAL_CANTHUS_DISTANCE / 4,
+    '3': this.eye.centerX - this.LATERAL_CANTHUS_DISTANCE / 1.4,
+    '2': this.eye.centerX - this.LATERAL_CANTHUS_DISTANCE / 2.4,
+    '1': this.eye.centerX - this.LATERAL_CANTHUS_DISTANCE / 4.4,
     '0': this.eye.centerX,
-    '4': this.eye.centerX + this.LATERAL_CANTHUS_DISTANCE / 4,
-    '5': this.eye.centerX + this.LATERAL_CANTHUS_DISTANCE / 2,
-    '6': this.eye.centerX + this.LATERAL_CANTHUS_DISTANCE
+    '4': this.eye.centerX + this.LATERAL_CANTHUS_DISTANCE / 4.4,
+    '5': this.eye.centerX + this.LATERAL_CANTHUS_DISTANCE / 2.4,
+    '6': this.eye.centerX + this.LATERAL_CANTHUS_DISTANCE / 1.4
   };
 
   // create the view zones
-  this.viewZoneSprite = this.game.add.sprite(this.eye.position.x - this.zoneSize / 2, 0, 'view_zone', 0);
-  this.viewZoneSprite.alpha = 0;
-  // this.viewZoneSprite.width = this.zoneSize;
-  // this.viewZoneSprite.height = this.game.world.height;
+  this.viewZone = this.game.add.sprite(this.eye.position.x - this.ZONE_SIZE / 2, 0, 'view_zone', 0);
+  this.viewZone.alpha = 0;
 
   // calculate and store the key positions of the view zone
-  var zoneDiv = this.zoneSize / 3;
-  this.viewZoneSprite.positions = {
+  var zoneDiv = this.ZONE_SIZE / 3;
+  this.viewZone.positions = {
     '3': 0,
     '2': zoneDiv,
     '1': zoneDiv * 2,
-    '0': this.viewZoneSprite.position.x,
-    '4': this.viewZoneSprite.position.x + zoneDiv,
-    '5': this.viewZoneSprite.position.x + zoneDiv * 2,
-    '6': this.game.world.width - this.zoneSize
+    '0': this.viewZone.position.x,
+    '4': this.viewZone.position.x + zoneDiv,
+    '5': this.viewZone.position.x + zoneDiv * 2,
+    '6': this.game.world.width - this.ZONE_SIZE
   };
 
   // (!) define the patterns for the EYE
+  // each pattern is formed by a series of steps, each steps defines:
+  // a start position (sp), an end position (ep) and a movement time (mt)
+  //   [
+  //     p1[step1[sp, ep, mt], step2[sp, ep, mt]...stepX[sp, ep, mt]],
+  //     p2[step1[sp, ep, mt], step2[sp, ep, mt]...stepX[sp, ep, mt]],
+  //     ...
+  //     pY[step1[sp, ep, mt], step2[sp, ep, mt]...stepX[sp, ep, mt]],
+  //   ]
   this.patterns = [
-    [[0, 3, 2], [3, 6, 4], [6, 0, 2]],
+    [[0, 3, 2], [3, 6, 4], [6, 0, 2]], // this will be always the first pattern
     [[0, 1, 0.5], [1, 4, 1], [4, 2, 1], [2, 5, 2], [5, 0, 1]],
     [[0, 3, 0.2], [3, 6, 0.4], [6, 0, 0.2]],
     [[0, 4, 0.5], [4, 1, 1], [1, 5, 1], [5, 2, 2], [2, 0, 1]]
   ];
 
   // ---------------------------------------------------------------------------
-  // setup the animations for THE EYE
+  // setup animations
   this.eye.animations.add('search', [0], 1, false);
   this.eye.animations.add('angry', [2], 1, false);
   this.eye.animations.add('tired', [1], 1, false);
-  // this.eye.animations.add('happy', [9], 1, false);
-  // this.eye.animations.add('irritated', [10], 1, false);
 
   // create a bitmap texture for drawing lines
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
@@ -137,9 +148,6 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.lightning.create(this.eye, this.playerObj, this.level);
   this.lightningTimer = 0;
 
-  // the EYE starts calm
-  this.anger = false;
-
   // ---------------------------------------------------------------------------
   // setup the sounds
   if (!this.laughSound) {
@@ -149,6 +157,16 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   if (!this.angerSound) {
     this.angerSound = this.game.add.sound('eye-anger', 0.8);
   }
+
+  // ---------------------------------------------------------------------------
+  // set global properties
+  this.shooting = false;
+  this.searching = false;
+  this.levelEnded = false;
+  this.usedPatterns = 0;
+  this.anger = false;
+  this.xDistanceMax = Math.abs((this.pupilImagePositions['6']) - this.eye.centerX);
+  this.eyeCenterYOffset = this.eye.centerY - 40;
 };
 
 /**
@@ -176,10 +194,6 @@ BasicGame.Eye.prototype.update = function () {
   }
 
   // ---------------------------------------------------------------------------
-  // move the pupil and the view zone
-  this.movePupil();
-
-  // ---------------------------------------------------------------------------
   // ray casting
 
   // test if the target can see the eye by casting a ray (a line) towards the eye.
@@ -198,11 +212,11 @@ BasicGame.Eye.prototype.update = function () {
   if (this.searching === true && this.isPlayerInsideViewZone() === true) {
     // check which of the points in the player should be used for "in shadow"
     // evaluation
-    if (this.playerObj.player.left > this.viewZoneSprite.left) {
+    if (this.playerObj.player.left > this.viewZone.left) {
       checkLeft = true;
     }
 
-    if (this.playerObj.player.right < this.viewZoneSprite.right) {
+    if (this.playerObj.player.right < this.viewZone.right) {
       checkRight = true;
     }
 
@@ -231,9 +245,9 @@ BasicGame.Eye.prototype.update = function () {
  * Method that checks if the player is inside the view zone of the EYE.
  */
 BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
-  if (this.viewZoneSprite.alpha > 0) {
-    return (this.playerObj.player.left > this.viewZoneSprite.left || this.playerObj.player.right > this.viewZoneSprite.left) &&
-      (this.playerObj.player.right < this.viewZoneSprite.right || this.playerObj.player.left < this.viewZoneSprite.right);
+  if (this.viewZone.alpha > 0) {
+    return (this.playerObj.player.left > this.viewZone.left || this.playerObj.player.right > this.viewZone.left) &&
+      (this.playerObj.player.right < this.viewZone.right || this.playerObj.player.left < this.viewZone.right);
   }
   return false;
 };
@@ -261,8 +275,8 @@ BasicGame.Eye.prototype.initSearch = function (delay) {
   }
 
   // set the defaults for the pupil and the view zone
-  this.viewZoneSprite.x = this.viewZoneSprite.positions['0'];
-  this.viewZoneSprite.alpha = 1;
+  this.viewZone.x = this.viewZone.positions['0'];
+  this.viewZone.alpha = 1;
   this.pupil.x = this.pupilImagePositions['0'];
   this.pupil.alpha = 1;
 
@@ -287,8 +301,8 @@ BasicGame.Eye.prototype.tweenEye = function (target, timeInSecs, callback) {
   // if (this.viewZoneTween && this.viewZoneTween.isRunning === true) return;
 
   // start the tweens for movement
-  // this.viewZoneTween = this.game.add.tween(this.viewZoneSprite)
-  //   .to({ x: this.viewZoneSprite.positions[target] },
+  // this.viewZoneTween = this.game.add.tween(this.viewZone)
+  //   .to({ x: this.viewZone.positions[target] },
   //     timeInSecs * 1000,
   //     null,
   //     false,
@@ -308,7 +322,7 @@ BasicGame.Eye.prototype.getTired = function () {
   this.eye.animations.play('tired');
 
   this.pupil.alpha = 0;
-  this.viewZoneSprite.alpha = 0;
+  this.viewZone.alpha = 0;
 
   this.getMadTimer = this.game.time.create(true);
   this.getMadTimer.add(1200,
@@ -438,8 +452,8 @@ BasicGame.Eye.prototype.endLevel = function (levelCompleted) {
 
 BasicGame.Eye.prototype.gameInDarkness = function () {
   this.eye.animations.play('search');
-  this.viewZoneSprite.x = this.viewZoneSprite.positions['0'];
-  this.viewZoneSprite.alpha = 0;
+  this.viewZone.x = this.viewZone.positions['0'];
+  this.viewZone.alpha = 0;
   this.pupil.alpha = 1;
 };
 
@@ -474,7 +488,7 @@ BasicGame.Eye.prototype.rejoice = function (callback) {
 
   this.eye.animations.play('happy');
 
-  this.viewZoneSprite.alpha = 0;
+  this.viewZone.alpha = 0;
 
   this.shakeTween = this.game.add.tween(this.eye);
   this.shakeTween.to({ y: this.eye.originalY + 10 },
@@ -538,46 +552,6 @@ BasicGame.Eye.prototype.drawLinesToTarget = function (target) {
   this.bitmap.context.stroke();
 };
 
-// most of the code in this function was taken from: https://gist.github.com/nielsdoorn/7959409
-BasicGame.Eye.prototype.movePupil = function () {
-  var targetX = this.pupil.x;
-
-  if (this.pupilTarget !== targetX) {
-    if (this.pupilTarget < this.eye.centerX && targetX > this.pupilTarget) {
-      targetX -= 1;
-
-      if (targetX <= this.pupilTarget) {
-        targetX = this.pupilTarget;
-        this.nextStepInPattern();
-      }
-    }
-    else if (this.pupilTarget > this.eye.centerX && targetX < this.pupilTarget) {
-      targetX += 1;
-
-      if (targetX >= this.pupilTarget) {
-        targetX = this.pupilTarget;
-        this.nextStepInPattern();
-      }
-    }
-
-    var dx = targetX - this.eye.centerX;
-    var targetY = this.eye.centerY + this.LOWER_EYELID_DISTANCE; // max = this.eye.centerY (0)
-    var dy = targetY - this.eye.centerY;
-    var c = Math.sqrt((dx * dx) + (dy * dy));
-    var alfa = 0;
-
-    if (Math.abs(dx) < this.LATERAL_CANTHUS_DISTANCE &&
-      Math.abs(dy) < this.LATERAL_CANTHUS_DISTANCE &&
-      c < this.LATERAL_CANTHUS_DISTANCE) {
-      r = c;
-    }
-    alfa = Math.asin(dy / c);
-
-    this.pupil.x = targetX;
-    this.pupil.y = Math.sin(alfa) * this.LOWER_EYELID_DISTANCE + + this.eye.centerY;
-  }
-};
-
 BasicGame.Eye.prototype.setPattern = function () {
   var intent = 0;
   var newPatternIndex = 0;
@@ -608,12 +582,53 @@ BasicGame.Eye.prototype.setPattern = function () {
 };
 
 BasicGame.Eye.prototype.iteratePattern = function () {
+  var initPosition = -1;
+  var targetPosition = -1;
+  var currentPattern = this.pattern[this.currentPatternIndex];
+  var viewZoneMovement = null;
+  var pupilMovement = null;
+
   // iterate over the steps of the pattern and make the EYE move to each
   // position of it
   if ((!this.patternReversed && this.currentPatternIndex < this.pattern.length) ||
     (this.patternReversed && this.currentPatternIndex >= 0)) {
+    if (!this.patternReversed) {
+      initPosition = currentPattern[0];
+      targetPosition = currentPattern[1];
+    }
+    else {
+      initPosition = currentPattern[1];
+      targetPosition = currentPattern[0];
+    }
+
     // set the initial X position of the EYE and the view zone
-    this.pupilTarget = this.pupilImagePositions[this.pattern[this.currentPatternIndex][2]];
+    this.viewZone.x = this.viewZone.positions[initPosition];
+    this.pupil.x = this.pupilImagePositions[initPosition];
+    this.movementTime = currentPattern[2] * 1000;
+
+    // move the view zone and the pupil
+    viewZoneMovement = this.game.add.tween(this.viewZone);
+    viewZoneMovement.to({
+      x: this.viewZone.positions[targetPosition]
+    }, this.movementTime);
+    viewZoneMovement.onComplete.add(function () {
+      this.nextStepInPattern();
+    }, this);
+    viewZoneMovement.start();
+
+    pupilMovement = this.game.add.tween(this.pupil);
+    pupilMovement.to({
+      x: this.pupilImagePositions[targetPosition]
+    }, this.movementTime);
+    pupilMovement.onUpdateCallback(function () {
+      var dx = Math.abs(this.pupil.x - this.eye.centerX);
+      var xDiffPercentage = 1 - dx / this.xDistanceMax;
+      var dy = (this.eye.centerY + (this.LOWER_EYELID_DISTANCE * xDiffPercentage)) - this.eyeCenterYOffset;
+      var c = Math.sqrt((dx * dx) + (dy * dy));
+      var alfa = Math.asin(dy / c);
+      this.pupil.y = (Math.sin(alfa) * this.LOWER_EYELID_DISTANCE) + this.eye.centerY;
+    }, this);
+    pupilMovement.start();
   }
   else {
     // if there are no more steps in the pattern
@@ -646,10 +661,6 @@ BasicGame.Eye.prototype.nextStepInPattern = function () {
       return;
     }
 
-    // var positionIndex = this.pattern[this.currentPatternIndex][!this.patternReversed ? 0 : 1];
-    // this.viewZoneSprite.x = this.viewZoneSprite.positions[positionIndex];
-    // this.pupil.x = this.pupilImagePositions[positionIndex];
-
     if (!this.patternReversed) {
       ++this.currentPatternIndex;
     }
@@ -661,6 +672,13 @@ BasicGame.Eye.prototype.nextStepInPattern = function () {
   }, this);
 };
 
-BasicGame.Eye.prototype.quitGame = function () {
-  // TODO
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+BasicGame.Eye.prototype.shutdown = function () {
+  this.viewZone.destroy();
+  this.pupil.destroy();
+  this.eye.destroy();
+  this.bitmap.destroy();
+  this.laughSound.destroy();
+  this.angerSound.destroy();
 };
+// ╚═══════════════════════════════════════════════════════════════════════════╝

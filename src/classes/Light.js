@@ -12,13 +12,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  */
 
 BasicGame.Light = function (game, gameObj) {
-  this.game = game;
-  this.gameObj = gameObj;
+  // destroyable objects
   this.lightGroup = null;
-  this.light = null;
   this.bitmap = null;
+  this.lightBitmap = null;
   this.rayBitmap = null;
   this.rayBitmapImage = null;
+
+  // global properties
+  this.game = game;
+  this.gameObj = gameObj;
   this.walls = null;
   this.level = null;
   this.shadowsDrawn = null;
@@ -323,3 +326,13 @@ BasicGame.Light.prototype.updateWalls = function (level) {
   this.walls = level.walls;
   this.shadowsDrawn = false;
 };
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+BasicGame.Light.prototype.shutdown = function () {
+  this.lightGroup.destroy();
+  this.bitmap.destroy();
+  this.lightBitmap.destroy();
+  this.rayBitmap.destroy();
+  this.rayBitmapImage.destroy();
+};
+// ╚═══════════════════════════════════════════════════════════════════════════╝

@@ -1,9 +1,19 @@
 var BasicGame = require('BasicGame');
 
 BasicGame.Game = function (game) {
-  // CONSTANTS
+  // constants
   this.LIFES_AMOUNT = 3;
 
+  // destroyable objects (sprites, sounds, groups, tweens...)
+  this.background = null;
+  this.lifesGroup = null;
+  this.flashGroup = null;
+  this.darknessGroup = null;
+  this.music = null;
+  this.darknessTween = null;
+  this.brightnessTween = null;
+
+  // references to other classes
   this.days = null;
   this.player = null;
   this.level = null;
@@ -11,18 +21,14 @@ BasicGame.Game = function (game) {
   this.eye = null;
   this.lightning = null;
   this.helper = null;
+
+  // global properties
   this.showFPS = null;
   this.map = null;
-  this.darknessGroup = null;
-  this.darknessTween = null;
-  this.brightnessTween = null;
   this.countdownDuration = null;
   this.inDarkness = null;
   this.isLoadingLevel = null;
   this.lifes = null;
-  this.lifesGroup = null;
-
-  this.music = null;
 };
 
 BasicGame.Game.developmentMode = false;
@@ -212,12 +218,6 @@ BasicGame.Game.prototype.levelEnded = function () {
 BasicGame.Game.prototype.render = function () {
   this.player.render();
   this.level.render();
-};
-
-BasicGame.Game.prototype.quitGame = function () {
-  //Here you should destroy anything you no longer need.
-  //Stop music, delete sprites, purge caches, free resources, all that good stuff.
-  this.state.start('MainMenu');
 };
 
 BasicGame.Game.prototype.loadLevel = function (levelNumber) {
@@ -447,3 +447,31 @@ BasicGame.Game.prototype.showLifes = function () {
 BasicGame.Game.prototype.getSkyName = function () {
   return this.helper.getSkyName(BasicGame.currentLevel);
 };
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+BasicGame.Game.prototype.quitGame = function () {
+  this.shutdown();
+};
+
+BasicGame.Game.prototype.shutdown = function () {
+  // here you should destroy anything you no longer need.
+  // stop music, delete sprites, purge caches, free resources, all that good stuff.
+  // destroy sprites
+  this.background.destroy();
+  // destroy groups
+  this.lifesGroup.destroy();
+  this.flashGroup.destroy();
+  this.darknessGroup.destroy();
+  // destroy sounds
+  this.music.destroy();
+  // destroy tweens
+  this.darknessTween.stop();
+  this.brightnessTween.stop();
+  // call the methods that will destroy everything in other classes
+  this.player.shutdown();
+  this.level.shutdown();
+  this.light.shutdown();
+  this.eye.shutdown();
+  this.lightning.shutdown();
+};
+// ╚═══════════════════════════════════════════════════════════════════════════╝
