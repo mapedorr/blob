@@ -14,8 +14,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 BasicGame.Level = function (game, gameObj) {
   // destroyable objects
   this.levelTextGroup = null;
-  this.dayNumberTextBitmap = null;
-  this.dayPhraseTextBitmap = null;
+  this.dayNumberText = null;
+  // this.dayPhraseTextBitmap = null;
   this.daySound = null;
   this.spikeSound = null;
   this.map = null;
@@ -50,44 +50,29 @@ BasicGame.Level = function (game, gameObj) {
 BasicGame.Level.prototype.create = function () {
   // create the background for the day
   this.levelTextGroup = this.game.add.group();
-  var dayTextBitmap = new Phaser.BitmapData(this.game,
-    'dayTextBitmap',
-    this.game.world.width,
-    this.game.world.height);
-  dayTextBitmap.ctx.rect(0, 0, this.game.world.width, this.game.world.height);
-  dayTextBitmap.ctx.fillStyle = '#FFF';
-  dayTextBitmap.ctx.fill();
-
-  var dayTextSprite = new Phaser.Sprite(this.game, 0, 0, dayTextBitmap);
-  dayTextSprite.anchor.set(0.5, 0.5);
-  dayTextSprite.position.set(this.game.world.width / 2, this.game.world.height / 2);
-  dayTextSprite.height = 200;
-  dayTextSprite.alpha = 0;
-
-  this.levelTextGroup.addChild(dayTextSprite);
 
   // create the bitmap for the day number
-  this.dayNumberTextBitmap = this.game.add.bitmapText(this.game.world.width / 2,
+  this.dayNumberText = this.game.add.bitmapText(this.game.world.width / 2,
     this.game.world.height / 2 - 15,
     this.fontId,
     '',
     72,
     this.levelTextGroup);
-  this.dayNumberTextBitmap.anchor.set(0.5, 0.5);
-  this.dayNumberTextBitmap.align = "center";
-  this.dayNumberTextBitmap.tint = 0x1e3137;
-  this.dayNumberTextBitmap.oriY = this.dayNumberTextBitmap.y;
+  this.dayNumberText.anchor.set(0.5, 0.5);
+  this.dayNumberText.align = "center";
+  this.dayNumberText.tint = 0x8d8d8e;
+  this.dayNumberText.oriY = this.dayNumberText.y;
 
   // create the bitmap for the day phrase
-  this.dayPhraseTextBitmap = this.game.add.bitmapText(0,
-    this.dayNumberTextBitmap.bottom + 20,
-    this.fontId,
-    '',
-    48,
-    this.levelTextGroup);
-  this.dayPhraseTextBitmap.maxWidth = this.game.world.width;
-  this.dayPhraseTextBitmap.align = "center";
-  this.dayPhraseTextBitmap.tint = 0x515151;
+  // this.dayPhraseTextBitmap = this.game.add.bitmapText(0,
+  //   this.dayNumberText.bottom + 20,
+  //   this.fontId,
+  //   '',
+  //   48,
+  //   this.levelTextGroup);
+  // this.dayPhraseTextBitmap.maxWidth = this.game.world.width;
+  // this.dayPhraseTextBitmap.align = "center";
+  // this.dayPhraseTextBitmap.tint = 0x515151;
 
   if (!this.daySound) {
     this.daySound = this.game.add.sound('day', 0.15);
@@ -98,27 +83,6 @@ BasicGame.Level.prototype.create = function () {
   }
 
   this.createLevel(parseInt(BasicGame.currentLevel));
-};
-
-BasicGame.Level.prototype.destroyCurrentLevel = function () {
-  this.map.destroy();
-  if (this.ground) {
-    this.ground.destroy();
-  }
-  this.walls.destroy();
-  if (this.hasSpikes) {
-    this.spikes.forEach(function (spikeSprite) {
-      if (!spikeSprite || !spikeSprite.showTween || !spikeSprite.hideTween) return;
-      spikeSprite.showTween.stop();
-      spikeSprite.hideTween.stop();
-    });
-    this.spikes.destroy();
-  }
-  if (this.pieces) {
-    this.pieces.destroy();
-  }
-  this.dayNumberTextBitmap.setText("");
-  this.dayPhraseTextBitmap.setText("");
 };
 
 BasicGame.Level.prototype.createLevel = function (num) {
@@ -205,21 +169,42 @@ BasicGame.Level.prototype.createLevel = function (num) {
 
   // show the days of the level
   var dayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
-  this.dayNumberTextBitmap.setText(this.dayText[BasicGame.language] + ' ' + dayObj.number);
-  this.dayNumberTextBitmap.y = this.dayNumberTextBitmap.oriY;
-  if (dayObj.text) {
-    this.dayPhraseTextBitmap.setText(dayObj.text[BasicGame.language]);
-    this.dayPhraseTextBitmap.x = this.game.world.width / 2 - this.dayPhraseTextBitmap.width / 2;
-  }
-  else {
-    this.dayNumberTextBitmap.y += 15;
-  }
+  this.dayNumberText.setText(this.dayText[BasicGame.language] + ' ' + dayObj.number);
+  this.dayNumberText.y = this.dayNumberText.oriY;
+  // if (dayObj.text) {
+  //   this.dayPhraseTextBitmap.setText(dayObj.text[BasicGame.language]);
+  //   this.dayPhraseTextBitmap.x = this.game.world.width / 2 - this.dayPhraseTextBitmap.width / 2;
+  // }
+  // else {
+  //   this.dayNumberText.y += 15;
+  // }
 
   // set the level as not ended
   this.isEnded = false;
 
-  // TODO: remove this property
-  this.isReady = true;
+  // notify to the game that the level is ready
+  this.gameObj.levelReady();
+};
+
+BasicGame.Level.prototype.destroyCurrentLevel = function () {
+  this.map.destroy();
+  if (this.ground) {
+    this.ground.destroy();
+  }
+  this.walls.destroy();
+  if (this.hasSpikes) {
+    this.spikes.forEach(function (spikeSprite) {
+      if (!spikeSprite || !spikeSprite.showTween || !spikeSprite.hideTween) return;
+      spikeSprite.showTween.stop();
+      spikeSprite.hideTween.stop();
+    });
+    this.spikes.destroy();
+  }
+  if (this.pieces) {
+    this.pieces.destroy();
+  }
+  this.dayNumberText.setText("");
+  this.dayPhraseTextBitmap.setText("");
 };
 
 BasicGame.Level.prototype.render = function () {
@@ -254,20 +239,20 @@ BasicGame.Level.prototype.endLevel = function () {
 };
 
 BasicGame.Level.prototype.showDay = function () {
-  if (this.isShowingDays === true) {
-    return;
-  }
+  // if (this.isShowingDays === true) {
+  //   return;
+  // }
 
-  this.isShowingDays = true;
+  // this.isShowingDays = true;
 
-  this.levelTextGroup.getChildAt(0).alpha = 1;
-  this.levelTextGroup.alpha = 1;
+  // this.levelTextGroup.getChildAt(0).alpha = 1;
+  // this.levelTextGroup.alpha = 1;
 
-  this.game.world.bringToTop(this.levelTextGroup);
+  // this.game.world.bringToTop(this.levelTextGroup);
 
-  this.daySound.play();
+  // this.daySound.play();
 
-  // create the timer
+  /* // create the timer
   var dayTimer = this.game.time.create(true);
 
   // set the timer to stop showing the day
@@ -279,8 +264,7 @@ BasicGame.Level.prototype.showDay = function () {
       this.gameObj.hideDarkness();
     },
     this);
-
-  dayTimer.start();
+  dayTimer.start(); */
 };
 
 BasicGame.Level.prototype.addWidthSpike = function (platformSprite, inBottom) {
@@ -433,7 +417,7 @@ BasicGame.Level.prototype.restartLevel = function () {
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 BasicGame.Level.prototype.shutdown = function () {
   this.levelTextGroup.destroy();
-  this.dayNumberTextBitmap.destroy();
+  this.dayNumberText.destroy();
   this.dayPhraseTextBitmap.destroy();
   this.daySound.destroy();
   this.spikeSound.destroy();

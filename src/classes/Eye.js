@@ -201,10 +201,10 @@ BasicGame.Eye.prototype.update = function () {
   // is in the way.
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
     if (this.isPlayerInsideViewZone() === true) {
-      this.playerObj.player.tint = 0x990000;
+      this.playerObj.playerSprite.tint = 0x990000;
     }
     else {
-      this.playerObj.player.tint = 0xFFFFFF;
+      this.playerObj.playerSprite.tint = 0xFFFFFF;
     }
   }
 
@@ -212,25 +212,25 @@ BasicGame.Eye.prototype.update = function () {
   if (this.searching === true && this.isPlayerInsideViewZone() === true) {
     // check which of the points in the player should be used for "in shadow"
     // evaluation
-    if (this.playerObj.player.left > this.viewZone.left) {
+    if (this.playerObj.playerSprite.left > this.viewZone.left) {
       checkLeft = true;
     }
 
-    if (this.playerObj.player.right < this.viewZone.right) {
+    if (this.playerObj.playerSprite.right < this.viewZone.right) {
       checkRight = true;
     }
 
     if (this.playerObj.isInShadow(checkLeft, checkRight) === false) {
       if (BasicGame.Game.developmentMode === true) { // [ development mode ]
-        this.playerObj.player.tint = 0xEECC00;
+        this.playerObj.playerSprite.tint = 0xEECC00;
       }
 
       // shoot to the player
-      this.shootPlayer(this.playerObj.player);
+      this.shootPlayer(this.playerObj.playerSprite);
     }
     else {
       if (BasicGame.Game.developmentMode === true) { // [ development mode ]
-        this.playerObj.player.tint = 0x990000;
+        this.playerObj.playerSprite.tint = 0x990000;
       }
     }
   }
@@ -246,8 +246,8 @@ BasicGame.Eye.prototype.update = function () {
  */
 BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
   if (this.viewZone.alpha > 0) {
-    return (this.playerObj.player.left > this.viewZone.left || this.playerObj.player.right > this.viewZone.left) &&
-      (this.playerObj.player.right < this.viewZone.right || this.playerObj.player.left < this.viewZone.right);
+    return (this.playerObj.playerSprite.left > this.viewZone.left || this.playerObj.playerSprite.right > this.viewZone.left) &&
+      (this.playerObj.playerSprite.right < this.viewZone.right || this.playerObj.playerSprite.left < this.viewZone.right);
   }
   return false;
 };
@@ -361,7 +361,7 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
 
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
     this.drawLinesToTarget(target);
-    this.playerObj.player.tint = 0x00ff00;
+    this.playerObj.playerSprite.tint = 0x00ff00;
   }
 
   if (this.shooting === false) {

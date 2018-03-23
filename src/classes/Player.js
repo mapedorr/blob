@@ -12,8 +12,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 BasicGame.Player = function (game, input, gameObj) {
+  // constants
+  this.DIALOGUE_TEXT_OFFSET_X = 20;
+  this.DIALOGUE_TEXT_OFFSET_Y = 32;
+
   // destroyable objects
-  this.player = null;
+  this.playerSprite = null;
   this.particlesGroup = null;
   this.jumpSound = null;
   this.walkSound = null;
@@ -21,12 +25,13 @@ BasicGame.Player = function (game, input, gameObj) {
   this.fallSound = null;
   this.deathSound = null;
   this.pieceSound = null;
+  this.dialogueText = null;
 
   // global properties
   this.game = game;
   this.input = input;
   this.gameObj = gameObj;
-  this.player = null;
+  this.playerSprite = null;
   this.level = null;
   this.bitmap = null;
   this.collectedPieces = 0;
@@ -34,6 +39,7 @@ BasicGame.Player = function (game, input, gameObj) {
   this.currentJumpMultiplier = 0;
   this.jumpChance = false;
   this.walkInAirTimer = null;
+  this.fontId = 'font';
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // define movement constants
@@ -102,19 +108,19 @@ BasicGame.Player.prototype.create = function (level) {
   this.level = level;
 
   //Put the player in the game's world
-  this.player = this.game.add.sprite(this.level.initPlayerPos.x,
+  this.playerSprite = this.game.add.sprite(this.level.initPlayerPos.x,
     this.level.initPlayerPos.y,
     'player');
 
   // configure the player animations
-  this.player.animations.add('normal', [0], 1, false);
-  this.player.animations.add('dying', null, 70, false);
+  this.playerSprite.animations.add('normal', [0], 1, false);
+  this.playerSprite.animations.add('dying', null, 70, false);
 
   //Enable physics on the player
-  this.game.physics.arcade.enable(this.player);
+  this.game.physics.arcade.enable(this.playerSprite);
 
   //Set player minimum and maximum movement speed
-  this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 20); // x, y
+  this.playerSprite.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 20); // x, y
 
   //Since we're jumping we need gravity
   this.game.physics.arcade.gravity.y = this.GRAVITY;
@@ -130,7 +136,7 @@ BasicGame.Player.prototype.create = function (level) {
   ]);
 
   // disable physics in the player's body while the game starts
-  this.player.body.enable = false;
+  this.playerSprite.body.enable = false;
 
   // create a bitmap texture for drawing lines
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
@@ -153,7 +159,7 @@ BasicGame.Player.prototype.create = function (level) {
       this.slideSound.stop();
     }, this);
     this.walkSound.onStop.add(function () {
-      if (this.onTheGround === true) {
+      if (this.onGround === true) {
         this.slideSound.play();
       }
     }, this);
@@ -190,7 +196,7 @@ BasicGame.Player.prototype.create = function (level) {
 
   particleX = 0;
   particleY = 0;
-  increaseAmount = this.player.width / this.PARTICLES_AMOUNT;
+  increaseAmount = this.playerSprite.width / this.PARTICLES_AMOUNT;
 
   while (this.particlesGroup.children.length < Math.pow(this.PARTICLES_AMOUNT, 2)) {
     particle = this.game.add.sprite(particleX, particleY, 'player');
@@ -205,7 +211,7 @@ BasicGame.Player.prototype.create = function (level) {
     this.particlesGroup.addChild(particle);
 
     particleX += particle.width;
-    if (particleX >= this.player.width) {
+    if (particleX >= this.playerSprite.width) {
       particleX = 0;
       particleY += particle.height;
     }
@@ -213,6 +219,16 @@ BasicGame.Player.prototype.create = function (level) {
 
   this.particlesGroup.x = -100;
   this.particlesGroup.y = -100;
+
+  // create the bitmap for the day phrase
+  this.dialogueText = this.game.add.bitmapText(this.playerSprite.x + this.DIALOGUE_TEXT_OFFSET_X,
+    this.playerSprite.y - this.DIALOGUE_TEXT_OFFSET_Y,
+    this.fontId,
+    '',
+    48);
+  this.dialogueText.anchor.setTo(0, 1);
+  this.dialogueText.maxWidth = 292;
+  this.dialogueText.tint = 0xfafafa;
 };
 
 BasicGame.Player.prototype.update = function () {
@@ -224,15 +240,18 @@ BasicGame.Player.prototype.update = function () {
   var headHit = false;
   var jumpMul = 0;
 
+  this.dialogueText.x = this.playerSprite.x + this.DIALOGUE_TEXT_OFFSET_X;
+  this.dialogueText.y = this.playerSprite.y - this.DIALOGUE_TEXT_OFFSET_Y;
+
   this.game.physics.arcade.isPaused = this.gameObj.isLoadingLevel;
   if (this.gameObj.isLoadingLevel) {
-    this.player.body.velocity.y = 0;
+    this.playerSprite.body.velocity.y = 0;
     return;
   }
 
   if (this.gameObj.isLoadingLevel === true || this.dead === true) {
     if (this.dead === true) {
-      this.player.body.acceleration.x = 0;
+      this.playerSprite.body.acceleration.x = 0;
 
       // check if a particle is out of the world to disable its gravity
       this.particlesGroup.forEach(function (particle) {
@@ -249,10 +268,10 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  if (this.player.y > this.game.world.height) {
+  if (this.playerSprite.y > this.game.world.height) {
     this.dead = true;
-    this.player.body.velocity.y = 0;
-    this.player.body.allowGravity = false;
+    this.playerSprite.body.velocity.y = 0;
+    this.playerSprite.body.allowGravity = false;
     this.gameObj.subtractAllLifes();
     return;
   }
@@ -272,30 +291,27 @@ BasicGame.Player.prototype.update = function () {
   rightPressed = this.rightInputIsActive() === true;
   upPressed = this.upInputIsActive() === true;
 
-  if (this.player.touchingPiece === false) {
-    this.onTheGround = this.player.body.touching.down === true;
-    onRightWall = this.player.body.touching.right === true && this.player.body.velocity.y > -500;
-    onLeftWall = this.player.body.touching.left === true && this.player.body.velocity.y > -500;
-    headHit = this.player.body.touching.up === true && this.onTheGround === false;
+  if (this.playerSprite.touchingPiece === false) {
+    this.onGround = this.playerSprite.body.touching.down === true;
+    onRightWall = this.playerSprite.body.touching.right === true && this.playerSprite.body.velocity.y > -500;
+    onLeftWall = this.playerSprite.body.touching.left === true && this.playerSprite.body.velocity.y > -500;
+    headHit = this.playerSprite.body.touching.up === true && this.onGround === false;
   }
 
-  if (this.onTheGround || onRightWall || onLeftWall) {
+  if (this.onGround || onRightWall || onLeftWall) {
     this.jumpCount = 0;
   }
 
   // reset some values to default if the player is touching the ground
-  if (this.onTheGround) {
-    this.isFalling = false;
-    this.isJumping = false;
-    if (this.justLeaveGround === true) this.fallSound.play();
-    this.justLeaveGround = false;
+  if (this.onGround) {
+    this.onGroundFeedback();
   }
   else {
     this.walkSound.stop();
     this.slideSound.stop();
 
     // check if the character just left the ground
-    if (this.justLeaveGround === false && this.player.body.velocity.y > 0) {
+    if (this.justLeaveGround === false && this.playerSprite.body.velocity.y > 0) {
       this.justLeaveGround = true;
 
       // create a time to allow the player walk in the air for a while after
@@ -313,7 +329,7 @@ BasicGame.Player.prototype.update = function () {
 
   // handle behaviour of player on walls
   if (onRightWall || onLeftWall) {
-    this.player.body.velocity.y = this.SLID_SPEED;
+    this.playerSprite.body.velocity.y = this.SLID_SPEED;
 
     this.currentJumpMultiplier = 0;
     this.jumpChance = false;
@@ -321,15 +337,15 @@ BasicGame.Player.prototype.update = function () {
     if (!this.slideSound.isPlaying) this.slideSound.play();
   }
 
-  if (this.player.x < 0) this.player.x = 0;
-  if (this.player.right > this.game.world.width) this.player.x = this.game.world.width - this.player.width;
+  if (this.playerSprite.x < 0) this.playerSprite.x = 0;
+  if (this.playerSprite.right > this.game.world.width) this.playerSprite.x = this.game.world.width - this.playerSprite.width;
 
-  if (leftPressed && this.player.x > 0) {
+  if (leftPressed && this.playerSprite.x > 0) {
     // set the player velocity to move left
     this.rightFirstPress = false;
-    this.player.body.acceleration.x = -this.ACCELERATION;
+    this.playerSprite.body.acceleration.x = -this.ACCELERATION;
 
-    if (this.onTheGround) {
+    if (this.onGround) {
       if (!this.leftFirstPress) {
         this.leftFirstPress = true;
         this.currentJumpMultiplier = 0;
@@ -344,21 +360,19 @@ BasicGame.Player.prototype.update = function () {
         this.slideSound.stop();
       }
       else if (upPressed) {
-        this.player.body.acceleration.x = this.ACCELERATION_WALL;
-        this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+        this.playerSprite.body.acceleration.x = this.ACCELERATION_WALL;
+        this.playerSprite.body.velocity.y = this.JUMP_SPEED_WALL;
 
-        // jump jump jump
-        this.currentJumpMultiplier = 0;
-        this.jumpSound.play();
+        this.jumpFeedback();
       }
     }
   }
-  else if (rightPressed && this.player.right < this.game.world.width) {
+  else if (rightPressed && this.playerSprite.right < this.game.world.width) {
     // If the RIGHT key is down, set the player velocity to move right
     this.leftFirstPress = false;
-    this.player.body.acceleration.x = this.ACCELERATION;
+    this.playerSprite.body.acceleration.x = this.ACCELERATION;
 
-    if (this.onTheGround) {
+    if (this.onGround) {
       if (this.rightFirstPress === false) {
         this.rightFirstPress = true;
         this.currentJumpMultiplier = 0;
@@ -373,20 +387,18 @@ BasicGame.Player.prototype.update = function () {
         this.slideSound.stop();
       }
       else if (upPressed) {
-        this.player.body.acceleration.x = -this.ACCELERATION_WALL;
-        this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+        this.playerSprite.body.acceleration.x = -this.ACCELERATION_WALL;
+        this.playerSprite.body.velocity.y = this.JUMP_SPEED_WALL;
 
-        // jump jump jump
-        this.currentJumpMultiplier = 0;
-        this.jumpSound.play();
+        this.jumpFeedback();
       }
     }
   }
   else {
     // not moving in X direction
     this.leftFirstPress = this.rightFirstPress = false;
-    this.player.body.acceleration.x = 0;
-    this.player.body.velocity.x = 0;
+    this.playerSprite.body.acceleration.x = 0;
+    this.playerSprite.body.velocity.x = 0;
     this.currentJumpMultiplier = 0;
     this.walkSound.stop();
     this.slideSound.stop();
@@ -394,21 +406,21 @@ BasicGame.Player.prototype.update = function () {
 
   if (upPressed) {
     jumpMul = Math.min(this.currentJumpMultiplier, this.JUMP_MULTIPLIER_MAX);
-    this.player.body.velocity.y = this.JUMP_SPEED;
-    this.player.body.velocity.y += this.JUMP_SPEED * jumpMul;
-    this.isJumping = true;
+    this.playerSprite.body.velocity.y = this.JUMP_SPEED;
+    this.playerSprite.body.velocity.y += this.JUMP_SPEED * jumpMul;
     this.jumpMultiplier = this.JUMP_MULTIPLIER;
 
     // jump jump jump
-    this.currentJumpMultiplier = 0;
-    this.jumpSound.play();
+    if (!this.isJumping) {
+      this.jumpFeedback();
+    }
   }
 
   // make the jump a bit higher if the player keeps pressing the jump button
   // if (this.input.keyboard.downDuration(this.jumpKey1, this.JUMP_TIME) === true ||
   //     this.input.keyboard.downDuration(this.jumpKey2, this.JUMP_TIME)
   // ) {
-  //   this.player.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
+  //   this.playerSprite.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
   //   if (this.jumpMultiplier > 0.1)
   //     this.jumpMultiplier *= 0.95;
   //   else
@@ -430,8 +442,8 @@ BasicGame.Player.prototype.update = function () {
 BasicGame.Player.prototype.render = function () {
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
     // Sprite debug info
-    this.game.debug.bodyInfo(this.player, 0, 100, 'rgba(0,255,0,0.4)');
-    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
+    this.game.debug.bodyInfo(this.playerSprite, 0, 100, 'rgba(0,255,0,0.4)');
+    this.game.debug.body(this.playerSprite, 'rgba(0,255,0,0.4)');
   }
 
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
@@ -458,18 +470,39 @@ BasicGame.Player.prototype.upInputIsActive = function (duration) {
   return false;
 };
 
+BasicGame.Player.prototype.onGroundFeedback = function () {
+  this.isFalling = false;
+  this.isJumping = false;
+  if (this.justLeaveGround === true) this.fallSound.play();
+  this.justLeaveGround = false;
+  // this.playerSprite.width = 32;
+  // this.playerSprite.height = 32;
+};
+
+BasicGame.Player.prototype.jumpFeedback = function () {
+  // jump jump jump
+  console.log("Player.jumpFeedback");
+  this.isJumping = true;
+  this.currentJumpMultiplier = 0;
+  if (!this.jumpSound.isPlaying) {
+    this.jumpSound.play();
+  }
+  // this.playerSprite.width = 24;
+  // this.playerSprite.height = 40;
+};
+
 /**
  * Method that checks collisions against walls, the ground and collectable pieces
  */
 BasicGame.Player.prototype.checkCollisions = function () {
-  this.player.touchingPiece = false;
+  this.playerSprite.touchingPiece = false;
 
   if (this.level.hasFloor === true) {
-    this.game.physics.arcade.collide(this.player, this.level.ground);
+    this.game.physics.arcade.collide(this.playerSprite, this.level.ground);
   }
 
   // check if the player touches a piece
-  this.game.physics.arcade.overlap(this.player, this.level.pieces,
+  this.game.physics.arcade.overlap(this.playerSprite, this.level.pieces,
     function (player, piece) {
       player.touchingPiece = true;
       piece.body.enable = false;
@@ -488,7 +521,7 @@ BasicGame.Player.prototype.checkCollisions = function () {
     this);
 
   if (this.level.hasSpikes === true) {
-    this.game.physics.arcade.collide(this.player, this.level.walls,
+    this.game.physics.arcade.collide(this.playerSprite, this.level.walls,
       function (player, spikePlatform) {
         if (spikePlatform.spikeRef && spikePlatform.spikeRef.isHidden === true) {
           if (this.gameObj.level.spikeSound.isPlaying === false) {
@@ -499,7 +532,7 @@ BasicGame.Player.prototype.checkCollisions = function () {
       }, null, this);
 
     if (this.level.spikes.openedSpikes > 0) {
-      this.game.physics.arcade.overlap(this.player, this.level.spikes,
+      this.game.physics.arcade.overlap(this.playerSprite, this.level.spikes,
         function (player, spike) {
           if (this.dead === false) {
             this.gameObj.subtractAllLifes(true);
@@ -507,7 +540,7 @@ BasicGame.Player.prototype.checkCollisions = function () {
         }, null, this);
     }
   } else {
-    this.game.physics.arcade.collide(this.player, this.level.walls);
+    this.game.physics.arcade.collide(this.playerSprite, this.level.walls);
   }
 };
 
@@ -522,27 +555,27 @@ BasicGame.Player.prototype.isInShadow = function (checkLeft, checkRight) {
 
   if (checkLeft === true) {
     // top left corner
-    raysToLight.push(new Phaser.Line(this.player.x + offset,
-      this.player.y + offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.x + offset,
+      this.playerSprite.y + offset,
       lightImage.x,
       lightImage.y));
 
     // bottom left corner
-    raysToLight.push(new Phaser.Line(this.player.x + offset,
-      this.player.y + this.player.height - offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.x + offset,
+      this.playerSprite.y + this.playerSprite.height - offset,
       lightImage.x,
       lightImage.y));
   }
 
   if (checkRight === true) {
     // top right corner
-    raysToLight.push(new Phaser.Line(this.player.x + this.player.width - offset,
-      this.player.y + offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.x + this.playerSprite.width - offset,
+      this.playerSprite.y + offset,
       lightImage.x, lightImage.y));
 
     // bottom right corner
-    raysToLight.push(new Phaser.Line(this.player.x + this.player.width - offset,
-      this.player.y + this.player.height - offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.x + this.playerSprite.width - offset,
+      this.playerSprite.y + this.playerSprite.height - offset,
       lightImage.x, lightImage.y));
   }
 
@@ -605,14 +638,14 @@ BasicGame.Player.prototype.drawLinesToLight = function (lightImage, raysToLight)
 
 BasicGame.Player.prototype.updateLevel = function (level) {
   this.collectedPieces = 0;
-  this.player.body.reset(this.player.x, this.player.y);
-  this.player.body.enable = false;
+  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
+  this.playerSprite.body.enable = false;
   this.level = level;
   this.justLeaveGround = false;
   this.slideSound.stop();
-  this.player.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
-  this.player.body.enable = true;
-  this.player.body.allowGravity = true;
+  this.playerSprite.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
+  this.playerSprite.body.enable = true;
+  this.playerSprite.body.allowGravity = true;
   this.dead = false;
 };
 
@@ -627,10 +660,10 @@ BasicGame.Player.prototype.explote = function () {
   this.walkSound.stop();
   this.fallSound.stop();
 
-  this.player.body.enable = false;
-  this.player.body.acceleration.x = 0;
-  this.player.body.velocity.y = 0;
-  this.player.body.allowGravity = false;
+  this.playerSprite.body.enable = false;
+  this.playerSprite.body.acceleration.x = 0;
+  this.playerSprite.body.velocity.y = 0;
+  this.playerSprite.body.allowGravity = false;
 
   timer = this.game.time.create(true);
   timer.add(100, function () {
@@ -638,10 +671,10 @@ BasicGame.Player.prototype.explote = function () {
   }, this);
   timer.start();
 
-  this.player.alpha = 0;
+  this.playerSprite.alpha = 0;
 
-  this.particlesGroup.x = this.player.x;
-  this.particlesGroup.y = this.player.y;
+  this.particlesGroup.x = this.playerSprite.x;
+  this.particlesGroup.y = this.playerSprite.y;
 
   this.particlesGroup.forEach(function (particle) {
     particle.x = particle.originalX;
@@ -663,27 +696,37 @@ BasicGame.Player.prototype.restartLevel = function () {
   this.walkSound.stop();
   this.slideSound.stop();
 
-  this.player.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
+  this.playerSprite.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
 
-  this.player.animations.play('normal');
+  this.playerSprite.animations.play('normal');
 
-  this.player.body.reset(this.player.x, this.player.y);
+  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
   this.game.time.create(true)
     .add(100, function () {
-      this.player.body.enable = true;
-      this.player.body.allowGravity = true;
+      this.playerSprite.body.enable = true;
+      this.playerSprite.body.allowGravity = true;
     }, this)
     .timer.start();
   this.dead = false;
 };
 
 BasicGame.Player.prototype.gameInDarkness = function () {
-  this.player.alpha = 1;
+  this.playerSprite.alpha = 1;
+};
+
+
+BasicGame.Player.prototype.showDialogue = function () {
+  var dayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
+
+  if (dayObj.text) {
+    this.dialogueText.setText(dayObj.text[BasicGame.language]);
+    this.game.world.bringToTop(this.dialogueText);
+  }
 };
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 BasicGame.Player.prototype.shutdown = function () {
-  this.player.destroy();
+  this.playerSprite.destroy();
   this.particlesGroup.destroy();
   this.jumpSound.destroy();
   this.walkSound.destroy();

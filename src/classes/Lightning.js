@@ -20,13 +20,13 @@ BasicGame.Lightning = function (game, gameObj) {
 
   this.game = game;
   this.gameObj = gameObj;
-  this.player = null;
+  this.playerObj = null;
   this.eye = null;
   this.level = null;
 };
 
 BasicGame.Lightning.prototype.create = function (eye, player, level) {
-  this.player = player;
+  this.playerObj = player;
   this.eye = eye;
   this.level = level;
 
@@ -57,11 +57,11 @@ BasicGame.Lightning.prototype.create = function (eye, player, level) {
 
 BasicGame.Lightning.prototype.update = function () {
   // check if the ray hits the player
-  if (this.player.player && this.fakeThing) {
-    if (this.fakeThing.left > this.player.player.left &&
-      this.fakeThing.right < this.player.player.right &&
-      this.fakeThing.top > this.player.player.top &&
-      this.fakeThing.bottom < this.player.player.bottom) {
+  if (this.playerObj.playerSprite && this.fakeThing) {
+    if (this.fakeThing.left > this.playerObj.playerSprite.left &&
+      this.fakeThing.right < this.playerObj.playerSprite.right &&
+      this.fakeThing.top > this.playerObj.playerSprite.top &&
+      this.fakeThing.bottom < this.playerObj.playerSprite.bottom) {
       this.gameObj.subtractLife();
       this.gameObj.shakeCamera();
     }

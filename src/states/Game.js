@@ -3,6 +3,7 @@ var BasicGame = require('BasicGame');
 BasicGame.Game = function (game) {
   // constants
   this.LIFES_AMOUNT = 3;
+  this.FADE_DURATION = 700;
 
   // destroyable objects (sprites, sounds, groups, tweens...)
   this.background = null;
@@ -10,8 +11,8 @@ BasicGame.Game = function (game) {
   this.flashGroup = null;
   this.darknessGroup = null;
   this.music = null;
-  this.darknessTween = null;
-  this.brightnessTween = null;
+  this.putDarkTween = null;
+  this.removeDarkTween = null;
 
   // references to other classes
   this.days = null;
@@ -25,7 +26,6 @@ BasicGame.Game = function (game) {
   // global properties
   this.showFPS = null;
   this.map = null;
-  this.countdownDuration = null;
   this.inDarkness = null;
   this.isLoadingLevel = null;
   this.lifes = null;
@@ -64,10 +64,14 @@ BasicGame.Game.prototype.preload = function () {
 };
 
 BasicGame.Game.prototype.create = function () {
+  var darknessBitmap = null;
+  var darknessSprite = null;
+  var flashBitmap = null;
+  var flashSprite = null;
+
   // define properties
   this.lifes = this.LIFES_AMOUNT;
   this.showFPS = false;
-  this.countdownDuration = 0.7;
   this.inDarkness = true;
   this.isLoadingLevel = true;
 
@@ -84,18 +88,53 @@ BasicGame.Game.prototype.create = function () {
     this.music = this.game.add.sound('level_music', 0.1, true);
   }
 
+  // ══════════════════════════════════════════════════════════════════════════╗
+  // create the darkness
+  this.darknessGroup = this.add.group();
+  darknessBitmap = new Phaser.BitmapData(this.game,
+    'darkness',
+    this.game.width,
+    this.game.height);
+  darknessBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
+  darknessBitmap.ctx.fillStyle = '#212121';
+  darknessBitmap.ctx.fill();
+  darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
+  this.darknessGroup.addChild(darknessSprite);
+
+  // create the darkness tween
+  this.putDarkTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
+  this.putDarkTween.to({ alpha: 1 }, this.FADE_DURATION, Phaser.Easing.Quadratic.Out, false);
+  this.putDarkTween.onComplete.add(this.putDarkTweenCompleted, this);
+
+  // create the brightness tween
+  this.removeDarkTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
+  this.removeDarkTween.to({ alpha: 0 }, 700, null, false);
+  this.removeDarkTween.onComplete.add(this.removeDarkTweenCompleted, this);
+
+  // create flash sprite
+  this.flashGroup = this.add.group();
+  flashBitmap = new Phaser.BitmapData(this.game,
+    'flash',
+    this.game.width,
+    this.game.height);
+  flashBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
+  flashBitmap.ctx.fillStyle = '#fff';
+  flashBitmap.ctx.fill();
+  flashSprite = new Phaser.Sprite(this.game, 0, 0, flashBitmap);
+  flashSprite.alpha = 0;
+  this.flashGroup.addChild(flashSprite);
+  // ══════════════════════════════════════════════════════════════════════════╝
+
+  // ══════════════════════════════════════════════════════════════════════════╗
   // create the level
   this.level.create();
 
   // create the player
   this.player.create(this.level);
 
-
   // create the group of sprites for lifes
   this.lifesGroup = this.game.add.group();
-
   this.createLifeIndicators();
-
   this.lifesGroup.x = 16;
   this.lifesGroup.y = 16;
 
@@ -104,7 +143,9 @@ BasicGame.Game.prototype.create = function () {
 
   // create THE EYE
   this.eye.create(this.player, this.level, this.lightning);
+  // ══════════════════════════════════════════════════════════════════════════╝
 
+  // ══════════════════════════════════════════════════════════════════════════╗
   // bring to top some things so the game looks better
   this.game.world.bringToTop(this.light.lightBitmap);
   if (this.level.spikes) {
@@ -113,54 +154,10 @@ BasicGame.Game.prototype.create = function () {
   this.game.world.bringToTop(this.level.walls);
   this.game.world.bringToTop(this.level.pieces);
   this.game.world.bringToTop(this.lifesGroup);
+  this.game.world.bringToTop(this.darknessGroup);
+  // ══════════════════════════════════════════════════════════════════════════╝
 
-  // create the darkness
-  this.darknessGroup = this.add.group();
-  var darknessBitmap = new Phaser.BitmapData(this.game,
-    'darkness',
-    this.game.width,
-    this.game.height);
-  darknessBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
-  darknessBitmap.ctx.fillStyle = '#000';
-  darknessBitmap.ctx.fill();
 
-  var darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
-
-  this.darknessGroup.addChild(darknessSprite);
-
-  // create the darkness tween
-  this.darknessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-  this.darknessTween.to({ alpha: 1 },
-    this.countdownDuration * 1000,
-    Phaser.Easing.Quadratic.Out,
-    false);
-  this.darknessTween.onComplete.add(this.darknessTweenCompleted, this);
-
-  // create the brightness tween
-  this.brightnessTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-  this.brightnessTween.to({ alpha: 0 },
-    700,
-    null,
-    false);
-  this.brightnessTween.onComplete.add(this.brightnessTweenCompleted, this);
-
-  // create flash sprite
-  this.flashGroup = this.add.group();
-  var flashBitmap = new Phaser.BitmapData(this.game,
-    'flash',
-    this.game.width,
-    this.game.height);
-  flashBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
-  flashBitmap.ctx.fillStyle = '#fff';
-  flashBitmap.ctx.fill();
-
-  var flashSprite = new Phaser.Sprite(this.game, 0, 0, flashBitmap);
-  flashSprite.alpha = 0;
-  this.flashGroup.addChild(flashSprite);
-
-  if (this.level.isReady === true) {
-    this.levelReady();
-  }
 
   // show FPS
   if (BasicGame.Game.developmentMode) {
@@ -191,15 +188,7 @@ BasicGame.Game.prototype.update = function () {
 };
 
 BasicGame.Game.prototype.levelReady = function () {
-  this.level.isReady = false;
-
-  if (BasicGame.isRetrying === false) {
-    this.level.showDay();
-  }
-  else {
-    this.level.levelTextGroup.alpha = 0;
-    this.hideDarkness();
-  }
+  this.hideDarkness();
 };
 
 BasicGame.Game.prototype.levelEnded = function () {
@@ -221,6 +210,8 @@ BasicGame.Game.prototype.render = function () {
 };
 
 BasicGame.Game.prototype.loadLevel = function (levelNumber) {
+  console.log("Game.loadLevel");
+
   if (levelNumber > 30) {
     // congrats, you ended the game
     this.state.start('TheEnd');
@@ -375,11 +366,11 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
 
 BasicGame.Game.prototype.showDarkness = function (durationInMS) {
   this.game.world.bringToTop(this.darknessGroup);
-  this.darknessTween.updateTweenData("duration", durationInMS || this.countdownDuration * 1000);
-  this.darknessTween.start();
+  this.putDarkTween.updateTweenData("duration", durationInMS || this.FADE_DURATION);
+  this.putDarkTween.start();
 };
 
-BasicGame.Game.prototype.darknessTweenCompleted = function () {
+BasicGame.Game.prototype.putDarkTweenCompleted = function () {
   this.inDarkness = true;
 
   this.eye.gameInDarkness();
@@ -393,13 +384,21 @@ BasicGame.Game.prototype.darknessTweenCompleted = function () {
 
 BasicGame.Game.prototype.hideDarkness = function (durationInMS) {
   this.inDarkness = false;
-  this.brightnessTween.updateTweenData("duration", durationInMS || this.countdownDuration * 1000);
-  this.brightnessTween.start();
+  this.removeDarkTween.updateTweenData("duration", durationInMS || this.FADE_DURATION);
+  this.removeDarkTween.start();
 };
 
-BasicGame.Game.prototype.brightnessTweenCompleted = function () {
+BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
   // this.eye.eyeStateTimer = this.eye.searchingTime;
   this.isLoadingLevel = false;
+
+  if (BasicGame.isRetrying === false) {
+    // if the level is played for the first time
+    // this.level.daySound.play();
+
+    // make the player say a line
+    this.player.showDialogue();
+  }
 
   this.lifes = this.LIFES_AMOUNT;
 
@@ -410,7 +409,7 @@ BasicGame.Game.prototype.brightnessTweenCompleted = function () {
     // this.music.play();
   }
 
-  this.player.player.body.enable = true;
+  this.player.playerSprite.body.enable = true;
 };
 
 BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {
@@ -465,8 +464,8 @@ BasicGame.Game.prototype.shutdown = function () {
   // destroy sounds
   this.music.destroy();
   // destroy tweens
-  this.darknessTween.stop();
-  this.brightnessTween.stop();
+  this.putDarkTween.stop();
+  this.removeDarkTween.stop();
   // call the methods that will destroy everything in other classes
   this.player.shutdown();
   this.level.shutdown();
