@@ -13,8 +13,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 BasicGame.Player = function (game, input, gameObj) {
   // constants
-  this.DIALOGUE_TEXT_OFFSET_X = 20;
-  this.DIALOGUE_TEXT_OFFSET_Y = 32;
+  this.DIALOGUE_TEXT_MAX_WIDTH = 292;
+  this.DIALOGUE_TEXT_H_PADDING = 10;
+  this.DIALOGUE_TEXT_V_PADDING = 5;
+  this.FADE_SPEED = 300;
+  this.DIALOGUE_WIDTH = this.DIALOGUE_TEXT_MAX_WIDTH + this.DIALOGUE_TEXT_H_PADDING * 2;
 
   // destroyable objects
   this.playerSprite = null;
@@ -25,6 +28,9 @@ BasicGame.Player = function (game, input, gameObj) {
   this.fallSound = null;
   this.deathSound = null;
   this.pieceSound = null;
+  this.dialogueGroup = null;
+  this.dialogueBackground = null;
+  this.dialogueMark = null;
   this.dialogueText = null;
 
   // global properties
@@ -40,6 +46,8 @@ BasicGame.Player = function (game, input, gameObj) {
   this.jumpChance = false;
   this.walkInAirTimer = null;
   this.fontId = 'font';
+  this.dialogueDisplayed = false;
+  this.flipDialogue = false;
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // define movement constants
@@ -220,15 +228,25 @@ BasicGame.Player.prototype.create = function (level) {
   this.particlesGroup.x = -100;
   this.particlesGroup.y = -100;
 
+  // ═ dialogue ═══════════════════════════════════════════════════════════════╗
+  this.dialogueGroup = this.game.add.group();
+
+  this.dialogueBackground = this.game.add.image(0, 0, 'dialogue_background', 0, this.dialogueGroup);
+  this.dialogueBackground.width = this.DIALOGUE_WIDTH;
+  this.dialogueBackground.height = this.DIALOGUE_TEXT_V_PADDING * 2;
+
+  this.dialogueMark = this.game.add.image(0, 0, 'dialogue_mark', 0, this.dialogueGroup);
+  this.dialogueMark.y = this.dialogueBackground.height + 8;
+
   // create the bitmap for the day phrase
-  this.dialogueText = this.game.add.bitmapText(this.playerSprite.x + this.DIALOGUE_TEXT_OFFSET_X,
-    this.playerSprite.y - this.DIALOGUE_TEXT_OFFSET_Y,
-    this.fontId,
-    '',
-    48);
-  this.dialogueText.anchor.setTo(0, 1);
-  this.dialogueText.maxWidth = 292;
-  this.dialogueText.tint = 0xfafafa;
+  this.dialogueText = this.game.add.bitmapText(0, 0, this.fontId, '', 18, this.dialogueGroup);
+  this.dialogueText.x = this.DIALOGUE_TEXT_H_PADDING;
+  this.dialogueText.y = this.DIALOGUE_TEXT_V_PADDING;
+  this.dialogueText.maxWidth = this.DIALOGUE_TEXT_MAX_WIDTH;
+  this.dialogueText.tint = 0x161a1e;
+
+  this.dialogueGroup.alpha = 0;
+  // ══════════════════════════════════════════════════════════════════════════╝
 };
 
 BasicGame.Player.prototype.update = function () {
@@ -240,8 +258,7 @@ BasicGame.Player.prototype.update = function () {
   var headHit = false;
   var jumpMul = 0;
 
-  this.dialogueText.x = this.playerSprite.x + this.DIALOGUE_TEXT_OFFSET_X;
-  this.dialogueText.y = this.playerSprite.y - this.DIALOGUE_TEXT_OFFSET_Y;
+  this.placeDialogueGroup();
 
   this.game.physics.arcade.isPaused = this.gameObj.isLoadingLevel;
   if (this.gameObj.isLoadingLevel) {
@@ -290,6 +307,12 @@ BasicGame.Player.prototype.update = function () {
   leftPressed = this.leftInputIsActive() === true;
   rightPressed = this.rightInputIsActive() === true;
   upPressed = this.upInputIsActive() === true;
+
+  if (this.dialogueDisplayed === true && (leftPressed || rightPressed || upPressed)) {
+    // if the player is moving and the dialogue box is visible, start the timer
+    // to fade it out
+    this.gameObj.helper.timer(this.waitTime, this.hideDialogue, this);
+  }
 
   if (this.playerSprite.touchingPiece === false) {
     this.onGround = this.playerSprite.body.touching.down === true;
@@ -714,14 +737,66 @@ BasicGame.Player.prototype.gameInDarkness = function () {
   this.playerSprite.alpha = 1;
 };
 
+BasicGame.Player.prototype.placeDialogueGroup = function () {
+  // this.dialogueGroup.x = this.playerSprite.centerX - this.dialogueGroup.width;
+  if (this.flipDialogue === true) {
+    this.dialogueGroup.x = this.playerSprite.centerX - this.dialogueGroup.width + 16;
+  }
+  else {
+    this.dialogueGroup.x = this.playerSprite.centerX;
+  }
+  this.dialogueGroup.y = this.playerSprite.y - this.dialogueGroup.height - 6.8;
+};
 
 BasicGame.Player.prototype.showDialogue = function () {
   var dayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
+  var displayTween = null;
+  var dialogueHeight = 0;
 
   if (dayObj.text) {
+    this.waitTime = dayObj.waitTime * 1000;
     this.dialogueText.setText(dayObj.text[BasicGame.language]);
-    this.game.world.bringToTop(this.dialogueText);
+    this.dialogueBackground.height = this.dialogueText.textHeight + this.DIALOGUE_TEXT_V_PADDING * 2;
+    this.dialogueMark.y = this.dialogueBackground.height + 8;
+    dialogueHeight = this.dialogueGroup.height;
+    this.game.world.bringToTop(this.dialogueGroup);
+
+    if (this.DIALOGUE_WIDTH + this.playerSprite.centerX > this.game.width) {
+      this.flipDialogue = true;
+      this.dialogueMark.x = this.DIALOGUE_WIDTH - 18;
+    }
+    else {
+      this.flipDialogue = false;
+      this.dialogueMark.x = 0;
+    }
+
+    this.dialogueGroup.alpha = 0;
+    this.dialogueGroup.width = 0;
+    this.dialogueGroup.height = 0;
+    displayTween = this.game.add.tween(this.dialogueGroup);
+    displayTween.to({
+      alpha: 1,
+      width: this.DIALOGUE_WIDTH,
+      height: dialogueHeight
+    }, this.FADE_SPEED, Phaser.Easing.Exponential.Out);
+    displayTween.onComplete.add(function () {
+      this.dialogueDisplayed = true;
+    }, this);
+    displayTween.start();
   }
+};
+
+BasicGame.Player.prototype.hideDialogue = function () {
+  var displayTween = this.game.add.tween(this.dialogueGroup);
+  displayTween.to({
+    alpha: 0
+  }, this.FADE_SPEED, Phaser.Easing.Cubic.Out);
+  displayTween.onComplete.add(function () {
+    this.dialogueDisplayed = false;
+    this.dialogueGroup.width = 0;
+    this.dialogueGroup.height = 0;
+  }, this);
+  displayTween.start();
 };
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗

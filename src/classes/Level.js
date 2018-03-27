@@ -39,7 +39,7 @@ BasicGame.Level = function (game, gameObj) {
   };
 
   // font attributes
-  this.fontId = 'font';
+  this.fontId = 'font-medium';
   this.hasFloor = false;
   this.hasSpikes = false;
 

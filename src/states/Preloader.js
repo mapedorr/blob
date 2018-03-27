@@ -50,10 +50,13 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('piece', 'assets/sprites/piece.png');
   this.load.image('platform', 'assets/sprites/platform.png');
   this.load.image('life', 'assets/sprites/life.png');
+  this.load.image('dialogue_background', 'assets/sprites/dialogue_background.png');
+  this.load.image('dialogue_mark', 'assets/sprites/dialogue_mark.png');
+  this.load.image('noise', 'assets/backgrounds/noise_01.png');
 
+  // this.load.spritesheet('noise', 'assets/backgrounds/noise.png', 1024, 640);
   this.load.spritesheet('player', 'assets/sprites/player.png', 32, 32);
   this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 119);
-  this.load.image('pupil_mask', 'assets/sprites/pupil_mask.png');
 
   this.load.audio('b', 'assets/soundfx/b.ogg', true);
   this.load.audio('h', 'assets/soundfx/h.ogg', true);
@@ -69,8 +72,10 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.audio('level_music', 'assets/music/levels_music.ogg', true);
   this.load.audio('piece', 'assets/soundfx/piece01.ogg', true);
 
-  this.load.bitmapFont('font', 'assets/fonts/teko-light_0.png',
-    'assets/fonts/teko-light.fnt', null, 5);
+  this.load.bitmapFont('font', 'assets/fonts/FiraCode_0.png',
+    'assets/fonts/FiraCode.fnt', null);
+  this.load.bitmapFont('font-medium', 'assets/fonts/FiraCodeMedium_0.png',
+    'assets/fonts/FiraCodeMedium.fnt', null);
 
   // it will not be necessary to load this one if the player already passed the
   // first part of the game

@@ -1,6 +1,11 @@
 var BasicGame = require('BasicGame');
 
 BasicGame.MainMenu = function (game) {
+  // constants
+
+  // destroyable objects (sprites, sounds, groups, tweens...)
+
+  // global properties
   this.splash_music = null;
   this.playButton = null;
   this.jugarButton = null;
@@ -233,4 +238,31 @@ BasicGame.MainMenu.prototype.showButtons = function () {
 
 BasicGame.MainMenu.prototype.showIntro = function () {
   this.state.start((BasicGame.currentLevel === 1) ? 'Intro' : 'Game');
+};
+
+/**
+ * This method will be called when the State is shutdown (i.e. you switch to another state from this one).
+ */
+BasicGame.MainMenu.prototype.shutdown = function () {
+  // destroy sprites and images
+  this.background.destroy();
+  this.fakeViewZone.destroy();
+  this.fakeEye.destroy();
+  this.pupil.destroy();
+  this.map.destroy();
+  this.fakeplayer.destroy();
+  this.light.destroy();
+  this.gameTitle.destroy();
+  this.showIntroTimer.destroy();
+  // destroy groups
+  this.buttons.destroy();
+  this.ground.destroy();
+  this.walls.destroy();
+  this.darknessGroup.destroy();
+  // destroy audio
+  this.enSound.destroy();
+  this.esSound.destroy();
+  this.splash_music.destroy();
+  // destroy tweens
+  this.darknessTween.stop();
 };

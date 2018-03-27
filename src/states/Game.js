@@ -13,6 +13,7 @@ BasicGame.Game = function (game) {
   this.music = null;
   this.putDarkTween = null;
   this.removeDarkTween = null;
+  this.noiseImage = null;
 
   // references to other classes
   this.days = null;
@@ -78,6 +79,11 @@ BasicGame.Game.prototype.create = function () {
   // set stage background
   this.background = this.game.add.tileSprite(0, 0,
     this.game.world.width, this.game.world.height, this.getSkyName());
+
+  this.noiseImage = this.game.add.image(0, 0, 'noise');
+  /* this.noiseImage = this.game.add.sprite(0, 0, 'noise');
+  this.noiseImage.animations.add('noisey', [0, 1], 12, true);
+  this.noiseImage.animations.play('noisey'); */
 
   // configure the camera for shaking
   this.game.camera.setSize(this.game.world.width / 2, this.game.world.height / 2);
@@ -178,6 +184,10 @@ BasicGame.Game.prototype.update = function () {
 
   // update the lightning
   this.lightning.update();
+
+  if (this.game.world.getTop().key !== 'noise') {
+    this.game.world.bringToTop(this.noiseImage);
+  }
 
   // show development information
   if (BasicGame.Game.developmentMode) {
@@ -452,8 +462,10 @@ BasicGame.Game.prototype.quitGame = function () {
   this.shutdown();
 };
 
+/**
+ * This method will be called when the State is shutdown (i.e. you switch to another state from this one).
+ */
 BasicGame.Game.prototype.shutdown = function () {
-  // here you should destroy anything you no longer need.
   // stop music, delete sprites, purge caches, free resources, all that good stuff.
   // destroy sprites
   this.background.destroy();
