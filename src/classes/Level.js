@@ -210,9 +210,11 @@ BasicGame.Level.prototype.destroyCurrentLevel = function () {
 BasicGame.Level.prototype.render = function () {
   if (BasicGame.Game.developmentMode === true) {
     var _self = this;
-    this.spikes.forEach(function (pieceSprite) {
-      _self.game.debug.body(pieceSprite, 'rgba(0,0,255,0.8)');
-    });
+    if (this.spikes) {
+      this.spikes.forEach(function (pieceSprite) {
+        _self.game.debug.body(pieceSprite, 'rgba(0,0,255,0.8)');
+      });
+    }
   }
 };
 

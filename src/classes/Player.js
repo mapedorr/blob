@@ -116,9 +116,10 @@ BasicGame.Player.prototype.create = function (level) {
   this.level = level;
 
   //Put the player in the game's world
-  this.playerSprite = this.game.add.sprite(this.level.initPlayerPos.x,
-    this.level.initPlayerPos.y,
+  this.playerSprite = this.game.add.sprite(this.level.initPlayerPos.x + 16,
+    this.level.initPlayerPos.y + 32,
     'player');
+  this.playerSprite.anchor.setTo(0.5, 1);
 
   // configure the player animations
   this.playerSprite.animations.add('normal', [0], 1, false);
@@ -352,6 +353,7 @@ BasicGame.Player.prototype.update = function () {
 
   // handle behaviour of player on walls
   if (onRightWall || onLeftWall) {
+    // this.onWallFeedback();
     this.playerSprite.body.velocity.y = this.SLID_SPEED;
 
     this.currentJumpMultiplier = 0;
@@ -494,22 +496,38 @@ BasicGame.Player.prototype.upInputIsActive = function (duration) {
 };
 
 BasicGame.Player.prototype.onGroundFeedback = function () {
+  var squashTween = null;
+  if (this.playerSprite.width !== 32 && !this.squashTweenPlaying) {
+    squashTween = this.game.add.tween(this.playerSprite);
+    squashTween.to({ width: 40, height: 24 }, 150, Phaser.Easing.Exponential.Out);
+    squashTween.onComplete.add(function () {
+      this.playerSprite.width = 32;
+      this.playerSprite.height = 32;
+      this.squashTweenPlaying = false;
+    }, this);
+    squashTween.start();
+    this.squashTweenPlaying = true;
+  }
   this.isFalling = false;
   this.isJumping = false;
   if (this.justLeaveGround === true) this.fallSound.play();
   this.justLeaveGround = false;
+  console.log("Player.onGroundFeedback");
   // this.playerSprite.width = 32;
   // this.playerSprite.height = 32;
 };
 
 BasicGame.Player.prototype.jumpFeedback = function () {
   // jump jump jump
-  console.log("Player.jumpFeedback");
+  var stretchTween = this.game.add.tween(this.playerSprite);
+  stretchTween.to({ width: 24, height: 40 }, 200, Phaser.Easing.Exponential.Out);
+  stretchTween.start();
   this.isJumping = true;
   this.currentJumpMultiplier = 0;
   if (!this.jumpSound.isPlaying) {
     this.jumpSound.play();
   }
+  console.log("Player.jumpFeedback");
   // this.playerSprite.width = 24;
   // this.playerSprite.height = 40;
 };
@@ -745,7 +763,7 @@ BasicGame.Player.prototype.placeDialogueGroup = function () {
   else {
     this.dialogueGroup.x = this.playerSprite.centerX;
   }
-  this.dialogueGroup.y = this.playerSprite.y - this.dialogueGroup.height - 6.8;
+  this.dialogueGroup.y = this.playerSprite.top - this.dialogueGroup.height - 6.8;
 };
 
 BasicGame.Player.prototype.showDialogue = function () {
