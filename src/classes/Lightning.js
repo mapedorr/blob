@@ -72,8 +72,8 @@ BasicGame.Lightning.prototype.update = function () {
 BasicGame.Lightning.prototype.shoot = function (target) {
   this.fakeThing.x = this.fakeThing.y = 0;
   var targetPos = {
-    x: target.x,
-    y: target.y
+    x: target.left,
+    y: target.top
   };
 
   // Rotate the lightning sprite so it goes in the

@@ -262,6 +262,7 @@ BasicGame.Player.prototype.update = function () {
   var headHit = false;
   var jumpMul = 0;
 
+  // update the position of the dialogue bubble based on the player's position
   this.placeDialogueGroup();
 
   this.game.physics.arcade.isPaused = this.gameObj.isLoadingLevel;
@@ -289,7 +290,7 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  if (this.playerSprite.y > this.game.world.height) {
+  if (this.playerSprite.top > this.game.world.height) {
     this.dead = true;
     this.playerSprite.body.velocity.y = 0;
     this.playerSprite.body.allowGravity = false;
@@ -300,9 +301,7 @@ BasicGame.Player.prototype.update = function () {
   // ___________________________________________________________________________
   // check collisions
   // ___________________________________________________________________________
-
   this.checkCollisions();
-
 
   // ___________________________________________________________________________
   // handle player movement
@@ -363,10 +362,7 @@ BasicGame.Player.prototype.update = function () {
     this.jumpChance = false;
   }
 
-  if (this.playerSprite.x < 0) this.playerSprite.x = 0;
-  if (this.playerSprite.right > this.game.world.width) this.playerSprite.x = this.game.world.width - this.playerSprite.width;
-
-  if (leftPressed && this.playerSprite.x > 0) {
+  if (leftPressed && this.playerSprite.left > 0) {
     // set the player velocity to move left
     this.rightFirstPress = false;
     this.playerSprite.body.acceleration.x = -this.ACCELERATION;
@@ -441,6 +437,10 @@ BasicGame.Player.prototype.update = function () {
       this.jumpFeedback();
     }
   }
+
+  // sprite out of the bounds of the game world
+  if (this.playerSprite.left < 0) this.playerSprite.left = 0;
+  if (this.playerSprite.right > this.game.world.width) this.playerSprite.left = this.game.world.width - this.playerSprite.width;
 
   // make the jump a bit higher if the player keeps pressing the jump button
   // if (this.input.keyboard.downDuration(this.jumpKey1, this.JUMP_TIME) === true ||
@@ -624,27 +624,27 @@ BasicGame.Player.prototype.isInShadow = function (checkLeft, checkRight) {
 
   if (checkLeft === true) {
     // top left corner
-    raysToLight.push(new Phaser.Line(this.playerSprite.x + offset,
-      this.playerSprite.y + offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.left + offset,
+      this.playerSprite.top + offset,
       lightImage.x,
       lightImage.y));
 
     // bottom left corner
-    raysToLight.push(new Phaser.Line(this.playerSprite.x + offset,
-      this.playerSprite.y + this.playerSprite.height - offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.left + offset,
+      this.playerSprite.top + this.playerSprite.height - offset,
       lightImage.x,
       lightImage.y));
   }
 
   if (checkRight === true) {
     // top right corner
-    raysToLight.push(new Phaser.Line(this.playerSprite.x + this.playerSprite.width - offset,
-      this.playerSprite.y + offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.left + this.playerSprite.width - offset,
+      this.playerSprite.top + offset,
       lightImage.x, lightImage.y));
 
     // bottom right corner
-    raysToLight.push(new Phaser.Line(this.playerSprite.x + this.playerSprite.width - offset,
-      this.playerSprite.y + this.playerSprite.height - offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.left + this.playerSprite.width - offset,
+      this.playerSprite.top + this.playerSprite.height - offset,
       lightImage.x, lightImage.y));
   }
 
