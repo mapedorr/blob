@@ -4,6 +4,8 @@ BasicGame.Game = function (game) {
   // constants
   this.LIFES_AMOUNT = 3;
   this.FADE_DURATION = 700;
+  this.KEY_PAUSE = Phaser.Keyboard.P;
+  this.KEY_MUTE = Phaser.Keyboard.M;
 
   // destroyable objects (sprites, sounds, groups, tweens...)
   this.background = null;
@@ -30,6 +32,9 @@ BasicGame.Game = function (game) {
   this.inDarkness = null;
   this.isLoadingLevel = null;
   this.lifes = null;
+  this.pausedOn = 0;
+  this.mutedOn = 0;
+  this.checkMKey = true;
 };
 
 BasicGame.Game.developmentMode = false;
@@ -70,7 +75,8 @@ BasicGame.Game.prototype.create = function () {
   var flashBitmap = null;
   var flashSprite = null;
 
-  // define properties
+  // ══════════════════════════════════════════════════════════════════════════╗
+  // define game properties and setup game objects
   this.lifes = this.LIFES_AMOUNT;
   this.showFPS = false;
   this.inDarkness = true;
@@ -93,6 +99,12 @@ BasicGame.Game.prototype.create = function () {
   if (!this.music) {
     this.music = this.game.add.sound('level_music', 0.1, true);
   }
+
+  this.game.input.keyboard.addKeyCapture([
+    this.KEY_PAUSE,
+    this.KEY_MUTE
+  ]);
+  // ══════════════════════════════════════════════════════════════════════════╝
 
   // ══════════════════════════════════════════════════════════════════════════╗
   // create the darkness
@@ -163,8 +175,6 @@ BasicGame.Game.prototype.create = function () {
   this.game.world.bringToTop(this.darknessGroup);
   // ══════════════════════════════════════════════════════════════════════════╝
 
-
-
   // show FPS
   if (BasicGame.Game.developmentMode) {
     this.game.time.advancedTiming = true;
@@ -189,12 +199,38 @@ BasicGame.Game.prototype.update = function () {
     this.game.world.bringToTop(this.noiseImage);
   }
 
+  if (this.inputIsActive(this.KEY_PAUSE) === true) {
+    this.pausedOn = this.game.time.now;
+    this.game.paused = !this.game.paused;
+  }
+
+  if (this.game.time.now - this.mutedOn >= 100) {
+    this.checkMKey = true;
+  }
+
+  if (this.checkMKey && this.inputIsActive(this.KEY_MUTE) === true) {
+    this.mutedOn = this.game.time.now;
+    this.checkMKey = false;
+    this.game.sound.mute = !this.game.sound.mute;
+  }
+
   // show development information
   if (BasicGame.Game.developmentMode) {
     if (this.game.time.fps !== 0) {
       this.fpsText.setText(this.game.time.fps + ' FPS');
     }
   }
+};
+
+BasicGame.Game.prototype.pauseUpdate = function () {
+  if ((this.game.time.now - this.pausedOn >= 100) && this.inputIsActive(this.KEY_PAUSE) === true) {
+    this.game.paused = !this.game.paused;
+    this.pausedOn = 0;
+  }
+};
+
+BasicGame.Game.prototype.inputIsActive = function (key) {
+  return this.game.input.keyboard.isDown(key);
 };
 
 BasicGame.Game.prototype.levelReady = function () {
@@ -220,8 +256,6 @@ BasicGame.Game.prototype.render = function () {
 };
 
 BasicGame.Game.prototype.loadLevel = function (levelNumber) {
-  console.log("Game.loadLevel");
-
   if (levelNumber > 30) {
     // congrats, you ended the game
     this.state.start('TheEnd');
@@ -416,7 +450,7 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
   this.eye.levelStart();
 
   if (this.music.isPlaying === false) {
-    // this.music.play();
+    this.music.play();
   }
 
   this.player.playerSprite.body.enable = true;

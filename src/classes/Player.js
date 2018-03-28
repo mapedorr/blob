@@ -18,6 +18,9 @@ BasicGame.Player = function (game, input, gameObj) {
   this.DIALOGUE_TEXT_V_PADDING = 5;
   this.FADE_SPEED = 300;
   this.DIALOGUE_WIDTH = this.DIALOGUE_TEXT_MAX_WIDTH + this.DIALOGUE_TEXT_H_PADDING * 2;
+  this.STRETCH_SQUASH_VALUE = 8;
+  this.BASE_SIZE = 32;
+  this.HALF_SIZE = this.BASE_SIZE / 2;
 
   // destroyable objects
   this.playerSprite = null;
@@ -116,8 +119,8 @@ BasicGame.Player.prototype.create = function (level) {
   this.level = level;
 
   //Put the player in the game's world
-  this.playerSprite = this.game.add.sprite(this.level.initPlayerPos.x + 16,
-    this.level.initPlayerPos.y + 32,
+  this.playerSprite = this.game.add.sprite(this.level.initPlayerPos.x + this.HALF_SIZE,
+    this.level.initPlayerPos.y + this.BASE_SIZE,
     'player');
   this.playerSprite.anchor.setTo(0.5, 1);
 
@@ -353,13 +356,11 @@ BasicGame.Player.prototype.update = function () {
 
   // handle behaviour of player on walls
   if (onRightWall || onLeftWall) {
-    // this.onWallFeedback();
+    this.onWallFeedback();
     this.playerSprite.body.velocity.y = this.SLID_SPEED;
 
     this.currentJumpMultiplier = 0;
     this.jumpChance = false;
-
-    if (!this.slideSound.isPlaying) this.slideSound.play();
   }
 
   if (this.playerSprite.x < 0) this.playerSprite.x = 0;
@@ -497,39 +498,66 @@ BasicGame.Player.prototype.upInputIsActive = function (duration) {
 
 BasicGame.Player.prototype.onGroundFeedback = function () {
   var squashTween = null;
-  if (this.playerSprite.width !== 32 && !this.squashTweenPlaying) {
+  if (this.justLeaveGround === true && !this.squashTweenPlaying) {
     squashTween = this.game.add.tween(this.playerSprite);
-    squashTween.to({ width: 40, height: 24 }, 150, Phaser.Easing.Exponential.Out);
+    squashTween.to({
+      width: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE,
+      height: this.BASE_SIZE - this.STRETCH_SQUASH_VALUE
+    }, 150, Phaser.Easing.Exponential.Out);
     squashTween.onComplete.add(function () {
-      this.playerSprite.width = 32;
-      this.playerSprite.height = 32;
+      this.playBaseSizeTween();
       this.squashTweenPlaying = false;
     }, this);
     squashTween.start();
     this.squashTweenPlaying = true;
   }
+
   this.isFalling = false;
   this.isJumping = false;
-  if (this.justLeaveGround === true) this.fallSound.play();
+
+  if (this.justLeaveGround === true) {
+    this.fallSound.play();
+  }
+
   this.justLeaveGround = false;
-  console.log("Player.onGroundFeedback");
-  // this.playerSprite.width = 32;
-  // this.playerSprite.height = 32;
+};
+
+BasicGame.Player.prototype.onWallFeedback = function () {
+  this.playBaseSizeTween();
+  if (!this.slideSound.isPlaying) this.slideSound.play();
+};
+
+BasicGame.Player.prototype.playBaseSizeTween = function () {
+  var baseSizeTween = null;
+  if (this.playerSprite.width !== this.BASE_SIZE && !this.baseSizeTweenPlaying) {
+    baseSizeTween = this.game.add.tween(this.playerSprite);
+    baseSizeTween.to({
+      width: this.BASE_SIZE,
+      height: this.BASE_SIZE
+    }, 150, Phaser.Easing.Exponential.Out);
+    baseSizeTween.onComplete.add(function () {
+      this.playerSprite.width = this.BASE_SIZE;
+      this.playerSprite.height = this.BASE_SIZE;
+      this.baseSizeTweenPlaying = false;
+    }, this);
+    baseSizeTween.start();
+    this.baseSizeTweenPlaying = true;
+  }
 };
 
 BasicGame.Player.prototype.jumpFeedback = function () {
   // jump jump jump
   var stretchTween = this.game.add.tween(this.playerSprite);
-  stretchTween.to({ width: 24, height: 40 }, 200, Phaser.Easing.Exponential.Out);
+  stretchTween.to({
+    width: this.BASE_SIZE - this.STRETCH_SQUASH_VALUE,
+    height: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE
+  }, 200, Phaser.Easing.Exponential.Out);
   stretchTween.start();
   this.isJumping = true;
   this.currentJumpMultiplier = 0;
   if (!this.jumpSound.isPlaying) {
     this.jumpSound.play();
   }
-  console.log("Player.jumpFeedback");
-  // this.playerSprite.width = 24;
-  // this.playerSprite.height = 40;
 };
 
 /**
