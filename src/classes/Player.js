@@ -583,7 +583,7 @@ BasicGame.Player.prototype.checkCollisions = function () {
 
       if (this.collectedPieces === this.level.pieces.children.length) {
         // the level has been finished
-        this.level.endLevel();
+        this.gameObj.levelEnded();
       }
     },
     null,

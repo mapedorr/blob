@@ -16,6 +16,7 @@ BasicGame.Game = function (game) {
   this.putDarkTween = null;
   this.removeDarkTween = null;
   this.noiseImage = null;
+  this.savingText = null;
 
   // references to other classes
   this.days = null;
@@ -35,36 +36,36 @@ BasicGame.Game = function (game) {
   this.pausedOn = 0;
   this.mutedOn = 0;
   this.checkMKey = true;
+  this.changingLevel = false;
+  this.fontId = 'font';
+  this.savingMessage = {
+    "es": "Guardando progreso...",
+    "en": "Saving progress..."
+  };
 };
 
 BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
 
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ PHASER STATE METHODS                                                     ║
 BasicGame.Game.prototype.preload = function () {
   // create the days object
   this.days = new BasicGame.Days();
-
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
   // define the size of the world
   this.game.world.setBounds(0, 0, this.game.width, this.game.height);
-
   // init the level
   this.level = new BasicGame.Level(this.game, this);
-
   // init the player
   this.player = new BasicGame.Player(this.game, this.input, this);
-
   // init a light
   this.light = new BasicGame.Light(this.game, this);
   BasicGame.light = this.light;
-
-  // init THE EYE
+  // init the EYE
   this.eye = new BasicGame.Eye(this.game, this);
-
   // init the lightning
   this.lightning = new BasicGame.Lightning(this.game, this);
-
   // init the helper
   this.helper = new BasicGame.Helper(this.game, this);
 };
@@ -75,12 +76,11 @@ BasicGame.Game.prototype.create = function () {
   var flashBitmap = null;
   var flashSprite = null;
 
-  // ══════════════════════════════════════════════════════════════════════════╗
+  // ═════════════════════════════════════════════
   // define game properties and setup game objects
   this.lifes = this.LIFES_AMOUNT;
   this.showFPS = false;
   this.inDarkness = true;
-  this.isLoadingLevel = true;
 
   // set stage background
   this.background = this.game.add.tileSprite(0, 0,
@@ -90,6 +90,16 @@ BasicGame.Game.prototype.create = function () {
   /* this.noiseImage = this.game.add.sprite(0, 0, 'noise');
   this.noiseImage.animations.add('noisey', [0, 1], 12, true);
   this.noiseImage.animations.play('noisey'); */
+
+  this.savingText = this.game.add.bitmapText(this.game.world.width / 2,
+    this.game.world.height / 2,
+    this.fontId,
+    this.savingMessage[BasicGame.language],
+    18);
+  this.savingText.anchor.set(0.5, 0.5);
+  this.savingText.align = "center";
+  this.savingText.tint = 0xfafafa;
+  this.savingText.alpha = 0;
 
   // configure the camera for shaking
   this.game.camera.setSize(this.game.world.width / 2, this.game.world.height / 2);
@@ -104,9 +114,8 @@ BasicGame.Game.prototype.create = function () {
     this.KEY_PAUSE,
     this.KEY_MUTE
   ]);
-  // ══════════════════════════════════════════════════════════════════════════╝
 
-  // ══════════════════════════════════════════════════════════════════════════╗
+  // ═══════════════════
   // create the darkness
   this.darknessGroup = this.add.group();
   darknessBitmap = new Phaser.BitmapData(this.game,
@@ -141,9 +150,8 @@ BasicGame.Game.prototype.create = function () {
   flashSprite = new Phaser.Sprite(this.game, 0, 0, flashBitmap);
   flashSprite.alpha = 0;
   this.flashGroup.addChild(flashSprite);
-  // ══════════════════════════════════════════════════════════════════════════╝
 
-  // ══════════════════════════════════════════════════════════════════════════╗
+  // ════════════════
   // create the level
   this.level.create();
 
@@ -161,19 +169,10 @@ BasicGame.Game.prototype.create = function () {
 
   // create THE EYE
   this.eye.create(this.player, this.level, this.lightning);
-  // ══════════════════════════════════════════════════════════════════════════╝
 
-  // ══════════════════════════════════════════════════════════════════════════╗
+  // ═════════════════════════════════════════════════
   // bring to top some things so the game looks better
-  this.game.world.bringToTop(this.light.lightBitmap);
-  if (this.level.spikes) {
-    this.game.world.bringToTop(this.level.spikes);
-  }
-  this.game.world.bringToTop(this.level.walls);
-  this.game.world.bringToTop(this.level.pieces);
-  this.game.world.bringToTop(this.lifesGroup);
-  this.game.world.bringToTop(this.darknessGroup);
-  // ══════════════════════════════════════════════════════════════════════════╝
+  this.arrangeRenderLayers();
 
   // show FPS
   if (BasicGame.Game.developmentMode) {
@@ -195,7 +194,7 @@ BasicGame.Game.prototype.update = function () {
   // update the lightning
   this.lightning.update();
 
-  if (this.game.world.getTop().key !== 'noise') {
+  if (!this.showingDarkness && this.game.world.getTop().key !== 'noise') {
     this.game.world.bringToTop(this.noiseImage);
   }
 
@@ -222,6 +221,11 @@ BasicGame.Game.prototype.update = function () {
   }
 };
 
+BasicGame.Game.prototype.render = function () {
+  this.player.render();
+  this.level.render();
+};
+
 BasicGame.Game.prototype.pauseUpdate = function () {
   if ((this.game.time.now - this.pausedOn >= 100) && this.inputIsActive(this.KEY_PAUSE) === true) {
     this.game.paused = !this.game.paused;
@@ -229,30 +233,66 @@ BasicGame.Game.prototype.pauseUpdate = function () {
   }
 };
 
+/**
+ * This method will be called when the State is shutdown (i.e. you switch to another state from this one).
+ */
+BasicGame.Game.prototype.shutdown = function () {
+  // stop music, delete sprites, purge caches, free resources, all that good stuff.
+  // destroy sprites
+  this.background.destroy();
+  this.noiseImage.destroy();
+  // destroy groups
+  this.lifesGroup.destroy();
+  this.flashGroup.destroy();
+  this.darknessGroup.destroy();
+  // destroy sounds
+  this.music.destroy();
+  // destroy tweens
+  this.putDarkTween.stop();
+  this.removeDarkTween.stop();
+  // call the methods that will destroy everything in other classes
+  this.player.shutdown();
+  this.level.shutdown();
+  this.light.shutdown();
+  this.eye.shutdown();
+  this.lightning.shutdown();
+};
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+BasicGame.Game.prototype.arrangeRenderLayers = function () {
+  this.game.world.bringToTop(this.light.lightBitmap);
+  if (this.level.spikes) {
+    this.game.world.bringToTop(this.level.spikes);
+  }
+  this.game.world.bringToTop(this.level.walls);
+  this.game.world.bringToTop(this.level.pieces);
+  this.game.world.bringToTop(this.lifesGroup);
+  this.game.world.bringToTop(this.noiseImage);
+  this.game.world.bringToTop(this.darknessGroup);
+};
+
 BasicGame.Game.prototype.inputIsActive = function (key) {
   return this.game.input.keyboard.isDown(key);
 };
 
-BasicGame.Game.prototype.levelReady = function () {
-  this.hideDarkness();
-};
-
 BasicGame.Game.prototype.levelEnded = function () {
-  // notify to the eye that the level was ended
-  this.eye.endLevel(true);
+  BasicGame.isRetrying = false;
+  this.putDarkTween.onComplete.addOnce(function () {
+    // show the Progress saved message
+    this.savingText.alpha = 1;
+    this.game.world.bringToTop(this.savingText);
 
-  if (this.inDarkness === false) {
-    this.helper.timer(100, this.levelEnded.bind(this));
-    return;
-  }
+    this.helper.timer(1500, function () {
+      // set the flag for loading level
+      this.isLoadingLevel = true;
 
-  this.isLoadingLevel = true;
-  this.loadLevel(++BasicGame.currentLevel);
-};
-
-BasicGame.Game.prototype.render = function () {
-  this.player.render();
-  this.level.render();
+      // notify to the eye that the level was ended
+      this.eye.endLevel(true);
+      this.loadLevel(++BasicGame.currentLevel);
+    }, this);
+  }, this);
+  this.showDarkness();
 };
 
 BasicGame.Game.prototype.loadLevel = function (levelNumber) {
@@ -274,23 +314,8 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
     if (this.background.key != skyName) {
       this.background.loadTexture(skyName);
     }
-
+    this.savingText.alpha = 0;
     this.level.createLevel(levelNumber);
-
-    this.player.updateLevel(this.level);
-    this.light.updateWalls(this.level);
-    this.eye.updateLevel(this.level);
-    this.lightning.updateLevel(this.level);
-
-    this.game.world.bringToTop(this.light.lightBitmap);
-    this.game.world.bringToTop(this.level.pieces);
-    this.game.world.bringToTop(this.lifesGroup);
-    this.game.world.bringToTop(this.darknessGroup);
-
-    if (this.level.isReady === true) {
-      BasicGame.isRetrying = false;
-      this.levelReady();
-    }
   }, this);
 
   var levelData = this.helper.getLevelIdAndName(levelNumber);
@@ -301,7 +326,19 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
 
   this.game.load.start();
 
-  // localStorage.setItem("oh-my-blob", BasicGame.setDay(levelNumber));
+  localStorage.setItem("oh-my-blob", BasicGame.setDay(levelNumber));
+};
+
+BasicGame.Game.prototype.levelReady = function () {
+  if (this.isLoadingLevel === true) {
+    this.player.updateLevel(this.level);
+    this.light.updateWalls(this.level);
+    this.eye.updateLevel(this.level);
+    this.lightning.updateLevel(this.level);
+    this.arrangeRenderLayers();
+  }
+
+  this.hideDarkness();
 };
 
 BasicGame.Game.prototype.shakeCamera = function () {
@@ -363,7 +400,7 @@ BasicGame.Game.prototype.subtractLife = function () {
 
   if (this.lifes <= 0) {
     // save the current level
-    // localStorage.setItem("oh-my-blob", BasicGame.addDeath());
+    localStorage.setItem("oh-my-blob", BasicGame.addDeath());
 
     // notify the PLAYER that its time to show the animation for dead
     this.player.explote();
@@ -381,7 +418,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
     return;
   }
 
-  // localStorage.setItem("oh-my-blob", BasicGame.addDeath());
+  localStorage.setItem("oh-my-blob", BasicGame.addDeath());
 
   this.lifes = 0;
 
@@ -409,6 +446,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
 };
 
 BasicGame.Game.prototype.showDarkness = function (durationInMS) {
+  this.showingDarkness = true;
   this.game.world.bringToTop(this.darknessGroup);
   this.putDarkTween.updateTweenData("duration", durationInMS || this.FADE_DURATION);
   this.putDarkTween.start();
@@ -428,6 +466,7 @@ BasicGame.Game.prototype.putDarkTweenCompleted = function () {
 
 BasicGame.Game.prototype.hideDarkness = function (durationInMS) {
   this.inDarkness = false;
+  this.showingDarkness = false;
   this.removeDarkTween.updateTweenData("duration", durationInMS || this.FADE_DURATION);
   this.removeDarkTween.start();
 };
@@ -494,29 +533,5 @@ BasicGame.Game.prototype.getSkyName = function () {
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 BasicGame.Game.prototype.quitGame = function () {
   this.shutdown();
-};
-
-/**
- * This method will be called when the State is shutdown (i.e. you switch to another state from this one).
- */
-BasicGame.Game.prototype.shutdown = function () {
-  // stop music, delete sprites, purge caches, free resources, all that good stuff.
-  // destroy sprites
-  this.background.destroy();
-  // destroy groups
-  this.lifesGroup.destroy();
-  this.flashGroup.destroy();
-  this.darknessGroup.destroy();
-  // destroy sounds
-  this.music.destroy();
-  // destroy tweens
-  this.putDarkTween.stop();
-  this.removeDarkTween.stop();
-  // call the methods that will destroy everything in other classes
-  this.player.shutdown();
-  this.level.shutdown();
-  this.light.shutdown();
-  this.eye.shutdown();
-  this.lightning.shutdown();
 };
 // ╚═══════════════════════════════════════════════════════════════════════════╝

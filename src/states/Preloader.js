@@ -27,24 +27,26 @@ BasicGame.Preloader.prototype.preload = function () {
 
   //  --------------------------------------
   //  ---| load the assets for the Main menu
-  // this.load.image('splash_view', 'assets/sprites/splash_view.png');
-  this.load.image('title', 'assets/images/title.png');
-  this.load.image('pupil', 'assets/sprites/pupil_normal.png');
+  // this.load.image('title', 'assets/images/title.png');
+  this.load.image('main_menu_background', 'assets/sprites/main_menu_background.png');
+  this.load.image('button_background', 'assets/sprites/button_background.png');
+  this.load.image('giant_pupil', 'assets/sprites/giant_pupil.png');
 
-  this.load.spritesheet('playButton', 'assets/sprites/play_button.png', 400, 256);
-  this.load.spritesheet('jugarButton', 'assets/sprites/jugar_button.png', 400, 256);
-  this.load.spritesheet('continueButton', 'assets/sprites/continue_button.png', 400, 256);
-  this.load.spritesheet('continuarButton', 'assets/sprites/continuar_button.png', 400, 256);
+  // this.load.spritesheet('playButton', 'assets/sprites/play_button.png', 400, 256);
+  // this.load.spritesheet('jugarButton', 'assets/sprites/jugar_button.png', 400, 256);
+  // this.load.spritesheet('continueButton', 'assets/sprites/continue_button.png', 400, 256);
+  // this.load.spritesheet('continuarButton', 'assets/sprites/continuar_button.png', 400, 256);
 
   this.load.audio('splash_music', 'assets/music/splash_music.ogg', true);
-  this.load.audio('en-lang', 'assets/soundfx/en.ogg', true);
-  this.load.audio('es-lang', 'assets/soundfx/es.ogg', true);
+  // this.load.audio('en-lang', 'assets/soundfx/en.ogg', true);
+  // this.load.audio('es-lang', 'assets/soundfx/es.ogg', true);
 
   this.game.load.tilemap('splash_lvl', 'assets/levels/splash.json',
     null, Phaser.Tilemap.TILED_JSON);
 
-  //  --------------------------------------
+  //  ---------------------------------
   //  ---| load the assets for the Game
+  this.load.image('pupil', 'assets/sprites/pupil_normal.png');
   this.load.image('light', 'assets/images/light.png');
   this.load.image('view_zone', 'assets/sprites/view_zone.png');
   this.load.image('piece', 'assets/sprites/piece.png');
@@ -107,6 +109,6 @@ BasicGame.Preloader.prototype.update = function () {
   //this.cache.isSoundDecoded('mainMenuMusic')
   if (this.ready === false) {
     this.ready = true;
-    this.state.start('Game');
+    this.state.start('MainMenu');
   }
 };

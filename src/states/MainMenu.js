@@ -2,28 +2,80 @@ var BasicGame = require('BasicGame');
 
 BasicGame.MainMenu = function (game) {
   // constants
+  this.BUTTON_WIDTH = 150;
+  this.BUTTON_HEIGHT = 38;
+  this.BUTTON_VSPACING = 15;
+  this.BUTTON_HSPACING = 12;
 
   // destroyable objects (sprites, sounds, groups, tweens...)
+  this.backgroundImage = null;
+  this.titleText = null;
+  this.giantPupilImage = null;
+  this.optionsGroup = null;
+  this.languageGroup = null;
 
   // global properties
+  this.fontId = 'font';
+  this.fontMediumId = 'font-medium';
+  /* this.creditsTextBitmap = null;
+  this.restartTextBitmap = null;
   this.splash_music = null;
   this.playButton = null;
   this.jugarButton = null;
   this.showIntroTimer = null;
   this.enSound = null;
   this.esSound = null;
-  this.listenKeys = false;
+  this.listenKeys = false; */
 
-  this.fontId = 'font';
-  this.creditsTextBitmap = null;
-  this.restartTextBitmap = null;
 };
 
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ PHASER STATE METHODS                                                     ║
 BasicGame.MainMenu.prototype.create = function () {
   var _self = this;
 
-  // set stage background
-  this.background = this.game.add.tileSprite(0, 0,
+  // set the background
+  this.backgroundImage = this.game.add.image(0, 0, 'main_menu_background');
+  this.backgroundImage.width = this.game.world.width;
+  this.backgroundImage.height = this.game.world.height;
+
+  // add the title
+  this.titleText = this.game.add.bitmapText(this.game.world.width / 2,
+    41,
+    this.fontMediumId,
+    'In the Shadows',
+    72);
+  this.titleText.anchor.set(0.5, 0);
+  this.titleText.align = "center";
+  this.titleText.tint = 0x303c42;
+
+  // add the pupil
+  this.giantPupilImage = this.game.add.image(this.game.world.width / 2,
+    this.game.world.height / 2,
+    'giant_pupil');
+  this.giantPupilImage.anchor.set(.5, .5);
+
+  // create the group for menu buttons
+  this.optionsGroup = this.game.add.group();
+
+  if (BasicGame.currentLevel > 1) {
+    this.addGameOption("Continue", null, 0, 1, this.optionsGroup);
+  }
+
+  this.addGameOption("New game", null, 0, 1, this.optionsGroup);
+  this.addGameOption("Credits", null, 0, 1, this.optionsGroup);
+  this.optionsGroup.right = this.game.world.width - 58;
+  this.optionsGroup.centerY = this.game.world.height / 2;
+
+  // create the group for language buttons
+  this.languageGroup = this.game.add.group();
+  this.addGameOption("Español", null, 1, 0, this.languageGroup);
+  this.addGameOption("English", null, 1, 0, this.languageGroup);
+  this.languageGroup.right = this.game.world.width - 58;
+  this.languageGroup.bottom = this.game.world.height - 32;
+
+
+  /* this.background = this.game.add.tileSprite(0, 0,
     this.game.world.width, this.game.world.height,
     BasicGame.Helper.prototype.getSkyName(BasicGame.currentLevel));
 
@@ -138,17 +190,17 @@ BasicGame.MainMenu.prototype.create = function () {
       soundObj.stop();
     }, this);
     this.splash_music.play();
-  }
+  } */
 
   // DARKNESS
   if (BasicGame.currentLevel === 1) {
-    this.darknessGroup = this.add.group();
+    /* this.darknessGroup = this.add.group();
     var darknessBitmap = new Phaser.BitmapData(this.game,
       'darkness_main',
       this.game.width,
       this.game.height);
     darknessBitmap.ctx.rect(0, 0, this.game.width, this.game.height);
-    darknessBitmap.ctx.fillStyle = '#000';
+    darknessBitmap.ctx.fillStyle = '#212121';
     darknessBitmap.ctx.fill();
     var darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
     this.darknessGroup.addChild(darknessSprite);
@@ -162,14 +214,15 @@ BasicGame.MainMenu.prototype.create = function () {
     this.darknessTween.onComplete.add(function () {
       this.showButtons();
     }, this);
+    this.darknessTween.start(); */
   }
   else {
-    this.showButtons();
+    // this.showButtons();
   }
 };
 
 BasicGame.MainMenu.prototype.update = function () {
-  if (this.listenKeys === false ||
+  /* if (this.listenKeys === false ||
     this.movingPlayer === true) {
     return;
   }
@@ -203,9 +256,47 @@ BasicGame.MainMenu.prototype.update = function () {
     BasicGame.reset();
     this.splash_music.stop();
     this.showIntro();
-  }
-
+  } */
 };
+
+/**
+ * This method will be called when the State is shutdown (i.e. you switch to another state from this one).
+ */
+BasicGame.MainMenu.prototype.shutdown = function () {
+
+  // destroy sprites and images
+  this.backgroundImage.destroy();
+  this.titleText.destroy();
+  this.giantPupilImage.destroy();
+  // destroy groups
+  this.optionsGroup.destroy();
+  this.languageGroup.destroy();
+
+  /* // destroy sprites and images
+  this.background.destroy();
+  this.fakeViewZone.destroy();
+  this.fakeEye.destroy();
+  this.pupil.destroy();
+  this.map.destroy();
+  this.fakeplayer.destroy();
+  this.light.destroy();
+  this.gameTitle.destroy();
+  this.showIntroTimer.destroy();
+  // destroy groups
+  this.buttons.destroy();
+  this.ground.destroy();
+  this.walls.destroy();
+  this.darknessGroup.destroy();
+  // destroy audio
+  this.enSound.destroy();
+  this.esSound.destroy();
+  this.splash_music.destroy();
+  // destroy tweens
+  this.darknessTween.stop(); */
+};
+
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
 
 BasicGame.MainMenu.prototype.moveFakePlayer = function (targetX) {
   this.splash_music.fadeOut(1480);
@@ -240,29 +331,43 @@ BasicGame.MainMenu.prototype.showIntro = function () {
   this.state.start((BasicGame.currentLevel === 1) ? 'Intro' : 'Game');
 };
 
-/**
- * This method will be called when the State is shutdown (i.e. you switch to another state from this one).
- */
-BasicGame.MainMenu.prototype.shutdown = function () {
-  // destroy sprites and images
-  this.background.destroy();
-  this.fakeViewZone.destroy();
-  this.fakeEye.destroy();
-  this.pupil.destroy();
-  this.map.destroy();
-  this.fakeplayer.destroy();
-  this.light.destroy();
-  this.gameTitle.destroy();
-  this.showIntroTimer.destroy();
-  // destroy groups
-  this.buttons.destroy();
-  this.ground.destroy();
-  this.walls.destroy();
-  this.darknessGroup.destroy();
-  // destroy audio
-  this.enSound.destroy();
-  this.esSound.destroy();
-  this.splash_music.destroy();
-  // destroy tweens
-  this.darknessTween.stop();
+BasicGame.MainMenu.prototype.addGameOption = function (name, action, hSpace, vSpace, group) {
+  var button = null;
+  var text = null;
+  var buttonsInGroup = Math.max(0, group.children.length - group.children.length / 2);
+
+  button = this.game.add.button(
+    0 + ((this.BUTTON_WIDTH + this.BUTTON_HSPACING) * buttonsInGroup) * hSpace,
+    0 + ((this.BUTTON_HEIGHT + this.BUTTON_VSPACING) * buttonsInGroup) * vSpace,
+    'button_background', action, this
+  );
+  button.anchor.set(1, 0);
+  button.width = this.BUTTON_WIDTH;
+  button.height = this.BUTTON_HEIGHT;
+
+  text = this.game.add.bitmapText(button.right - 13,
+    button.centerY,
+    this.fontId, name, 18);
+  text.anchor.set(1, 0.5);
+  text.align = "right";
+  text.tint = 0xfafafa;
+
+  button.width = text.textWidth + 13 * 2;
+  button.defaultWidth = text.textWidth + 13 * 2;
+
+  button.onInputOver.add(function (sprite, pointer, text) {
+    var overTween = this.game.add.tween(sprite);
+    overTween.to({ width: this.BUTTON_WIDTH }, 150, Phaser.Easing.Exponential.Out);
+    overTween.start();
+    text.tint = 0xf15a4a;
+  }, this, 0, text);
+  button.onInputOut.add(function (sprite, pointer, text) {
+    var overTween = this.game.add.tween(sprite);
+    overTween.to({ width: sprite.defaultWidth }, 250, Phaser.Easing.Exponential.Out);
+    overTween.start();
+    text.tint = 0xfafafa;
+  }, this, 0, text);
+
+  group.add(button);
+  group.add(text);
 };

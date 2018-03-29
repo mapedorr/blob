@@ -15,7 +15,6 @@ BasicGame.Level = function (game, gameObj) {
   // destroyable objects
   this.levelTextGroup = null;
   this.dayNumberText = null;
-  // this.dayPhraseTextBitmap = null;
   this.daySound = null;
   this.spikeSound = null;
   this.map = null;
@@ -28,10 +27,8 @@ BasicGame.Level = function (game, gameObj) {
   this.game = game;
   this.gameObj = gameObj;
   this.endTimer = null;
-  this.isEnded = null;
   this.initPlayerPos = { x: 0, y: 0 };
   this.daysShown = false;
-  this.isReady = false;
   this.isShowingDays = false;
   this.dayText = {
     "es": "Día",
@@ -62,17 +59,6 @@ BasicGame.Level.prototype.create = function () {
   this.dayNumberText.align = "center";
   this.dayNumberText.tint = 0x8d8d8e;
   this.dayNumberText.oriY = this.dayNumberText.y;
-
-  // create the bitmap for the day phrase
-  // this.dayPhraseTextBitmap = this.game.add.bitmapText(0,
-  //   this.dayNumberText.bottom + 20,
-  //   this.fontId,
-  //   '',
-  //   48,
-  //   this.levelTextGroup);
-  // this.dayPhraseTextBitmap.maxWidth = this.game.world.width;
-  // this.dayPhraseTextBitmap.align = "center";
-  // this.dayPhraseTextBitmap.tint = 0x515151;
 
   if (!this.daySound) {
     this.daySound = this.game.add.sound('day', 0.15);
@@ -171,16 +157,6 @@ BasicGame.Level.prototype.createLevel = function (num) {
   var dayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
   this.dayNumberText.setText(this.dayText[BasicGame.language] + ' ' + dayObj.number);
   this.dayNumberText.y = this.dayNumberText.oriY;
-  // if (dayObj.text) {
-  //   this.dayPhraseTextBitmap.setText(dayObj.text[BasicGame.language]);
-  //   this.dayPhraseTextBitmap.x = this.game.world.width / 2 - this.dayPhraseTextBitmap.width / 2;
-  // }
-  // else {
-  //   this.dayNumberText.y += 15;
-  // }
-
-  // set the level as not ended
-  this.isEnded = false;
 
   // notify to the game that the level is ready
   this.gameObj.levelReady();
@@ -204,7 +180,6 @@ BasicGame.Level.prototype.destroyCurrentLevel = function () {
     this.pieces.destroy();
   }
   this.dayNumberText.setText("");
-  this.dayPhraseTextBitmap.setText("");
 };
 
 BasicGame.Level.prototype.render = function () {
@@ -216,28 +191,6 @@ BasicGame.Level.prototype.render = function () {
       });
     }
   }
-};
-
-BasicGame.Level.prototype.endLevel = function () {
-  BasicGame.isRetrying = false;
-  var secondsToEnd = this.gameObj.countdownDuration;
-
-  // create the timer
-  this.endTimer = this.game.time.create(true);
-
-  // starts the timer that will end the level
-  this.endTimer.add(secondsToEnd * 1000,
-    function () {
-      // enable the flag that indicates the other objects the level is finished
-      this.endTimer = undefined;
-      this.isEnded = true;
-
-      this.gameObj.levelEnded();
-    },
-    this);
-
-  this.endTimer.start();
-  this.gameObj.showDarkness();
 };
 
 BasicGame.Level.prototype.showDay = function () {
@@ -420,7 +373,6 @@ BasicGame.Level.prototype.restartLevel = function () {
 BasicGame.Level.prototype.shutdown = function () {
   this.levelTextGroup.destroy();
   this.dayNumberText.destroy();
-  this.dayPhraseTextBitmap.destroy();
   this.daySound.destroy();
   this.spikeSound.destroy();
   this.map.destroy();
