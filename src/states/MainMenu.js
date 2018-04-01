@@ -2,10 +2,27 @@ var BasicGame = require('BasicGame');
 
 BasicGame.MainMenu = function (game) {
   // constants
-  this.BUTTON_WIDTH = 150;
+  this.BUTTON_WIDTH = 180;
   this.BUTTON_HEIGHT = 38;
   this.BUTTON_VSPACING = 15;
   this.BUTTON_HSPACING = 12;
+  this.SCREEN_PADDING = 32;
+  this.continueValue = {
+    'es': 'Continuar',
+    'en': 'Continue'
+  };
+  this.newGameValue = {
+    'es': 'Nuevo juego',
+    'en': 'New game'
+  };
+  this.creditsValue = {
+    'es': 'Créditos',
+    'en': 'Credits'
+  };
+  this.keysDescriptionValue = {
+    'es': 'usa WASD o las FLECHAS DEL TECLADO para moverte\nusa Z o ESPACIO para saltar',
+    'en': 'use WASD or the ARROW KEYS to move\nuse Z or SPACE to jump'
+  };
 
   // destroyable objects (sprites, sounds, groups, tweens...)
   this.backgroundImage = null;
@@ -55,24 +72,57 @@ BasicGame.MainMenu.prototype.create = function () {
     'giant_pupil');
   this.giantPupilImage.anchor.set(.5, .5);
 
+  // add the text for key inputs
+  this.keysDescriptionText = this.game.add.bitmapText(0, 0,
+    this.fontId,
+    this.keysDescriptionValue[BasicGame.language],
+    18);
+  this.keysDescriptionText.anchor.set(0.5, 0);
+  this.keysDescriptionText.align = "center";
+  this.keysDescriptionText.tint = 0x303c42;
+  this.keysDescriptionText.x = this.game.world.width / 2;
+  this.keysDescriptionText.bottom = this.game.world.height - this.SCREEN_PADDING;
+  this.keysDescriptionText.alpha = 0;
+
   // create the group for menu buttons
   this.optionsGroup = this.game.add.group();
 
   if (BasicGame.currentLevel > 1) {
-    this.addGameOption("Continue", null, 0, 1, this.optionsGroup);
+    this.addGameOption({name: this.continueValue[BasicGame.language],
+      hSpace: 0,
+      vSpace: 1,
+      group: this.optionsGroup,
+      overCallback: this.showKeysDescription.bind(this, true),
+      outCallback: this.showKeysDescription.bind(this, false),
+      clickCallback: this.showIntro
+    });
   }
-
-  this.addGameOption("New game", null, 0, 1, this.optionsGroup);
-  this.addGameOption("Credits", null, 0, 1, this.optionsGroup);
-  this.optionsGroup.right = this.game.world.width - 58;
-  this.optionsGroup.centerY = this.game.world.height / 2;
+  this.addGameOption({name: this.newGameValue[BasicGame.language],
+    hSpace: 0,
+    vSpace: 1,
+    group: this.optionsGroup,
+    overCallback: this.showKeysDescription.bind(this, true),
+    outCallback: this.showKeysDescription.bind(this, false),
+    clickCallback: this.newGame
+  });
+  this.addGameOption({name: this.creditsValue[BasicGame.language],
+    hSpace: 0,
+    vSpace: 1,
+    group: this.optionsGroup,
+    clickCallback: this.showCredits
+  });
+  this.optionsGroup.right = this.game.world.width - this.SCREEN_PADDING;
+  this.optionsGroup.bottom = this.game.world.height - this.SCREEN_PADDING;
 
   // create the group for language buttons
-  this.languageGroup = this.game.add.group();
-  this.addGameOption("Español", null, 1, 0, this.languageGroup);
-  this.addGameOption("English", null, 1, 0, this.languageGroup);
-  this.languageGroup.right = this.game.world.width - 58;
-  this.languageGroup.bottom = this.game.world.height - 32;
+  // this.languageGroup = this.game.add.group();
+  // this.addGameOption("Español", null, 1, 0, this.languageGroup);
+  // this.addGameOption("English", null, 1, 0, this.languageGroup);
+  // this.languageGroup.right = this.game.world.width - this.SCREEN_PADDING;
+  // this.languageGroup.bottom = this.game.world.height - this.SCREEN_PADDING;
+
+
+
 
 
   /* this.background = this.game.add.tileSprite(0, 0,
@@ -268,9 +318,10 @@ BasicGame.MainMenu.prototype.shutdown = function () {
   this.backgroundImage.destroy();
   this.titleText.destroy();
   this.giantPupilImage.destroy();
+  this.keysDescriptionText.destroy();
   // destroy groups
   this.optionsGroup.destroy();
-  this.languageGroup.destroy();
+  // this.languageGroup.destroy();
 
   /* // destroy sprites and images
   this.background.destroy();
@@ -328,46 +379,71 @@ BasicGame.MainMenu.prototype.showButtons = function () {
 };
 
 BasicGame.MainMenu.prototype.showIntro = function () {
-  this.state.start((BasicGame.currentLevel === 1) ? 'Intro' : 'Game');
+  // this.state.start((BasicGame.currentLevel === 1) ? 'Intro' : 'Game');
+  this.state.start('Game');
 };
 
-BasicGame.MainMenu.prototype.addGameOption = function (name, action, hSpace, vSpace, group) {
+BasicGame.MainMenu.prototype.addGameOption = function (prop) {
   var button = null;
   var text = null;
-  var buttonsInGroup = Math.max(0, group.children.length - group.children.length / 2);
-
+  var buttonsInGroup = Math.max(0, prop.group.children.length - prop.group.children.length / 2);
+  
   button = this.game.add.button(
-    0 + ((this.BUTTON_WIDTH + this.BUTTON_HSPACING) * buttonsInGroup) * hSpace,
-    0 + ((this.BUTTON_HEIGHT + this.BUTTON_VSPACING) * buttonsInGroup) * vSpace,
-    'button_background', action, this
+    0 + ((this.BUTTON_WIDTH + this.BUTTON_HSPACING) * buttonsInGroup) * prop.hSpace,
+    0 + ((this.BUTTON_HEIGHT + this.BUTTON_VSPACING) * buttonsInGroup) * prop.vSpace,
+    'button_background', prop.clickCallback, this
   );
   button.anchor.set(1, 0);
   button.width = this.BUTTON_WIDTH;
   button.height = this.BUTTON_HEIGHT;
-
+  
   text = this.game.add.bitmapText(button.right - 13,
     button.centerY,
-    this.fontId, name, 18);
+    this.fontId, prop.name, 18);
   text.anchor.set(1, 0.5);
   text.align = "right";
   text.tint = 0xfafafa;
-
+  
   button.width = text.textWidth + 13 * 2;
   button.defaultWidth = text.textWidth + 13 * 2;
-
+  
   button.onInputOver.add(function (sprite, pointer, text) {
     var overTween = this.game.add.tween(sprite);
     overTween.to({ width: this.BUTTON_WIDTH }, 150, Phaser.Easing.Exponential.Out);
     overTween.start();
     text.tint = 0xf15a4a;
+    
+    if (prop.overCallback) {
+      prop.overCallback();
+    }
   }, this, 0, text);
   button.onInputOut.add(function (sprite, pointer, text) {
     var overTween = this.game.add.tween(sprite);
     overTween.to({ width: sprite.defaultWidth }, 250, Phaser.Easing.Exponential.Out);
     overTween.start();
     text.tint = 0xfafafa;
+    
+    if (prop.outCallback) {
+      prop.outCallback();
+    }
   }, this, 0, text);
+  
+  prop.group.add(button);
+  prop.group.add(text);
+};
 
-  group.add(button);
-  group.add(text);
+BasicGame.MainMenu.prototype.showKeysDescription = function (show) {
+  var showTween = this.game.add.tween(this.keysDescriptionText);
+  showTween.to({ alpha: (show === true) ? 1 : 0 }, 200, Phaser.Easing.Exponential.Out);
+  showTween.start();
+};
+
+BasicGame.MainMenu.prototype.newGame = function () {
+  localStorage.removeItem("oh-my-blob");
+  BasicGame.reset();
+  this.showIntro();
+};
+
+BasicGame.MainMenu.prototype.showCredits = function () {
+  this.state.start('Credits');
 };
