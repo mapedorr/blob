@@ -45,6 +45,10 @@ var BasicGame = {
     this.currentLevel = 1;
     this.deaths = 0;
     this.rest = 0;
+  },
+  changeHTMLBackground: function (color) {
+    document.body.style.backgroundColor = color;
+
   }
 };
 

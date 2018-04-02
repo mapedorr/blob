@@ -20,7 +20,7 @@ BasicGame.Helper.prototype.timer = function (delay, callback, context) {
 BasicGame.Helper.prototype.randomColor = function () {
   var letters = '0123456789ABCDEF';
   var color = '0x';
-  for (var i = 0; i < 6; i++ ) {
+  for (var i = 0; i < 6; i++) {
     color += letters[Math.floor(Math.random() * 16)];
   }
   return color;
@@ -45,5 +45,19 @@ BasicGame.Helper.prototype.getSkyName = function (levelNumber) {
     return 'sky02';
   } else {
     return 'sky03';
+  }
+};
+
+BasicGame.Helper.prototype.getSkyColor = function (levelNumber) {
+  if (!levelNumber) {
+    return '#F2F2F0';
+  }
+
+  if (levelNumber <= 10) {
+    return '#2B3825';
+  } else if (levelNumber <= 20) {
+    return '#33393D';
+  } else {
+    return '#4E1B1B';
   }
 };

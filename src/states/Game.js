@@ -84,6 +84,8 @@ BasicGame.Game.prototype.create = function () {
 
   // set stage background
   this.background = this.game.add.image(0, 0, this.getSkyName());
+  this.background.width = this.game.world.width;
+  this.background.height = this.game.world.height;
 
   this.noiseImage = this.game.add.image(0, 0, 'noise');
   this.noiseImage.alpha = .5;
@@ -170,6 +172,8 @@ BasicGame.Game.prototype.create = function () {
   // ═════════════════════════════════════════════════
   // bring to top some things so the game looks better
   this.arrangeRenderLayers();
+
+  BasicGame.changeHTMLBackground(this.helper.getSkyColor(BasicGame.currentLevel));
 
   // show FPS
   if (BasicGame.Game.developmentMode) {

@@ -120,6 +120,8 @@ BasicGame.MainMenu.prototype.create = function () {
     soundObj.stop();
   }, this);
   this.splashMusic.play();
+
+  BasicGame.changeHTMLBackground(BasicGame.Helper.prototype.getSkyColor(BasicGame.currentLevel));
 };
 
 BasicGame.MainMenu.prototype.update = function () {
@@ -390,12 +392,15 @@ BasicGame.MainMenu.prototype.showKeysDescription = function (show) {
 
 BasicGame.MainMenu.prototype.newGame = function () {
   var levelData = null;
+  var skyName = null;
 
   localStorage.removeItem("oh-my-blob");
   BasicGame.reset();
 
   this.game.load.onLoadComplete.addOnce(this.showIntro, this);
-  var levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);;
+  levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);
+  skyName = BasicGame.Helper.prototype.getSkyName(BasicGame.currentLevel);
+  this.load.image(skyName, 'assets/sprites/' + skyName + '.png');
   this.game.load.tilemap(levelData.id,
     'assets/levels/' + levelData.name + '.json',
     null,
