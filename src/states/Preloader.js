@@ -31,15 +31,12 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('main_menu_background', 'assets/sprites/main_menu_background.png');
   this.load.image('button_background', 'assets/sprites/button_background.png');
   this.load.image('giant_pupil', 'assets/sprites/giant_pupil.png');
-
-  // this.load.spritesheet('playButton', 'assets/sprites/play_button.png', 400, 256);
-  // this.load.spritesheet('jugarButton', 'assets/sprites/jugar_button.png', 400, 256);
-  // this.load.spritesheet('continueButton', 'assets/sprites/continue_button.png', 400, 256);
-  // this.load.spritesheet('continuarButton', 'assets/sprites/continuar_button.png', 400, 256);
+  this.load.image('close', 'assets/sprites/close.png');
+  this.load.image('credits_background', 'assets/sprites/credits_background.png');
+  this.load.image('credits_en', 'assets/sprites/credits_en.png');
+  this.load.image('credits_es', 'assets/sprites/credits_es.png');
 
   this.load.audio('splash_music', 'assets/music/splash_music.ogg', true);
-  // this.load.audio('en-lang', 'assets/soundfx/en.ogg', true);
-  // this.load.audio('es-lang', 'assets/soundfx/es.ogg', true);
 
   this.game.load.tilemap('splash_lvl', 'assets/levels/splash.json',
     null, Phaser.Tilemap.TILED_JSON);
@@ -47,18 +44,19 @@ BasicGame.Preloader.prototype.preload = function () {
   //  ---------------------------------
   //  ---| load the assets for the Game
   this.load.image('pupil', 'assets/sprites/pupil_normal.png');
-  this.load.image('light', 'assets/images/light.png');
+  this.load.image('light', 'assets/sprites/light.png');
   this.load.image('view_zone', 'assets/sprites/view_zone.png');
   this.load.image('piece', 'assets/sprites/piece.png');
   this.load.image('platform', 'assets/sprites/platform.png');
   this.load.image('life', 'assets/sprites/life.png');
   this.load.image('dialogue_background', 'assets/sprites/dialogue_background.png');
   this.load.image('dialogue_mark', 'assets/sprites/dialogue_mark.png');
-  this.load.image('noise', 'assets/backgrounds/noise_01.png');
+  this.load.image('noise', 'assets/sprites/noise_01.png');
 
-  // this.load.spritesheet('noise', 'assets/backgrounds/noise.png', 1024, 640);
-  this.load.spritesheet('player', 'assets/sprites/player.png', 32, 32);
-  this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 119);
+  // this.load.spritesheet('noise', 'assets/sprites/noise.png', 1024, 640);
+  this.load.spritesheet('player', 'assets/sprites/player.png', 32, 32, 1);
+  this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 119, 3);
+  this.load.spritesheet('checkbox', 'assets/sprites/checkbox.png', 24, 24, 2);
 
   this.load.audio('b', 'assets/soundfx/b.ogg', true);
   this.load.audio('h', 'assets/soundfx/h.ogg', true);
@@ -82,7 +80,7 @@ BasicGame.Preloader.prototype.preload = function () {
   // it will not be necessary to load this one if the player already passed the
   // first part of the game
   skyName = BasicGame.Helper.prototype.getSkyName(BasicGame.currentLevel);
-  this.load.image(skyName, 'assets/backgrounds/' + skyName + '.png');
+  this.load.image(skyName, 'assets/sprites/' + skyName + '.png');
 
   // load this if the current level stored requires it, otherwise load it
   // when the player is near the end of the corresponding chapter

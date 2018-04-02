@@ -7,21 +7,34 @@ BasicGame.MainMenu = function (game) {
   this.BUTTON_VSPACING = 15;
   this.BUTTON_HSPACING = 12;
   this.SCREEN_PADDING = 32;
-  this.continueValue = {
+  this.BUTTON_PADDING = 16;
+  this.continueMsg = {
     'es': 'Continuar',
     'en': 'Continue'
   };
-  this.newGameValue = {
+  this.newGameMsg = {
     'es': 'Nuevo juego',
     'en': 'New game'
   };
-  this.creditsValue = {
+  this.creditsMsg = {
     'es': 'Créditos',
     'en': 'Credits'
   };
-  this.keysDescriptionValue = {
-    'es': 'usa WASD o las FLECHAS DEL TECLADO para moverte\nusa Z o ESPACIO para saltar',
-    'en': 'use WASD or the ARROW KEYS to move\nuse Z or SPACE to jump'
+  this.keysDescriptionMsg = {
+    'es': 'usa A y D o IZQUIERA y DERECHA para moverte\nusa W, Z, ESPACIO o ARRIBA para saltar',
+    'en': 'use A and D or LEFT and RIGHT to move\nuse W, Z, SPACE or UP to jump'
+  };
+  this.continueDayMsg = {
+    "es": "Día",
+    "en": "Day"
+  };
+  this.spanishLangMsg = {
+    "es": "Español",
+    "en": "Spanish"
+  };
+  this.englishLangMsg = {
+    "es": "Inglés",
+    "en": "English"
   };
 
   // destroyable objects (sprites, sounds, groups, tweens...)
@@ -30,10 +43,19 @@ BasicGame.MainMenu = function (game) {
   this.giantPupilImage = null;
   this.optionsGroup = null;
   this.languageGroup = null;
+  this.keysDescriptionText = null;
+  this.continueDayText = null;
+  this.creditsGroup = null;
 
   // global properties
   this.fontId = 'font';
   this.fontMediumId = 'font-medium';
+  this.translatableTexts = [];
+  this.fakeEye = {
+    centerX: 512,
+    centerY: 321,
+    radius: 210
+  };
   /* this.creditsTextBitmap = null;
   this.restartTextBitmap = null;
   this.splash_music = null;
@@ -56,6 +78,12 @@ BasicGame.MainMenu.prototype.create = function () {
   this.backgroundImage.width = this.game.world.width;
   this.backgroundImage.height = this.game.world.height;
 
+  // add the pupil
+  this.giantPupilImage = this.game.add.image(this.game.world.width / 2,
+    this.game.world.height / 2,
+    'giant_pupil');
+  this.giantPupilImage.anchor.set(.5, .5);
+
   // add the title
   this.titleText = this.game.add.bitmapText(this.game.world.width / 2,
     41,
@@ -66,16 +94,10 @@ BasicGame.MainMenu.prototype.create = function () {
   this.titleText.align = "center";
   this.titleText.tint = 0x303c42;
 
-  // add the pupil
-  this.giantPupilImage = this.game.add.image(this.game.world.width / 2,
-    this.game.world.height / 2,
-    'giant_pupil');
-  this.giantPupilImage.anchor.set(.5, .5);
-
   // add the text for key inputs
   this.keysDescriptionText = this.game.add.bitmapText(0, 0,
     this.fontId,
-    this.keysDescriptionValue[BasicGame.language],
+    this.keysDescriptionMsg[BasicGame.language],
     18);
   this.keysDescriptionText.anchor.set(0.5, 0);
   this.keysDescriptionText.align = "center";
@@ -84,42 +106,20 @@ BasicGame.MainMenu.prototype.create = function () {
   this.keysDescriptionText.bottom = this.game.world.height - this.SCREEN_PADDING;
   this.keysDescriptionText.alpha = 0;
 
-  // create the group for menu buttons
-  this.optionsGroup = this.game.add.group();
+  this.translatableTexts.push({
+    sourceMsg: this.keysDescriptionMsg,
+    phaserObj: this.keysDescriptionText
+  });
 
-  if (BasicGame.currentLevel > 1) {
-    this.addGameOption({name: this.continueValue[BasicGame.language],
-      hSpace: 0,
-      vSpace: 1,
-      group: this.optionsGroup,
-      overCallback: this.showKeysDescription.bind(this, true),
-      outCallback: this.showKeysDescription.bind(this, false),
-      clickCallback: this.showIntro
-    });
-  }
-  this.addGameOption({name: this.newGameValue[BasicGame.language],
-    hSpace: 0,
-    vSpace: 1,
-    group: this.optionsGroup,
-    overCallback: this.showKeysDescription.bind(this, true),
-    outCallback: this.showKeysDescription.bind(this, false),
-    clickCallback: this.newGame
-  });
-  this.addGameOption({name: this.creditsValue[BasicGame.language],
-    hSpace: 0,
-    vSpace: 1,
-    group: this.optionsGroup,
-    clickCallback: this.showCredits
-  });
-  this.optionsGroup.right = this.game.world.width - this.SCREEN_PADDING;
-  this.optionsGroup.bottom = this.game.world.height - this.SCREEN_PADDING;
+  // create the group for menu buttons
+  this.createGameOptions();
 
   // create the group for language buttons
-  // this.languageGroup = this.game.add.group();
-  // this.addGameOption("Español", null, 1, 0, this.languageGroup);
-  // this.addGameOption("English", null, 1, 0, this.languageGroup);
-  // this.languageGroup.right = this.game.world.width - this.SCREEN_PADDING;
-  // this.languageGroup.bottom = this.game.world.height - this.SCREEN_PADDING;
+  this.createLanguageOptions();
+
+  // create the assets for the credits
+  this.createCredits();
+  this.creditsGroup.alpha = 0;
 
 
 
@@ -272,6 +272,31 @@ BasicGame.MainMenu.prototype.create = function () {
 };
 
 BasicGame.MainMenu.prototype.update = function () {
+  // afstand van middenpunt oog tot cursor
+  dx = this.game.input.activePointer.x - this.fakeEye.centerX;
+  dy = this.game.input.activePointer.y - this.fakeEye.centerY;
+  // stelling van pythagoras
+  c = Math.sqrt((dx * dx) + (dy * dy));
+
+  // afstand middelpunt tot pupil
+  r = this.fakeEye.radius * 0.3;
+
+  // cursor op oog
+  if (Math.abs(dx) < r && Math.abs(dy) < r && c < r) {
+    r = c;
+  }
+
+  // hoek bepalen
+  alfa = Math.asin(dy / c);
+
+  // coordinaten op rand cirkel bepalen
+  this.giantPupilImage.x = (Math.cos(alfa) * r) + this.fakeEye.centerX;
+  // 180 graden fout herstellen
+  if (dx < 0) {
+    this.giantPupilImage.x = this.fakeEye.centerX * 2 - this.giantPupilImage.x;
+  }
+  this.giantPupilImage.y = (Math.sin(alfa) * r) + this.fakeEye.centerY;
+
   /* if (this.listenKeys === false ||
     this.movingPlayer === true) {
     return;
@@ -321,7 +346,9 @@ BasicGame.MainMenu.prototype.shutdown = function () {
   this.keysDescriptionText.destroy();
   // destroy groups
   this.optionsGroup.destroy();
-  // this.languageGroup.destroy();
+  this.languageGroup.destroy();
+
+  this.translatableTexts = null;
 
   /* // destroy sprites and images
   this.background.destroy();
@@ -349,87 +376,207 @@ BasicGame.MainMenu.prototype.shutdown = function () {
 // ║                                                                           ║
 // ╚═══════════════════════════════════════════════════════════════════════════╝
 
-BasicGame.MainMenu.prototype.moveFakePlayer = function (targetX) {
-  this.splash_music.fadeOut(1480);
-  this.movingPlayer = true;
-  var moveTween = this.game.add.tween(this.fakeplayer)
-    .to({ x: targetX },
-      1500,
-      null,
-      false);
-  moveTween.onComplete.add(function () {
-    this.showIntro();
-  }, this);
-  moveTween.start();
+BasicGame.MainMenu.prototype.createGameOptions = function () {
+  this.optionsGroup = this.game.add.group();
+
+  if (BasicGame.currentLevel > 1) {
+    this.addOptionTo({
+      changeWidth: true,
+      msg: this.continueMsg,
+      attachTextChangeCallback: true,
+      hSpace: 0,
+      vSpace: 1,
+      group: this.optionsGroup,
+      overCallback: this.showKeysDescription.bind(this, true),
+      outCallback: this.showKeysDescription.bind(this, false),
+      clickCallback: this.showIntro
+    });
+  }
+  this.addOptionTo({
+    changeWidth: true,
+    msg: this.newGameMsg,
+    attachTextChangeCallback: true,
+    hSpace: 0,
+    vSpace: 1,
+    group: this.optionsGroup,
+    overCallback: this.showKeysDescription.bind(this, true),
+    outCallback: this.showKeysDescription.bind(this, false),
+    clickCallback: this.newGame
+  });
+  this.addOptionTo({
+    changeWidth: true,
+    msg: this.creditsMsg,
+    attachTextChangeCallback: true,
+    hSpace: 0,
+    vSpace: 1,
+    group: this.optionsGroup,
+    clickCallback: this.showCredits
+  });
+
+  this.optionsGroup.right = this.game.world.width - this.SCREEN_PADDING;
+  this.optionsGroup.bottom = this.game.world.height - this.SCREEN_PADDING;
+
+  if (BasicGame.currentLevel > 1) {
+    // add a text to display the current day to load
+    this.continueDayText = this.game.add.bitmapText(this.optionsGroup.right,
+      this.optionsGroup.top - 10,
+      this.fontId,
+      this.getDayString(),
+      18);
+    this.continueDayText.anchor.set(1, 1);
+    this.continueDayText.alpha = 0;
+    this.continueDayText.tint = 0x303c42;
+    this.continueDayText.alpha = .8;
+
+    this.translatableTexts.push({
+      sourceMsg: this.continueDayMsg,
+      phaserObj: this.continueDayText,
+      onChangeCallback: (function () {
+        this.continueDayText.text = this.getDayString();
+      }).bind(this)
+    });
+  }
 };
 
-BasicGame.MainMenu.prototype.showButtons = function () {
-  var showButtonsTween = this.game.add.tween(this.buttons)
-    .to({ alpha: 1 },
-      1000,
-      null,
-      false);
-  showButtonsTween.onComplete.add(function () {
-    this.fakeEye.frame = 0;
-    this.pupil.alpha = 1;
-    this.fakeViewZone.alpha = 1;
-    this.listenKeys = true;
-  }, this);
-  showButtonsTween.start();
+BasicGame.MainMenu.prototype.createLanguageOptions = function () {
+  var spanishOption = null;
+  var englishOption = null;
+
+  this.languageGroup = this.game.add.group();
+
+  spanishOption = this.addOptionTo({
+    msg: this.spanishLangMsg,
+    textColor: 0x303c42,
+    textAlign: 'left',
+    clickCallback: this.setLanguage.bind(this, 'es'),
+    hSpace: 0,
+    vSpace: 1,
+    fixedWidth: 115,
+    group: this.languageGroup,
+    key: 'main_menu_background'
+  });
+
+  englishOption = this.addOptionTo({
+    msg: this.englishLangMsg,
+    textColor: 0x303c42,
+    textAlign: 'left',
+    clickCallback: this.setLanguage.bind(this, 'en'),
+    hSpace: 0,
+    vSpace: 1,
+    fixedWidth: 115,
+    group: this.languageGroup,
+    key: 'main_menu_background'
+  });
+
+  spanishOption.textObj.anchor.set(0, 0.5);
+  spanishOption.textObj.x = spanishOption.buttonObj.left + 32;
+  englishOption.textObj.anchor.set(0, 0.5);
+  englishOption.textObj.x = englishOption.buttonObj.left + 32;
+
+  // add the checkbox for spanish language option
+  this.spanishCheckbox = this.addCheckboxFor({
+    referenceObj: spanishOption.buttonObj,
+    group: this.languageGroup,
+    checked: BasicGame.language === 'es'
+  });
+
+  // add the checkbox for english language option
+  this.englishCheckbox = this.addCheckboxFor({
+    referenceObj: englishOption.buttonObj,
+    group: this.languageGroup,
+    checked: BasicGame.language === 'en'
+  });
+
+  this.languageGroup.left = this.SCREEN_PADDING;
+  this.languageGroup.bottom = this.game.world.height - this.SCREEN_PADDING;
 };
 
-BasicGame.MainMenu.prototype.showIntro = function () {
-  // this.state.start((BasicGame.currentLevel === 1) ? 'Intro' : 'Game');
-  this.state.start('Game');
-};
-
-BasicGame.MainMenu.prototype.addGameOption = function (prop) {
+BasicGame.MainMenu.prototype.addOptionTo = function (prop) {
   var button = null;
   var text = null;
   var buttonsInGroup = Math.max(0, prop.group.children.length - prop.group.children.length / 2);
-  
+  var translatableObj = {};
+
   button = this.game.add.button(
     0 + ((this.BUTTON_WIDTH + this.BUTTON_HSPACING) * buttonsInGroup) * prop.hSpace,
     0 + ((this.BUTTON_HEIGHT + this.BUTTON_VSPACING) * buttonsInGroup) * prop.vSpace,
-    'button_background', prop.clickCallback, this
+    prop.key || 'button_background', prop.clickCallback, this
   );
   button.anchor.set(1, 0);
   button.width = this.BUTTON_WIDTH;
   button.height = this.BUTTON_HEIGHT;
-  
-  text = this.game.add.bitmapText(button.right - 13,
+
+  text = this.game.add.bitmapText(button.right - this.BUTTON_PADDING,
     button.centerY,
-    this.fontId, prop.name, 18);
+    this.fontId, prop.msg[BasicGame.language], 18);
   text.anchor.set(1, 0.5);
-  text.align = "right";
-  text.tint = 0xfafafa;
-  
-  button.width = text.textWidth + 13 * 2;
-  button.defaultWidth = text.textWidth + 13 * 2;
-  
+  text.align = prop.textAlign || "right";
+  text.tint = prop.textColor || 0xfafafa;
+  text.defaultTint = text.tint;
+  text.linkedButton = button;
+  translatableObj.sourceMsg = prop.msg;
+  translatableObj.phaserObj = text;
+  if (prop.attachTextChangeCallback) {
+    translatableObj.onChangeCallback = (function (textObj) {
+      textObj.linkedButton.width = textObj.textWidth + this.BUTTON_PADDING * 2;
+      textObj.linkedButton.defaultWidth = textObj.textWidth + this.BUTTON_PADDING * 2;
+    }).bind(this, text);
+  }
+  this.translatableTexts.push(translatableObj);
+
   button.onInputOver.add(function (sprite, pointer, text) {
-    var overTween = this.game.add.tween(sprite);
-    overTween.to({ width: this.BUTTON_WIDTH }, 150, Phaser.Easing.Exponential.Out);
-    overTween.start();
     text.tint = 0xf15a4a;
-    
+
     if (prop.overCallback) {
       prop.overCallback();
     }
   }, this, 0, text);
+
   button.onInputOut.add(function (sprite, pointer, text) {
-    var overTween = this.game.add.tween(sprite);
-    overTween.to({ width: sprite.defaultWidth }, 250, Phaser.Easing.Exponential.Out);
-    overTween.start();
-    text.tint = 0xfafafa;
-    
+    text.tint = text.defaultTint;
+
     if (prop.outCallback) {
       prop.outCallback();
     }
   }, this, 0, text);
-  
+
+  button.width = text.textWidth + this.BUTTON_PADDING * 2;
+  button.defaultWidth = text.textWidth + this.BUTTON_PADDING * 2;
+
+  if (prop.fixedWidth) {
+    button.width = prop.fixedWidth;
+    button.defaultWidth = prop.fixedWidth;
+  }
+
+  if (prop.changeWidth === true) {
+
+    button.onInputOver.add(function (sprite, pointer) {
+      var overTween = this.game.add.tween(sprite);
+      overTween.to({ width: this.BUTTON_WIDTH }, 150, Phaser.Easing.Exponential.Out);
+      overTween.start();
+    }, this, 0);
+
+    button.onInputOut.add(function (sprite, pointer) {
+      var overTween = this.game.add.tween(sprite);
+      overTween.to({ width: sprite.defaultWidth }, 250, Phaser.Easing.Exponential.Out);
+      overTween.start();
+    }, this, 0);
+  }
+
   prop.group.add(button);
   prop.group.add(text);
+
+  return {
+    buttonObj: button,
+    textObj: text
+  };
+};
+
+BasicGame.MainMenu.prototype.addCheckboxFor = function (prop) {
+  var checkbox = this.game.add.image(prop.referenceObj.left, 0, 'checkbox',
+    (prop.checked) ? 1 : 0, prop.group);
+  checkbox.centerY = prop.referenceObj.centerY;
+  return checkbox;
 };
 
 BasicGame.MainMenu.prototype.showKeysDescription = function (show) {
@@ -439,11 +586,93 @@ BasicGame.MainMenu.prototype.showKeysDescription = function (show) {
 };
 
 BasicGame.MainMenu.prototype.newGame = function () {
+  var levelData = null;
+
   localStorage.removeItem("oh-my-blob");
   BasicGame.reset();
-  this.showIntro();
+
+  this.game.load.onLoadComplete.addOnce(this.showIntro, this);
+  var levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);;
+  this.game.load.tilemap(levelData.id,
+    'assets/levels/' + levelData.name + '.json',
+    null,
+    Phaser.Tilemap.TILED_JSON);
+  this.game.load.start();
+};
+
+BasicGame.MainMenu.prototype.showIntro = function () {
+  // this.state.start((BasicGame.currentLevel === 1) ? 'Intro' : 'Game');
+  this.state.start('Game');
 };
 
 BasicGame.MainMenu.prototype.showCredits = function () {
-  this.state.start('Credits');
+  this.creditsGroup.children[1].alpha = 0;
+  this.creditsGroup.children[2].alpha = 0;
+
+  if (BasicGame.language === 'es') {
+    this.creditsGroup.children[1].alpha = 1;
+  }
+  else {
+    this.creditsGroup.children[2].alpha = 1;
+  }
+
+  this.creditsGroup.alpha = 1;
+
+  // this.optionsGroup.children[0].inputEnabled = false;
+};
+
+
+BasicGame.MainMenu.prototype.setLanguage = function (newLang) {
+  if (BasicGame.language === newLang) {
+    return;
+  }
+
+  this.spanishCheckbox.frame = 0;
+  this.englishCheckbox.frame = 0;
+
+  localStorage.setItem("oh-my-blob", BasicGame.setLanguage(newLang));
+
+  if (newLang === 'es') {
+    this.spanishCheckbox.frame = 1;
+  }
+  else {
+    this.englishCheckbox.frame = 1;
+  }
+
+  this.translatableTexts.forEach(function (element, index) {
+    element.phaserObj.text = element.sourceMsg[BasicGame.language];
+    if (element.onChangeCallback) {
+      element.onChangeCallback();
+    }
+  });
+};
+
+BasicGame.MainMenu.prototype.createCredits = function (newLang) {
+  var backgroundImage = null;
+  var englishImage = null;
+  var spanishImage = null;
+  var closeImage = null;
+
+  this.creditsGroup = this.game.add.group();
+
+  backgroundImage = this.game.add.image(0, 0, 'credits_background', 0, this.creditsGroup);
+  backgroundImage.width = this.game.world.width;
+  backgroundImage.height = this.game.world.height;
+
+  englishImage = this.game.add.image(this.game.world.width / 2,
+    this.game.world.height / 2,
+    'credits_es', 0, this.creditsGroup);
+  englishImage.anchor.set(.5, .5);
+  spanishImage = this.game.add.image(this.game.world.width / 2,
+    this.game.world.height / 2,
+    'credits_en', 0, this.creditsGroup);
+  spanishImage.anchor.set(.5, .5);
+  closeImage = this.game.add.image(this.game.world.width - 32, 32, 'close', 0, this.creditsGroup);
+  closeImage.anchor.set(1, 0);
+};
+
+BasicGame.MainMenu.prototype.getDayString = function (newLang) {
+  var days = new BasicGame.Days();
+  return this.continueDayMsg[BasicGame.language] +
+    ' ' + days.getDay(BasicGame.currentLevel).number;
 };

@@ -84,10 +84,14 @@ BasicGame.Player = function (game, input, gameObj) {
   this.JUMP_MULTIPLIER = 0.3;
 
   // define gameplay keys
-  this.leftKey = Phaser.Keyboard.LEFT;
-  this.rightKey = Phaser.Keyboard.RIGHT;
+  this.leftKey1 = Phaser.Keyboard.LEFT;
+  this.leftKey2 = Phaser.Keyboard.A;
+  this.rightKey1 = Phaser.Keyboard.RIGHT;
+  this.rightKey2 = Phaser.Keyboard.D;
   this.jumpKey1 = Phaser.Keyboard.Z;
   this.jumpKey2 = Phaser.Keyboard.SPACEBAR;
+  this.jumpKey3 = Phaser.Keyboard.UP;
+  this.jumpKey4 = Phaser.Keyboard.W;
 
   this.justLeaveGround = false;
 
@@ -141,8 +145,8 @@ BasicGame.Player.prototype.create = function (level) {
   //This is only necessary because this is an HTML5 game. Games on other
   //platforms may not need code like this.
   this.game.input.keyboard.addKeyCapture([
-    this.leftKey,
-    this.rightKey,
+    this.leftKey1,
+    this.rightKey1,
     this.jumpKey1,
     this.jumpKey2
   ]);
@@ -479,16 +483,21 @@ BasicGame.Player.prototype.render = function () {
 };
 
 BasicGame.Player.prototype.leftInputIsActive = function () {
-  return this.input.keyboard.isDown(this.leftKey);
+  return this.input.keyboard.isDown(this.leftKey1) ||
+    this.input.keyboard.isDown(this.leftKey2);
 };
 
 BasicGame.Player.prototype.rightInputIsActive = function () {
-  return this.input.keyboard.isDown(this.rightKey);
+  return this.input.keyboard.isDown(this.rightKey1) ||
+    this.input.keyboard.isDown(this.rightKey2);
 };
 
 BasicGame.Player.prototype.upInputIsActive = function (duration) {
   if ((this.input.keyboard.downDuration(this.jumpKey1, duration) ||
-    this.input.keyboard.downDuration(this.jumpKey2, duration)) && this.jumpCount === 0) {
+    this.input.keyboard.downDuration(this.jumpKey2, duration) ||
+    this.input.keyboard.downDuration(this.jumpKey3, duration) ||
+    this.input.keyboard.downDuration(this.jumpKey4, duration)) &&
+    this.jumpCount === 0) {
     this.jumpCount++;
     return true;
   }

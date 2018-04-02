@@ -38,7 +38,7 @@ BasicGame.Game = function (game) {
   this.checkMKey = true;
   this.changingLevel = false;
   this.fontId = 'font';
-  this.savingMessage = {
+  this.savingMsg = {
     "es": "Guardando progreso...",
     "en": "Saving progress..."
   };
@@ -83,18 +83,14 @@ BasicGame.Game.prototype.create = function () {
   this.inDarkness = true;
 
   // set stage background
-  this.background = this.game.add.tileSprite(0, 0,
-    this.game.world.width, this.game.world.height, this.getSkyName());
+  this.background = this.game.add.image(0, 0, this.getSkyName());
 
   this.noiseImage = this.game.add.image(0, 0, 'noise');
-  /* this.noiseImage = this.game.add.sprite(0, 0, 'noise');
-  this.noiseImage.animations.add('noisey', [0, 1], 12, true);
-  this.noiseImage.animations.play('noisey'); */
 
   this.savingText = this.game.add.bitmapText(this.game.world.width / 2,
     this.game.world.height / 2,
     this.fontId,
-    this.savingMessage[BasicGame.language],
+    this.savingMsg[BasicGame.language],
     18);
   this.savingText.anchor.set(0.5, 0.5);
   this.savingText.align = "center";

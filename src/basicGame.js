@@ -3,8 +3,12 @@ var BasicGame = {
   currentLevel: 1,
   deaths: 0,
   rest: 0,
+  setLanguage: function (newLanguage) {
+    this.language = newLanguage;
+    return this.getCode();
+  },
   setDay: function (n) {
-    this.currentLevel = (n < 10) ? ('0' + n) : n;
+    this.currentLevel = n;
     return this.getCode();
   },
   addDeath: function () {
@@ -16,12 +20,21 @@ var BasicGame = {
     return this.getCode();
   },
   getCode: function () {
-    return this.rest + '' + this.deaths + '' + this.currentLevel;
+    var level = this.currentLevel;
+    return this.rest +
+      '' + this.deaths +
+      '' + ((level < 10) ? ('0' + level) : level) +
+      '' + this.language;
   },
   readCode: function (code) {
     if (code.length < 4) return;
 
-    this.currentLevel = parseInt(code.slice(code.length - 2, code.length));
+    if (code.length > 4) {
+      this.language = code.slice(code.length - 2) || this.language;
+      code = code.slice(0, code.length - 2);
+    }
+
+    this.currentLevel = parseInt(code.slice(code.length - 2));
     this.deaths = parseInt(code.slice(1, code.length - 2));
     this.rest = parseInt(code.charAt(0));
   },

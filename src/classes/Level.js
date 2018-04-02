@@ -154,7 +154,7 @@ BasicGame.Level.prototype.createLevel = function (num) {
   this.game.world.bringToTop(this.levelTextGroup);
 
   // show the days of the level
-  var dayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
+  var dayObj = this.gameObj.days.getDay(parseInt(BasicGame.currentLevel));
   this.dayNumberText.setText(this.dayText[BasicGame.language] + ' ' + dayObj.number);
   this.dayNumberText.y = this.dayNumberText.oriY;
 
