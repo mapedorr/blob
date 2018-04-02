@@ -76,7 +76,7 @@ BasicGame.Light.prototype.drawShadows = function () {
   }
 
   // Next, fill the entire light bitmap with a dark shadow color.
-  this.bitmap.context.fillStyle = 'rgb(48, 60, 66)';
+  this.bitmap.context.fillStyle = 'rgb(102, 185, 204)';
   this.bitmap.context.fillRect(0, 0, this.game.world.width, this.game.height);
 
   // An array of the stage corners that we'll use later

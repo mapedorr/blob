@@ -35,7 +35,7 @@ BasicGame.Lightning.prototype.create = function (eye, player, level) {
 
   // Create a sprite to hold the lightning bolt texture
   this.lightning = this.game.add.image(this.eye.x,
-    this.eye.y,
+    this.eye.y + 32,
     this.lightningBitmap);
   this.lightning.anchor.setTo(0.5, 0);
 
@@ -43,10 +43,6 @@ BasicGame.Lightning.prototype.create = function (eye, player, level) {
   this.fakeThing.anchor.setTo(0.5, 0.5);
   this.fakeThing.width = this.fakeThing.height = 16;
   this.fakeThing.alpha = 0;
-
-  // this.game.physics.arcade.enable(this.fakeThing);
-  // this.fakeThing.body.immovable = true;
-  // this.fakeThing.body.allowGravity = false;
 
   this.lightningTimer = 0;
 

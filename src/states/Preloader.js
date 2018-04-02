@@ -14,10 +14,6 @@ BasicGame.Preloader.prototype.preload = function () {
   // these are the assets we loaded in Boot.js
   // a nice sparkly background and a loading progress bar
   this.background = this.add.sprite(0, 0, 'preloaderBackground');
-  this.banner = this.add.image(this.game.world.width / 2,
-    this.game.world.height - 40,
-    'loading_banner');
-  this.banner.anchor.set(0.5, 0);
   this.preloadBar = this.add.sprite(0, 0, 'preloaderBar');
 
   // set the preloadBar sprite as a loader sprite.
@@ -35,11 +31,9 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('credits_background', 'assets/sprites/credits_background.png');
   this.load.image('credits_en', 'assets/sprites/credits_en.png');
   this.load.image('credits_es', 'assets/sprites/credits_es.png');
+  this.load.image('social', 'assets/sprites/social.png');
 
   this.load.audio('splash_music', 'assets/music/splash_music.ogg', true);
-
-  this.game.load.tilemap('splash_lvl', 'assets/levels/splash.json',
-    null, Phaser.Tilemap.TILED_JSON);
 
   //  ---------------------------------
   //  ---| load the assets for the Game
@@ -51,11 +45,11 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('life', 'assets/sprites/life.png');
   this.load.image('dialogue_background', 'assets/sprites/dialogue_background.png');
   this.load.image('dialogue_mark', 'assets/sprites/dialogue_mark.png');
-  this.load.image('noise', 'assets/sprites/noise_01.png');
+  this.load.image('noise', 'assets/sprites/noise.png');
 
   // this.load.spritesheet('noise', 'assets/sprites/noise.png', 1024, 640);
   this.load.spritesheet('player', 'assets/sprites/player.png', 32, 32, 1);
-  this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 119, 3);
+  this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 118, 3);
   this.load.spritesheet('checkbox', 'assets/sprites/checkbox.png', 24, 24, 2);
 
   this.load.audio('b', 'assets/soundfx/b.ogg', true);

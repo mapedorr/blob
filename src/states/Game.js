@@ -86,6 +86,7 @@ BasicGame.Game.prototype.create = function () {
   this.background = this.game.add.image(0, 0, this.getSkyName());
 
   this.noiseImage = this.game.add.image(0, 0, 'noise');
+  this.noiseImage.alpha = .5;
 
   this.savingText = this.game.add.bitmapText(this.game.world.width / 2,
     this.game.world.height / 2,
@@ -190,9 +191,9 @@ BasicGame.Game.prototype.update = function () {
   // update the lightning
   this.lightning.update();
 
-  if (!this.showingDarkness && this.game.world.getTop().key !== 'noise') {
+  /* if (!this.showingDarkness && this.game.world.getTop().key !== 'noise') {
     this.game.world.bringToTop(this.noiseImage);
-  }
+  } */
 
   if (this.inputIsActive(this.KEY_PAUSE) === true) {
     this.pausedOn = this.game.time.now;
@@ -257,14 +258,14 @@ BasicGame.Game.prototype.shutdown = function () {
 // ╚═══════════════════════════════════════════════════════════════════════════╝
 
 BasicGame.Game.prototype.arrangeRenderLayers = function () {
-  this.game.world.bringToTop(this.light.lightBitmap);
   if (this.level.spikes) {
     this.game.world.bringToTop(this.level.spikes);
   }
   this.game.world.bringToTop(this.level.walls);
+  this.game.world.bringToTop(this.noiseImage);
+  this.game.world.bringToTop(this.light.lightBitmap);
   this.game.world.bringToTop(this.level.pieces);
   this.game.world.bringToTop(this.lifesGroup);
-  this.game.world.bringToTop(this.noiseImage);
   this.game.world.bringToTop(this.darknessGroup);
 };
 
