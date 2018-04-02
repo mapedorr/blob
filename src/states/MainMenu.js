@@ -8,31 +8,33 @@ BasicGame.MainMenu = function (game) {
   this.BUTTON_HSPACING = 12;
   this.SCREEN_PADDING = 32;
   this.BUTTON_PADDING = 16;
-  this.continueMsg = {
+  this.FONT_REGULAR = 'font';
+  this.FONT_MEDIUM = 'font-medium';
+  this.CONTINUE_MSG = {
     'es': 'Continuar',
     'en': 'Continue'
   };
-  this.newGameMsg = {
+  this.NEWGAME_MSG = {
     'es': 'Nuevo juego',
     'en': 'New game'
   };
-  this.creditsMsg = {
+  this.CREDITS_MSG = {
     'es': 'Créditos',
     'en': 'Credits'
   };
-  this.keysDescriptionMsg = {
+  this.KEYS_DESCRIPTION_MSG = {
     'es': 'usa A y D o IZQUIERA y DERECHA para moverte\nusa W, Z, ESPACIO o ARRIBA para saltar',
     'en': 'use A and D or LEFT and RIGHT to move\nuse W, Z, SPACE or UP to jump'
   };
-  this.continueDayMsg = {
+  this.CONTINUE_DAY_MSG = {
     "es": "Día",
     "en": "Day"
   };
-  this.spanishLangMsg = {
+  this.SPANISH_LANG_MSG = {
     "es": "Español",
     "en": "Spanish"
   };
-  this.englishLangMsg = {
+  this.ENGLISH_LANG_MSG = {
     "es": "Inglés",
     "en": "English"
   };
@@ -46,16 +48,17 @@ BasicGame.MainMenu = function (game) {
   this.keysDescriptionText = null;
   this.continueDayText = null;
   this.creditsGroup = null;
+  this.closeButton = null;
 
   // global properties
-  this.fontId = 'font';
-  this.fontMediumId = 'font-medium';
-  this.translatableTexts = [];
   this.fakeEye = {
     centerX: 512,
     centerY: 321,
     radius: 210
   };
+  this.translatableTexts = [];
+  this.menuButtons = [];
+
   /* this.creditsTextBitmap = null;
   this.restartTextBitmap = null;
   this.splash_music = null;
@@ -87,7 +90,7 @@ BasicGame.MainMenu.prototype.create = function () {
   // add the title
   this.titleText = this.game.add.bitmapText(this.game.world.width / 2,
     41,
-    this.fontMediumId,
+    this.FONT_MEDIUM,
     'In the Shadows',
     72);
   this.titleText.anchor.set(0.5, 0);
@@ -96,8 +99,8 @@ BasicGame.MainMenu.prototype.create = function () {
 
   // add the text for key inputs
   this.keysDescriptionText = this.game.add.bitmapText(0, 0,
-    this.fontId,
-    this.keysDescriptionMsg[BasicGame.language],
+    this.FONT_REGULAR,
+    this.KEYS_DESCRIPTION_MSG[BasicGame.language],
     18);
   this.keysDescriptionText.anchor.set(0.5, 0);
   this.keysDescriptionText.align = "center";
@@ -107,18 +110,18 @@ BasicGame.MainMenu.prototype.create = function () {
   this.keysDescriptionText.alpha = 0;
 
   this.translatableTexts.push({
-    sourceMsg: this.keysDescriptionMsg,
+    sourceMsg: this.KEYS_DESCRIPTION_MSG,
     phaserObj: this.keysDescriptionText
   });
 
   // create the group for menu buttons
-  this.createGameOptions();
+  this.createOptionsGroup();
 
   // create the group for language buttons
-  this.createLanguageOptions();
+  this.createLanguageGroup();
 
   // create the assets for the credits
-  this.createCredits();
+  this.createCreditsGroup();
   this.creditsGroup.alpha = 0;
 
 
@@ -179,7 +182,7 @@ BasicGame.MainMenu.prototype.create = function () {
   // create the credits button
   this.creditsTextBitmap = this.add.bitmapText(this.game.world.width / 2,
     this.game.world.height - 32,
-    this.fontId,
+    this.FONT_REGULAR,
     '(C) Credits/Créditos',
     36);
   this.creditsTextBitmap.align = "center";
@@ -188,7 +191,7 @@ BasicGame.MainMenu.prototype.create = function () {
   if (BasicGame.currentLevel > 1) {
     this.restartTextBitmap = this.add.bitmapText((this.game.world.width / 2) + 10,
       this.game.world.height - 32,
-      this.fontId,
+      this.FONT_REGULAR,
       '(R) Restart/Reiniciar',
       36);
     this.restartTextBitmap.align = "center";
@@ -347,8 +350,11 @@ BasicGame.MainMenu.prototype.shutdown = function () {
   // destroy groups
   this.optionsGroup.destroy();
   this.languageGroup.destroy();
+  this.creditsGroup.destroy();
 
   this.translatableTexts = null;
+  this.menuButtons = null;
+  this.closeButton = null;
 
   /* // destroy sprites and images
   this.background.destroy();
@@ -376,13 +382,13 @@ BasicGame.MainMenu.prototype.shutdown = function () {
 // ║                                                                           ║
 // ╚═══════════════════════════════════════════════════════════════════════════╝
 
-BasicGame.MainMenu.prototype.createGameOptions = function () {
+BasicGame.MainMenu.prototype.createOptionsGroup = function () {
   this.optionsGroup = this.game.add.group();
 
   if (BasicGame.currentLevel > 1) {
     this.addOptionTo({
       changeWidth: true,
-      msg: this.continueMsg,
+      msg: this.CONTINUE_MSG,
       attachTextChangeCallback: true,
       hSpace: 0,
       vSpace: 1,
@@ -394,7 +400,7 @@ BasicGame.MainMenu.prototype.createGameOptions = function () {
   }
   this.addOptionTo({
     changeWidth: true,
-    msg: this.newGameMsg,
+    msg: this.NEWGAME_MSG,
     attachTextChangeCallback: true,
     hSpace: 0,
     vSpace: 1,
@@ -405,12 +411,16 @@ BasicGame.MainMenu.prototype.createGameOptions = function () {
   });
   this.addOptionTo({
     changeWidth: true,
-    msg: this.creditsMsg,
+    msg: this.CREDITS_MSG,
     attachTextChangeCallback: true,
     hSpace: 0,
     vSpace: 1,
     group: this.optionsGroup,
-    clickCallback: this.showCredits
+    clickCallback: function (button, pointer, isOver) {
+      // invoke input out event on the button to retore its apperance to default
+      button.onInputOutHandler(button, pointer);
+      this.showCredits(true);
+    }
   });
 
   this.optionsGroup.right = this.game.world.width - this.SCREEN_PADDING;
@@ -420,7 +430,7 @@ BasicGame.MainMenu.prototype.createGameOptions = function () {
     // add a text to display the current day to load
     this.continueDayText = this.game.add.bitmapText(this.optionsGroup.right,
       this.optionsGroup.top - 10,
-      this.fontId,
+      this.FONT_REGULAR,
       this.getDayString(),
       18);
     this.continueDayText.anchor.set(1, 1);
@@ -429,7 +439,7 @@ BasicGame.MainMenu.prototype.createGameOptions = function () {
     this.continueDayText.alpha = .8;
 
     this.translatableTexts.push({
-      sourceMsg: this.continueDayMsg,
+      sourceMsg: this.CONTINUE_DAY_MSG,
       phaserObj: this.continueDayText,
       onChangeCallback: (function () {
         this.continueDayText.text = this.getDayString();
@@ -438,14 +448,14 @@ BasicGame.MainMenu.prototype.createGameOptions = function () {
   }
 };
 
-BasicGame.MainMenu.prototype.createLanguageOptions = function () {
+BasicGame.MainMenu.prototype.createLanguageGroup = function () {
   var spanishOption = null;
   var englishOption = null;
 
   this.languageGroup = this.game.add.group();
 
   spanishOption = this.addOptionTo({
-    msg: this.spanishLangMsg,
+    msg: this.SPANISH_LANG_MSG,
     textColor: 0x303c42,
     textAlign: 'left',
     clickCallback: this.setLanguage.bind(this, 'es'),
@@ -457,7 +467,7 @@ BasicGame.MainMenu.prototype.createLanguageOptions = function () {
   });
 
   englishOption = this.addOptionTo({
-    msg: this.englishLangMsg,
+    msg: this.ENGLISH_LANG_MSG,
     textColor: 0x303c42,
     textAlign: 'left',
     clickCallback: this.setLanguage.bind(this, 'en'),
@@ -508,7 +518,7 @@ BasicGame.MainMenu.prototype.addOptionTo = function (prop) {
 
   text = this.game.add.bitmapText(button.right - this.BUTTON_PADDING,
     button.centerY,
-    this.fontId, prop.msg[BasicGame.language], 18);
+    this.FONT_REGULAR, prop.msg[BasicGame.language], 18);
   text.anchor.set(1, 0.5);
   text.align = prop.textAlign || "right";
   text.tint = prop.textColor || 0xfafafa;
@@ -523,6 +533,7 @@ BasicGame.MainMenu.prototype.addOptionTo = function (prop) {
     }).bind(this, text);
   }
   this.translatableTexts.push(translatableObj);
+  this.menuButtons.push(button);
 
   button.onInputOver.add(function (sprite, pointer, text) {
     text.tint = 0xf15a4a;
@@ -605,23 +616,6 @@ BasicGame.MainMenu.prototype.showIntro = function () {
   this.state.start('Game');
 };
 
-BasicGame.MainMenu.prototype.showCredits = function () {
-  this.creditsGroup.children[1].alpha = 0;
-  this.creditsGroup.children[2].alpha = 0;
-
-  if (BasicGame.language === 'es') {
-    this.creditsGroup.children[1].alpha = 1;
-  }
-  else {
-    this.creditsGroup.children[2].alpha = 1;
-  }
-
-  this.creditsGroup.alpha = 1;
-
-  // this.optionsGroup.children[0].inputEnabled = false;
-};
-
-
 BasicGame.MainMenu.prototype.setLanguage = function (newLang) {
   if (BasicGame.language === newLang) {
     return;
@@ -647,11 +641,10 @@ BasicGame.MainMenu.prototype.setLanguage = function (newLang) {
   });
 };
 
-BasicGame.MainMenu.prototype.createCredits = function (newLang) {
+BasicGame.MainMenu.prototype.createCreditsGroup = function (newLang) {
   var backgroundImage = null;
   var englishImage = null;
   var spanishImage = null;
-  var closeImage = null;
 
   this.creditsGroup = this.game.add.group();
 
@@ -663,16 +656,45 @@ BasicGame.MainMenu.prototype.createCredits = function (newLang) {
     this.game.world.height / 2,
     'credits_es', 0, this.creditsGroup);
   englishImage.anchor.set(.5, .5);
+
   spanishImage = this.game.add.image(this.game.world.width / 2,
     this.game.world.height / 2,
     'credits_en', 0, this.creditsGroup);
   spanishImage.anchor.set(.5, .5);
-  closeImage = this.game.add.image(this.game.world.width - 32, 32, 'close', 0, this.creditsGroup);
-  closeImage.anchor.set(1, 0);
+
+  this.closeButton = this.game.add.button(this.game.world.width - 32, 32,
+    'close', function (button, pointer, isOver) {
+      this.showCredits(false);
+    }, this, null, null, null, null, this.creditsGroup);
+  this.closeButton.anchor.set(1, 0);
+  this.closeButton.input.enabled = false;
+};
+
+BasicGame.MainMenu.prototype.showCredits = function (show) {
+  this.creditsGroup.children[1].alpha = 0;
+  this.creditsGroup.children[2].alpha = 0;
+  this.creditsGroup.alpha = 0;
+  this.closeButton.input.enabled = false;
+
+  if (show === true) {
+    if (BasicGame.language === 'es') {
+      this.creditsGroup.children[1].alpha = 1;
+    }
+    else {
+      this.creditsGroup.children[2].alpha = 1;
+    }
+
+    this.creditsGroup.alpha = 1;
+    this.closeButton.input.enabled = true;
+  }
+
+  this.menuButtons.forEach(function (element, index) {
+    element.input.enabled = !show;
+  });
 };
 
 BasicGame.MainMenu.prototype.getDayString = function (newLang) {
   var days = new BasicGame.Days();
-  return this.continueDayMsg[BasicGame.language] +
+  return this.CONTINUE_DAY_MSG[BasicGame.language] +
     ' ' + days.getDay(BasicGame.currentLevel).number;
 };
