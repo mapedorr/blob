@@ -27,6 +27,8 @@ BasicGame.Light = function (game, gameObj) {
   this.shadowsDrawn = null;
 };
 
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ PHASER STATE METHODS                                                     ║
 BasicGame.Light.prototype.create = function (level) {
   var light = null;
 
@@ -66,6 +68,23 @@ BasicGame.Light.prototype.create = function (level) {
   this.rayBitmapImage = this.game.add.image(0, 0, this.rayBitmap);
   this.rayBitmapImage.visible = false;
 };
+
+BasicGame.Light.prototype.update = function () {
+  // if (this.shadowsDrawn === false) {
+  this.drawShadows();
+  // }
+  // draw shadows if light is moving in the level
+};
+
+BasicGame.Light.prototype.shutdown = function () {
+  this.lightGroup.destroy();
+  this.bitmap.destroy();
+  this.lightBitmap.destroy();
+  this.rayBitmap.destroy();
+  this.rayBitmapImage.destroy();
+};
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
 
 BasicGame.Light.prototype.drawShadows = function () {
   // Move the light to the pointer/touch location
@@ -277,13 +296,6 @@ BasicGame.Light.prototype.drawShadows = function () {
   this.shadowsDrawn = true;
 };
 
-BasicGame.Light.prototype.update = function () {
-  if (this.shadowsDrawn === false) {
-    this.drawShadows();
-  }
-  // draw shadows if light is moving in the level
-};
-
 // Given a ray, this function iterates through all of the walls and
 // returns the closest wall intersection from the start of the ray
 // or null if the ray does not intersect any walls.
@@ -326,13 +338,3 @@ BasicGame.Light.prototype.updateWalls = function (level) {
   this.walls = level.walls;
   this.shadowsDrawn = false;
 };
-
-// ╔═══════════════════════════════════════════════════════════════════════════╗
-BasicGame.Light.prototype.shutdown = function () {
-  this.lightGroup.destroy();
-  this.bitmap.destroy();
-  this.lightBitmap.destroy();
-  this.rayBitmap.destroy();
-  this.rayBitmapImage.destroy();
-};
-// ╚═══════════════════════════════════════════════════════════════════════════╝

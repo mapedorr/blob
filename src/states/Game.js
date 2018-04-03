@@ -44,7 +44,7 @@ BasicGame.Game = function (game) {
   };
 };
 
-BasicGame.Game.developmentMode = true;
+BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
@@ -125,7 +125,6 @@ BasicGame.Game.prototype.create = function () {
   darknessBitmap.ctx.fillStyle = '#212121';
   darknessBitmap.ctx.fill();
   darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
-  darknessSprite.alpha = .2;
   this.darknessGroup.addChild(darknessSprite);
 
   // create the darkness tween
@@ -195,10 +194,6 @@ BasicGame.Game.prototype.update = function () {
 
   // update the lightning
   this.lightning.update();
-
-  /* if (!this.showingDarkness && this.game.world.getTop().key !== 'noise') {
-    this.game.world.bringToTop(this.noiseImage);
-  } */
 
   if (this.inputIsActive(this.KEY_PAUSE) === true) {
     this.pausedOn = this.game.time.now;
@@ -271,6 +266,7 @@ BasicGame.Game.prototype.arrangeRenderLayers = function () {
   this.game.world.bringToTop(this.light.lightBitmap);
   this.game.world.bringToTop(this.level.pieces);
   this.game.world.bringToTop(this.lifesGroup);
+  this.game.world.bringToTop(this.player.dialogueGroup);
   this.game.world.bringToTop(this.darknessGroup);
 };
 
@@ -290,7 +286,7 @@ BasicGame.Game.prototype.levelEnded = function () {
       this.isLoadingLevel = true;
 
       // notify to the eye that the level was ended
-      this.eye.endLevel(true);
+      this.eye.levelEndedEvent(true);
       this.loadLevel(++BasicGame.currentLevel);
     }, this);
   }, this);
@@ -308,8 +304,7 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
 
   var skyName = this.getSkyName();
   if (this.background.key != skyName) {
-    this.load.image(skyName,
-      'assets/images/' + skyName + '-min.png');
+    this.load.image(skyName, 'assets/sprites/' + skyName + '.png');
   }
 
   this.game.load.onLoadComplete.addOnce(function () {
@@ -344,13 +339,15 @@ BasicGame.Game.prototype.levelReady = function () {
 };
 
 BasicGame.Game.prototype.shakeCamera = function () {
+  var shakeTween;
+
   // shake the camera by moving it up and down 5 times really fast
   this.game.camera.y = 10;
   this.game.camera.x = 10;
 
   // create the tween for shaking the camera
-  this.shakeTween = this.game.add.tween(this.game.camera);
-  this.shakeTween.to({ y: -5, x: -5 },
+  shakeTween = this.game.add.tween(this.game.camera);
+  shakeTween.to({ y: -5, x: -5 },
     40,
     Phaser.Easing.Sinusoidal.InOut,
     false,
@@ -358,20 +355,21 @@ BasicGame.Game.prototype.shakeCamera = function () {
     4,
     true);
 
-  this.shakeTween.onComplete.add(function () {
+  shakeTween.onComplete.add(function () {
     // set the camera position to its initial position
     this.game.camera.setPosition(0, 0);
-    this.shakeTween.stop();
   }, this);
 
-  this.shakeTween.start();
+  shakeTween.start();
 };
 
 BasicGame.Game.prototype.subtractLife = function () {
   var that = this;
 
   // if the player collected all the pieces, don't kill him
-  if (this.level.endTimer) return;
+  if (this.level.endTimer) {
+    return;
+  }
 
   // remove one life sprite
   if (this.lifes <= 0) {
@@ -384,21 +382,16 @@ BasicGame.Game.prototype.subtractLife = function () {
     Phaser.Easing.Quadratic.Out,
     true);
 
-  // create the tween for shaking the camera
-  this.flashTween = this.game.add.tween(this.flashGroup.getChildAt(0));
-  this.flashTween.to({ alpha: 1 },
+  // create the tween for flashing the camera
+  var flashTween = this.game.add.tween(this.flashGroup.getChildAt(0));
+  flashTween.to({ alpha: 1 },
     40,
     Phaser.Easing.Sinusoidal.InOut,
     false,
     0,
     4,
     true);
-
-  this.flashTween.onComplete.add(function () {
-    this.flashTween.stop();
-  }, this);
-
-  this.flashTween.start();
+  flashTween.start();
 
   if (this.lifes <= 0) {
     // save the current level
@@ -408,9 +401,9 @@ BasicGame.Game.prototype.subtractLife = function () {
     this.player.explote();
 
     // notify to the EYE the player has died
-    this.eye.rejoice(function () {
-      that.showDarkness(200);
-    });
+    this.eye.rejoice((function () {
+      this.showDarkness(200);
+    }).bind(this));
   }
 };
 
@@ -430,7 +423,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
     Phaser.Easing.Quadratic.Out,
     true);
 
-  this.eye.endLevel(false);
+  this.eye.levelEndedEvent(false);
 
   if (destroyPlayer) {
     // play the animation of death of the player
@@ -461,6 +454,7 @@ BasicGame.Game.prototype.putDarkTweenCompleted = function () {
   this.player.gameInDarkness();
 
   this.showLifes();
+
   if (this.lifes <= 0) {
     this.restartLevel(true);
   }
@@ -478,9 +472,6 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
   this.isLoadingLevel = false;
 
   if (BasicGame.isRetrying === false) {
-    // if the level is played for the first time
-    // this.level.daySound.play();
-
     // make the player say a line
     this.player.showDialogue();
   }
@@ -488,23 +479,23 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
   this.lifes = this.LIFES_AMOUNT;
 
   // make the EYE seek for the player
-  this.eye.levelStart();
 
   if (this.music.isPlaying === false) {
     this.music.play();
   }
 
   this.player.enableBody();
+  this.eye.levelStart();
 };
 
 BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {
-  // restore the alpha for life indicators and lifes group
+  // restore the alpha for life indicators and lifes' group
   this.lifes = this.LIFES_AMOUNT;
   this.showLifes();
 
-  this.player.restartLevel();
-  this.level.restartLevel();
-  this.eye.restartLevel();
+  this.player.restartLevel(runHideDarkness);
+  this.level.restartLevel(runHideDarkness);
+  this.eye.restartLevel(runHideDarkness);
 
   if (runHideDarkness === true) {
     this.hideDarkness(200);

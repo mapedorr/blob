@@ -127,24 +127,19 @@ BasicGame.Player.prototype.create = function (level) {
   this.level = level;
 
   //Put the player in the game's world
-  this.playerSprite = this.game.add.sprite(this.level.initPlayerPos.x + this.HALF_SIZE,
-    this.level.initPlayerPos.y + this.BASE_SIZE,
-    'player');
+  this.playerSprite = this.game.add.sprite(0, 0, 'player');
   this.playerSprite.anchor.setTo(0.5, 1);
-
-  // configure the player animations
-  this.playerSprite.animations.add('normal', [0], 1, false);
-  this.playerSprite.animations.add('dying', null, 70, false);
 
   //Enable physics on the player
   this.game.physics.arcade.enable(this.playerSprite);
 
   //Set player minimum and maximum movement speed
-  this.playerSprite.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 20); // x, y
-  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
+  this.playerSprite.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 20);
 
   //Since we're jumping we need gravity
   this.game.physics.arcade.gravity.y = this.GRAVITY;
+
+  this.setPlayerPositionInLevel();
 
   //Capture certain keys to prevent their default actions in the browser.
   //This is only necessary because this is an HTML5 game. Games on other
@@ -764,9 +759,7 @@ BasicGame.Player.prototype.updateLevel = function (level) {
   this.justLeaveGround = false;
   this.slideSound.stop();
   this.enableBody();
-  this.playerSprite.position.set(this.level.initPlayerPos.x + this.BASE_SIZE / 2,
-    this.level.initPlayerPos.y + this.BASE_SIZE);
-  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
+  this.setPlayerPositionInLevel();
   this.dead = false;
   this.dialogueFadeOutStarted = false;
 };
@@ -812,23 +805,17 @@ BasicGame.Player.prototype.explote = function () {
   }, this);
 };
 
-BasicGame.Player.prototype.restartLevel = function () {
+BasicGame.Player.prototype.restartLevel = function (hideDarknessDelay) {
   this.collectedPieces = 0;
-
   this.walkSound.stop();
   this.slideSound.stop();
-
-  this.playerSprite.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
-  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
-
-  this.playerSprite.animations.play('normal');
-
-  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
-  this.game.time.create(true)
-    .add(100, function () {
-      this.enableBody();
-    }, this)
-    .timer.start();
+  this.setPlayerPositionInLevel();
+  // this.game.time
+  //   .create(true)
+  //   .add(hideDarknessDelay || 100, function () {
+  //     this.enableBody();
+  //   }, this)
+  //   .timer.start();
   this.dead = false;
 };
 
@@ -854,10 +841,10 @@ BasicGame.Player.prototype.showDialogue = function () {
 
   if (dayObj.text) {
     this.waitTime = dayObj.waitTime * 1000;
-    this.dialogueText.setText(dayObj.text[BasicGame.language]);
+    this.dialogueText.text = dayObj.text[BasicGame.language];
     this.dialogueBackground.height = this.dialogueText.textHeight + this.DIALOGUE_TEXT_V_PADDING * 2;
     this.dialogueMark.y = this.dialogueBackground.height + 8;
-    dialogueHeight = this.dialogueGroup.height;
+    dialogueHeight = this.dialogueMark.bottom;
     this.game.world.bringToTop(this.dialogueGroup);
 
     if (this.DIALOGUE_WIDTH + this.playerSprite.centerX > this.game.width) {
@@ -901,4 +888,10 @@ BasicGame.Player.prototype.hideDialogue = function () {
 BasicGame.Player.prototype.enableBody = function () {
   this.playerSprite.body.enable = true;
   this.playerSprite.body.allowGravity = true;
+};
+
+BasicGame.Player.prototype.setPlayerPositionInLevel = function () {
+  this.playerSprite.position.set(this.level.initPlayerPos.x + this.HALF_SIZE,
+    this.level.initPlayerPos.y + this.BASE_SIZE);
+  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
 };
