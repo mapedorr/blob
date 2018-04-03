@@ -51,6 +51,8 @@ BasicGame.Player = function (game, input, gameObj) {
   this.fontId = 'font';
   this.dialogueDisplayed = false;
   this.flipDialogue = false;
+  this.dialogueFadeOutStarted = false;
+  this.jumpFeedbackStarted = false;
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // define movement constants
@@ -113,6 +115,8 @@ BasicGame.Player = function (game, input, gameObj) {
   this.PARTICLES_AMOUNT = 4;
 };
 
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ PHASER STATE METHODS                                                     ║
 BasicGame.Player.prototype.create = function (level) {
   var particle = null,
     particleX = null,
@@ -137,6 +141,7 @@ BasicGame.Player.prototype.create = function (level) {
 
   //Set player minimum and maximum movement speed
   this.playerSprite.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 20); // x, y
+  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
 
   //Since we're jumping we need gravity
   this.game.physics.arcade.gravity.y = this.GRAVITY;
@@ -315,9 +320,11 @@ BasicGame.Player.prototype.update = function () {
   rightPressed = this.rightInputIsActive() === true;
   upPressed = this.upInputIsActive() === true;
 
-  if (this.dialogueDisplayed === true && (leftPressed || rightPressed || upPressed)) {
+  if (this.dialogueDisplayed === true && this.dialogueFadeOutStarted === false &&
+    (leftPressed || rightPressed || upPressed)) {
     // if the player is moving and the dialogue box is visible, start the timer
     // to fade it out
+    this.dialogueFadeOutStarted = true;
     this.gameObj.helper.timer(this.waitTime, this.hideDialogue, this);
   }
 
@@ -326,6 +333,15 @@ BasicGame.Player.prototype.update = function () {
     onRightWall = this.playerSprite.body.touching.right === true && this.playerSprite.body.velocity.y > -500;
     onLeftWall = this.playerSprite.body.touching.left === true && this.playerSprite.body.velocity.y > -500;
     headHit = this.playerSprite.body.touching.up === true && this.onGround === false;
+  }
+
+  if (headHit) {
+    this.isJumping = false;
+  }
+
+  // jump jump jump
+  if (this.isJumping && this.jumpFeedbackStarted === false) {
+    this.jumpFeedback();
   }
 
   if (this.onGround || onRightWall || onLeftWall) {
@@ -389,7 +405,9 @@ BasicGame.Player.prototype.update = function () {
         this.playerSprite.body.acceleration.x = this.ACCELERATION_WALL;
         this.playerSprite.body.velocity.y = this.JUMP_SPEED_WALL;
 
-        this.jumpFeedback();
+        if (this.isJumping && this.jumpFeedbackStarted === false) {
+          this.jumpFeedback();
+        }
       }
     }
   }
@@ -416,7 +434,9 @@ BasicGame.Player.prototype.update = function () {
         this.playerSprite.body.acceleration.x = -this.ACCELERATION_WALL;
         this.playerSprite.body.velocity.y = this.JUMP_SPEED_WALL;
 
-        this.jumpFeedback();
+        if (this.isJumping && this.jumpFeedbackStarted === false) {
+          this.jumpFeedback();
+        }
       }
     }
   }
@@ -430,16 +450,17 @@ BasicGame.Player.prototype.update = function () {
     this.slideSound.stop();
   }
 
-  if (upPressed) {
+  if (upPressed && !headHit) {
     jumpMul = Math.min(this.currentJumpMultiplier, this.JUMP_MULTIPLIER_MAX);
     this.playerSprite.body.velocity.y = this.JUMP_SPEED;
     this.playerSprite.body.velocity.y += this.JUMP_SPEED * jumpMul;
     this.jumpMultiplier = this.JUMP_MULTIPLIER;
-
-    // jump jump jump
     if (!this.isJumping) {
-      this.jumpFeedback();
+      this.isJumping = true;
     }
+  }
+  else {
+    this.isJumping = false;
   }
 
   // sprite out of the bounds of the game world
@@ -481,6 +502,19 @@ BasicGame.Player.prototype.render = function () {
     this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
   }
 };
+
+BasicGame.Player.prototype.shutdown = function () {
+  this.playerSprite.destroy();
+  this.particlesGroup.destroy();
+  this.jumpSound.destroy();
+  this.walkSound.destroy();
+  this.slideSound.destroy();
+  this.fallSound.destroy();
+  this.deathSound.destroy();
+  this.pieceSound.destroy();
+};
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
 
 BasicGame.Player.prototype.leftInputIsActive = function () {
   return this.input.keyboard.isDown(this.leftKey1) ||
@@ -555,15 +589,23 @@ BasicGame.Player.prototype.playBaseSizeTween = function () {
 };
 
 BasicGame.Player.prototype.jumpFeedback = function () {
-  // jump jump jump
-  var stretchTween = this.game.add.tween(this.playerSprite);
+  var stretchTween;
+
+  this.jumpFeedbackStarted = true;
+
+  stretchTween = this.game.add.tween(this.playerSprite);
   stretchTween.to({
     width: this.BASE_SIZE - this.STRETCH_SQUASH_VALUE,
     height: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE
   }, 200, Phaser.Easing.Exponential.Out);
+  stretchTween.onComplete.add(function () {
+    this.jumpFeedbackStarted = false;
+  }, this);
   stretchTween.start();
-  this.isJumping = true;
+
+  // this.isJumping = true;
   this.currentJumpMultiplier = 0;
+
   if (!this.jumpSound.isPlaying) {
     this.jumpSound.play();
   }
@@ -721,10 +763,12 @@ BasicGame.Player.prototype.updateLevel = function (level) {
   this.level = level;
   this.justLeaveGround = false;
   this.slideSound.stop();
-  this.playerSprite.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
-  this.playerSprite.body.enable = true;
-  this.playerSprite.body.allowGravity = true;
+  this.enableBody();
+  this.playerSprite.position.set(this.level.initPlayerPos.x + this.BASE_SIZE / 2,
+    this.level.initPlayerPos.y + this.BASE_SIZE);
+  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
   this.dead = false;
+  this.dialogueFadeOutStarted = false;
 };
 
 BasicGame.Player.prototype.explote = function () {
@@ -775,14 +819,14 @@ BasicGame.Player.prototype.restartLevel = function () {
   this.slideSound.stop();
 
   this.playerSprite.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
+  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
 
   this.playerSprite.animations.play('normal');
 
   this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
   this.game.time.create(true)
     .add(100, function () {
-      this.playerSprite.body.enable = true;
-      this.playerSprite.body.allowGravity = true;
+      this.enableBody();
     }, this)
     .timer.start();
   this.dead = false;
@@ -854,15 +898,7 @@ BasicGame.Player.prototype.hideDialogue = function () {
   displayTween.start();
 };
 
-// ╔═══════════════════════════════════════════════════════════════════════════╗
-BasicGame.Player.prototype.shutdown = function () {
-  this.playerSprite.destroy();
-  this.particlesGroup.destroy();
-  this.jumpSound.destroy();
-  this.walkSound.destroy();
-  this.slideSound.destroy();
-  this.fallSound.destroy();
-  this.deathSound.destroy();
-  this.pieceSound.destroy();
+BasicGame.Player.prototype.enableBody = function () {
+  this.playerSprite.body.enable = true;
+  this.playerSprite.body.allowGravity = true;
 };
-// ╚═══════════════════════════════════════════════════════════════════════════╝

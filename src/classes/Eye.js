@@ -430,7 +430,7 @@ BasicGame.Eye.prototype.shake = function () {
 BasicGame.Eye.prototype.levelStart = function () {
   this.levelEnded = false;
   this.shooting = false;
-  this.initSearch();
+  // this.initSearch();
 };
 
 BasicGame.Eye.prototype.endLevel = function (levelCompleted) {

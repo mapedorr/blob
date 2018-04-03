@@ -44,7 +44,7 @@ BasicGame.Game = function (game) {
   };
 };
 
-BasicGame.Game.developmentMode = false;
+BasicGame.Game.developmentMode = true;
 BasicGame.isRetrying = false;
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
@@ -125,6 +125,7 @@ BasicGame.Game.prototype.create = function () {
   darknessBitmap.ctx.fillStyle = '#212121';
   darknessBitmap.ctx.fill();
   darknessSprite = new Phaser.Sprite(this.game, 0, 0, darknessBitmap);
+  darknessSprite.alpha = .2;
   this.darknessGroup.addChild(darknessSprite);
 
   // create the darkness tween
@@ -493,7 +494,7 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
     this.music.play();
   }
 
-  this.player.playerSprite.body.enable = true;
+  this.player.enableBody();
 };
 
 BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {
