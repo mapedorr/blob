@@ -160,7 +160,7 @@ BasicGame.Days = function () {
       "number": 11,
       "text": {
         "en": "(cool down days)",
-        "es": "(dían de calma)"
+        "es": "(días de calma)"
       },
       "waitTime": 3
     },

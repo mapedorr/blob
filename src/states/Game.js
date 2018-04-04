@@ -6,6 +6,7 @@ BasicGame.Game = function (game) {
   this.FADE_DURATION = 700;
   this.KEY_PAUSE = Phaser.Keyboard.P;
   this.KEY_MUTE = Phaser.Keyboard.M;
+  this.KEY_CHAT = Phaser.Keyboard.C;
 
   // destroyable objects (sprites, sounds, groups, tweens...)
   this.background = null;
@@ -17,6 +18,7 @@ BasicGame.Game = function (game) {
   this.removeDarkTween = null;
   this.noiseImage = null;
   this.savingText = null;
+  this.uiGroup = null;
 
   // references to other classes
   this.days = null;
@@ -36,6 +38,7 @@ BasicGame.Game = function (game) {
   this.pausedOn = 0;
   this.mutedOn = 0;
   this.checkMKey = true;
+  this.checkCKey = true;
   this.changingLevel = false;
   this.fontId = 'font';
   this.savingMsg = {
@@ -46,6 +49,7 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
+BasicGame.ignoreSave = true;
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ PHASER STATE METHODS                                                     ║
@@ -111,8 +115,13 @@ BasicGame.Game.prototype.create = function () {
 
   this.game.input.keyboard.addKeyCapture([
     this.KEY_PAUSE,
-    this.KEY_MUTE
+    this.KEY_MUTE,
+    this.KEY_CHAT
   ]);
+
+  // ═══════════════════
+  // create the UI group
+  this.createUIGroup();
 
   // ═══════════════════
   // create the darkness
@@ -197,7 +206,7 @@ BasicGame.Game.prototype.update = function () {
 
   if (this.inputIsActive(this.KEY_PAUSE) === true) {
     this.pausedOn = this.game.time.now;
-    this.game.paused = !this.game.paused;
+    this.pauseGame();
   }
 
   if (this.game.time.now - this.mutedOn >= 100) {
@@ -207,7 +216,16 @@ BasicGame.Game.prototype.update = function () {
   if (this.checkMKey && this.inputIsActive(this.KEY_MUTE) === true) {
     this.mutedOn = this.game.time.now;
     this.checkMKey = false;
-    this.game.sound.mute = !this.game.sound.mute;
+    this.muteGame();
+  }
+
+  if (this.checkCKey === false && this.player.dialogueGroup.alpha === 0) {
+    this.checkCKey = true;
+  }
+
+  if (this.checkCKey && this.inputIsActive(this.KEY_CHAT) === true) {
+    this.checkCKey = false;
+    this.showPlayerDialogue(true);
   }
 
   // show development information
@@ -225,7 +243,7 @@ BasicGame.Game.prototype.render = function () {
 
 BasicGame.Game.prototype.pauseUpdate = function () {
   if ((this.game.time.now - this.pausedOn >= 100) && this.inputIsActive(this.KEY_PAUSE) === true) {
-    this.game.paused = !this.game.paused;
+    this.pauseGame();
     this.pausedOn = 0;
   }
 };
@@ -257,6 +275,23 @@ BasicGame.Game.prototype.shutdown = function () {
 // ║                                                                           ║
 // ╚═══════════════════════════════════════════════════════════════════════════╝
 
+BasicGame.Game.prototype.createUIGroup = function () {
+  this.uiGroup = this.game.add.group();
+
+  this.chatImage = this.game.add.button(0, 0, 'chat', function () {
+    this.showPlayerDialogue(true);
+  }, this, null, null, null, null, this.uiGroup);
+
+  this.muteButton = this.game.add.button(this.chatImage.right + 10, 0, 'mute',
+    this.muteGame, this, null, null, null, null, this.uiGroup);
+
+  this.pauseButton = this.game.add.button(this.muteButton.right + 10, 0, 'pause',
+    this.pauseGame, this, null, null, null, null, this.uiGroup);
+
+  this.uiGroup.x = this.game.world.width - this.uiGroup.width - 16;
+  this.uiGroup.y = 16;
+};
+
 BasicGame.Game.prototype.arrangeRenderLayers = function () {
   if (this.level.spikes) {
     this.game.world.bringToTop(this.level.spikes);
@@ -267,6 +302,7 @@ BasicGame.Game.prototype.arrangeRenderLayers = function () {
   this.game.world.bringToTop(this.level.pieces);
   this.game.world.bringToTop(this.lifesGroup);
   this.game.world.bringToTop(this.player.dialogueGroup);
+  this.game.world.bringToTop(this.uiGroup);
   this.game.world.bringToTop(this.darknessGroup);
 };
 
@@ -323,7 +359,7 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
 
   this.game.load.start();
 
-  localStorage.setItem("oh-my-blob", BasicGame.setDay(levelNumber));
+  this.saveGame(BasicGame.setDay(levelNumber));
 };
 
 BasicGame.Game.prototype.levelReady = function () {
@@ -395,7 +431,7 @@ BasicGame.Game.prototype.subtractLife = function () {
 
   if (this.lifes <= 0) {
     // save the current level
-    localStorage.setItem("oh-my-blob", BasicGame.addDeath());
+    this.saveGame(BasicGame.addDeath());
 
     // notify the PLAYER that its time to show the animation for dead
     this.player.explote();
@@ -413,7 +449,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
     return;
   }
 
-  localStorage.setItem("oh-my-blob", BasicGame.addDeath());
+  this.saveGame(BasicGame.addDeath());
 
   this.lifes = 0;
 
@@ -473,7 +509,7 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
 
   if (BasicGame.isRetrying === false) {
     // make the player say a line
-    this.player.showDialogue();
+    this.showPlayerDialogue();
   }
 
   this.lifes = this.LIFES_AMOUNT;
@@ -522,6 +558,36 @@ BasicGame.Game.prototype.showLifes = function () {
 BasicGame.Game.prototype.getSkyName = function () {
   return this.helper.getSkyName(BasicGame.currentLevel);
 };
+
+BasicGame.Game.prototype.saveGame = function (data) {
+  if (BasicGame.Game.developmentMode === true || BasicGame.ignoreSave === true) {
+    return;
+  }
+
+  this.saveGame(data);
+};
+
+BasicGame.Game.prototype.showPlayerDialogue = function (immediateHide) {
+  this.player.showDialogue(immediateHide);
+};
+
+BasicGame.Game.prototype.muteGame = function () {
+  this.game.sound.mute = !this.game.sound.mute;
+  this.muteButton.frame = (this.game.sound.mute === true) ? 1 : 0;
+};
+
+BasicGame.Game.prototype.pauseGame = function () {
+  this.game.paused = !this.game.paused;
+  this.pauseButton.frame = 0;
+  this.darknessGroup.getChildAt(0).alpha = 0;
+
+  if (this.game.paused === true) {
+    this.pauseButton.frame = 1;
+    // this.darknessGroup.getChildAt(0).alpha = 0.8;
+    // this.game.world.bringToTop(this.darknessGroup);
+  }
+};
+
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 BasicGame.Game.prototype.quitGame = function () {

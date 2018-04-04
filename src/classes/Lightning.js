@@ -68,21 +68,21 @@ BasicGame.Lightning.prototype.update = function () {
 BasicGame.Lightning.prototype.shoot = function (target) {
   this.fakeThing.x = this.fakeThing.y = 0;
   var targetPos = {
-    x: target.left,
-    y: target.top
+    x: target.centerX,
+    y: target.centerY
   };
 
   // Rotate the lightning sprite so it goes in the
   // direction of the pointer
   this.lightning.rotation = this.game.math.angleBetween(
     this.lightning.x, this.lightning.y,
-    targetPos.x + 16, targetPos.y + 16
+    targetPos.x, targetPos.y
   ) - Math.PI / 2;
 
   // Calculate the distance from the lightning source to the pointer
   var distance = this.game.math.distance(
     this.lightning.x, this.lightning.y,
-    targetPos.x + 16, targetPos.y + 16
+    targetPos.x, targetPos.y
   );
 
   // Create the lightning texture
@@ -101,8 +101,8 @@ BasicGame.Lightning.prototype.shoot = function (target) {
     .to({ alpha: 0 }, 250, Phaser.Easing.Cubic.In)
     .start();
 
-  this.fakeThing.x = targetPos.x + 16;
-  this.fakeThing.y = targetPos.y + 16;
+  this.fakeThing.x = targetPos.x;
+  this.fakeThing.y = targetPos.y;
 
   this.lightningSound.play();
 };

@@ -46,11 +46,14 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('dialogue_background', 'assets/sprites/dialogue_background.png');
   this.load.image('dialogue_mark', 'assets/sprites/dialogue_mark.png');
   this.load.image('noise', 'assets/sprites/noise.png');
+  this.load.image('chat', 'assets/sprites/chat.png');
 
   // this.load.spritesheet('noise', 'assets/sprites/noise.png', 1024, 640);
   this.load.spritesheet('player', 'assets/sprites/player.png', 32, 32, 1);
   this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 118, 3);
   this.load.spritesheet('checkbox', 'assets/sprites/checkbox.png', 24, 24, 2);
+  this.load.spritesheet('mute', 'assets/sprites/mute.png', 24, 24, 2);
+  this.load.spritesheet('pause', 'assets/sprites/pause.png', 24, 24, 2);
 
   this.load.audio('b', 'assets/soundfx/b.ogg', true);
   this.load.audio('h', 'assets/soundfx/h.ogg', true);
@@ -78,7 +81,7 @@ BasicGame.Preloader.prototype.preload = function () {
 
   // load this if the current level stored requires it, otherwise load it
   // when the player is near the end of the corresponding chapter
-  this.load.image('spike-platform', 'assets/sprites/spike-platform.png');
+  this.load.spritesheet('spike-platform', 'assets/sprites/spike-platform.png', 32, 32);
   this.load.image('spike', 'assets/sprites/spike.png');
   this.load.image('spike-r', 'assets/sprites/spike-r.png');
   this.load.image('spike-l', 'assets/sprites/spike-l.png');
@@ -100,6 +103,6 @@ BasicGame.Preloader.prototype.create = function () {
 BasicGame.Preloader.prototype.update = function () {
   if (this.ready === false) {
     this.ready = true;
-    this.state.start('Game');
+    this.state.start('MainMenu');
   }
 };

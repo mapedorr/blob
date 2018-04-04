@@ -23,8 +23,12 @@ BasicGame.MainMenu = function (game) {
     'en': 'Credits'
   };
   this.KEYS_DESCRIPTION_MSG = {
-    'es': 'usa A y D o IZQUIERA y DERECHA para moverte\nusa W, Z, ESPACIO o ARRIBA para saltar',
-    'en': 'use A and D or LEFT and RIGHT to move\nuse W, Z, SPACE or UP to jump'
+    'es': 'usa A y D o IZQUIERA y DERECHA para moverte\n' +
+      'usa W, Z, ESPACIO o ARRIBA para saltar\n' +
+      'usa C para ver los diálogos',
+    'en': 'use A and D or LEFT and RIGHT to move\n' +
+      'use W, Z, SPACE or UP to jump\n' +
+      'use C to show the dialogues'
   };
   this.CONTINUE_DAY_MSG = {
     "es": "Día",

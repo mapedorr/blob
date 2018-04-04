@@ -94,6 +94,8 @@ BasicGame.Player = function (game, input, gameObj) {
   this.jumpKey2 = Phaser.Keyboard.SPACEBAR;
   this.jumpKey3 = Phaser.Keyboard.UP;
   this.jumpKey4 = Phaser.Keyboard.W;
+  this.downKey1 = Phaser.Keyboard.DOWN;
+  this.downKey2 = Phaser.Keyboard.S;
 
   this.justLeaveGround = false;
 
@@ -148,7 +150,8 @@ BasicGame.Player.prototype.create = function (level) {
     this.leftKey1,
     this.rightKey1,
     this.jumpKey1,
-    this.jumpKey2
+    this.jumpKey2,
+    this.downKey1
   ]);
 
   // disable physics in the player's body while the game starts
@@ -200,11 +203,6 @@ BasicGame.Player.prototype.create = function (level) {
   if (!this.pieceSound) {
     this.pieceSound = this.game.add.sound('piece', 0.2);
   }
-  // if (!this.piecesSound || this.piecesSound.length === 0) {
-  //   for(var i = 1; i <= 20; i++) {
-  //     this.piecesSound.push(this.game.add.sound('piece' + ((i < 10) ? '0' : '') + i, 0.2));
-  //   }
-  // }
 
   // create the group that will contain the particles that will be used during
   // player death
@@ -216,7 +214,6 @@ BasicGame.Player.prototype.create = function (level) {
 
   while (this.particlesGroup.children.length < Math.pow(this.PARTICLES_AMOUNT, 2)) {
     particle = this.game.add.sprite(particleX, particleY, 'player');
-    // particle.tint = this.gameObj.helper.randomColor();
     particle.width = particle.height = increaseAmount;
     particle.originalX = particle.x;
     particle.originalY = particle.y;
@@ -261,6 +258,7 @@ BasicGame.Player.prototype.update = function () {
   var leftPressed = false;
   var rightPressed = false;
   var upPressed = false;
+  var downPressed = false;
   var onRightWall = false;
   var onLeftWall = false;
   var headHit = false;
@@ -314,6 +312,12 @@ BasicGame.Player.prototype.update = function () {
   leftPressed = this.leftInputIsActive() === true;
   rightPressed = this.rightInputIsActive() === true;
   upPressed = this.upInputIsActive() === true;
+  downPressed = this.downInputIsActive() === true;
+
+  if (this.duckTweenPlaying === true && !downPressed) {
+    this.playBaseSizeTween();
+    this.duckTweenPlaying = false;
+  }
 
   if (this.dialogueDisplayed === true && this.dialogueFadeOutStarted === false &&
     (leftPressed || rightPressed || upPressed)) {
@@ -386,7 +390,7 @@ BasicGame.Player.prototype.update = function () {
       if (!this.leftFirstPress) {
         this.leftFirstPress = true;
         this.currentJumpMultiplier = 0;
-        this.walkSound.play();
+        this.walkFeedback(true);
       }
       else {
         this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
@@ -415,7 +419,7 @@ BasicGame.Player.prototype.update = function () {
       if (this.rightFirstPress === false) {
         this.rightFirstPress = true;
         this.currentJumpMultiplier = 0;
-        this.walkSound.play();
+        this.walkFeedback();
       }
       else {
         this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
@@ -443,6 +447,15 @@ BasicGame.Player.prototype.update = function () {
     this.currentJumpMultiplier = 0;
     this.walkSound.stop();
     this.slideSound.stop();
+
+    if (downPressed) {
+      this.duckFeedback();
+    }
+
+    /* if (this.walkTweenPlayed === true) {
+      this.playBaseSizeTween();
+      this.walkTweenPlayed = false;
+    } */
   }
 
   if (upPressed && !headHit) {
@@ -489,7 +502,7 @@ BasicGame.Player.prototype.render = function () {
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
     // Sprite debug info
     this.game.debug.bodyInfo(this.playerSprite, 0, 100, 'rgba(0,255,0,0.4)');
-    this.game.debug.body(this.playerSprite, 'rgba(0,255,0,0.4)');
+    // this.game.debug.body(this.playerSprite, 'rgba(0,255,0,0.4)');
   }
 
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
@@ -534,6 +547,11 @@ BasicGame.Player.prototype.upInputIsActive = function (duration) {
   return false;
 };
 
+BasicGame.Player.prototype.downInputIsActive = function () {
+  return this.input.keyboard.isDown(this.downKey1) ||
+    this.input.keyboard.isDown(this.downKey2);
+};
+
 BasicGame.Player.prototype.onGroundFeedback = function () {
   var squashTween = null;
   if (this.justLeaveGround === true && !this.squashTweenPlaying) {
@@ -558,6 +576,45 @@ BasicGame.Player.prototype.onGroundFeedback = function () {
   }
 
   this.justLeaveGround = false;
+};
+
+BasicGame.Player.prototype.walkFeedback = function (left) {
+  var squashTween = null;
+
+  if (!this.walkTweenPlayed) {
+    squashTween = this.game.add.tween(this.playerSprite);
+    squashTween.to({
+      width: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE / 1.5
+    }, 150, Phaser.Easing.Exponential.Out);
+    squashTween.onComplete.add(function () {
+      this.playBaseSizeTween();
+      this.walkTweenPlayed = false;
+    }, this);
+    squashTween.start();
+    this.walkTweenPlayed = true;
+  }
+
+  if (!this.walkSound.isPlaying) {
+    this.walkSound.play();
+  }
+};
+
+BasicGame.Player.prototype.duckFeedback = function () {
+  var squashTween = null;
+
+  if (!this.duckTweenPlaying) {
+    squashTween = this.game.add.tween(this.playerSprite);
+    squashTween.to({
+      width: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE,
+      height: this.BASE_SIZE - this.STRETCH_SQUASH_VALUE
+    }, 150, Phaser.Easing.Exponential.Out);
+    // squashTween.onComplete.add(function () {
+    //   this.playBaseSizeTween();
+    //   this.duckTweenPlaying = false;
+    // }, this);
+    squashTween.start();
+    this.duckTweenPlaying = true;
+  }
 };
 
 BasicGame.Player.prototype.onWallFeedback = function () {
@@ -677,20 +734,22 @@ BasicGame.Player.prototype.isInShadow = function (checkLeft, checkRight) {
 
     // bottom left corner
     raysToLight.push(new Phaser.Line(this.playerSprite.left + offset,
-      this.playerSprite.top + this.playerSprite.height - offset,
+      // this.playerSprite.bottom - offset,
+      this.playerSprite.bottom,
       lightImage.x,
       lightImage.y));
   }
 
   if (checkRight === true) {
     // top right corner
-    raysToLight.push(new Phaser.Line(this.playerSprite.left + this.playerSprite.width - offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.right - offset,
       this.playerSprite.top + offset,
       lightImage.x, lightImage.y));
 
     // bottom right corner
-    raysToLight.push(new Phaser.Line(this.playerSprite.left + this.playerSprite.width - offset,
-      this.playerSprite.top + this.playerSprite.height - offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.right - offset,
+      // this.playerSprite.bottom - offset,
+      this.playerSprite.bottom,
       lightImage.x, lightImage.y));
   }
 
@@ -824,7 +883,6 @@ BasicGame.Player.prototype.gameInDarkness = function () {
 };
 
 BasicGame.Player.prototype.placeDialogueGroup = function () {
-  // this.dialogueGroup.x = this.playerSprite.centerX - this.dialogueGroup.width;
   if (this.flipDialogue === true) {
     this.dialogueGroup.x = this.playerSprite.centerX - this.dialogueGroup.width + 16;
   }
@@ -834,13 +892,13 @@ BasicGame.Player.prototype.placeDialogueGroup = function () {
   this.dialogueGroup.y = this.playerSprite.top - this.dialogueGroup.height - 6.8;
 };
 
-BasicGame.Player.prototype.showDialogue = function () {
+BasicGame.Player.prototype.showDialogue = function (immediateHide) {
   var dayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
   var displayTween = null;
   var dialogueHeight = 0;
 
   if (dayObj.text) {
-    this.waitTime = dayObj.waitTime * 1000;
+    this.waitTime = (immediateHide === true) ? 100 : dayObj.waitTime * 1000;
     this.dialogueText.text = dayObj.text[BasicGame.language];
     this.dialogueBackground.height = this.dialogueText.textHeight + this.DIALOGUE_TEXT_V_PADDING * 2;
     this.dialogueMark.y = this.dialogueBackground.height + 8;
@@ -872,13 +930,14 @@ BasicGame.Player.prototype.showDialogue = function () {
   }
 };
 
-BasicGame.Player.prototype.hideDialogue = function () {
+BasicGame.Player.prototype.hideDialogue = function (delay) {
   var displayTween = this.game.add.tween(this.dialogueGroup);
   displayTween.to({
     alpha: 0
-  }, this.FADE_SPEED, Phaser.Easing.Cubic.Out);
+  }, this.FADE_SPEED, Phaser.Easing.Cubic.Out, false, delay);
   displayTween.onComplete.add(function () {
     this.dialogueDisplayed = false;
+    this.dialogueFadeOutStarted = false;
     this.dialogueGroup.width = 0;
     this.dialogueGroup.height = 0;
   }, this);
