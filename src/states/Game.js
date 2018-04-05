@@ -7,6 +7,9 @@ BasicGame.Game = function (game) {
   this.KEY_PAUSE = Phaser.Keyboard.P;
   this.KEY_MUTE = Phaser.Keyboard.M;
   this.KEY_CHAT = Phaser.Keyboard.C;
+  this.GO_TO_NEXT_LEVEL_DELAY
+  this.DARKNESS_ALPHA = 1;
+  this.GO_TO_NEXT_LEVEL_DELAY = 1500;
 
   // destroyable objects (sprites, sounds, groups, tweens...)
   this.background = null;
@@ -138,7 +141,7 @@ BasicGame.Game.prototype.create = function () {
 
   // create the darkness tween
   this.putDarkTween = this.game.add.tween(this.darknessGroup.getChildAt(0));
-  this.putDarkTween.to({ alpha: 1 }, this.FADE_DURATION, Phaser.Easing.Quadratic.Out, false);
+  this.putDarkTween.to({ alpha: this.DARKNESS_ALPHA }, this.FADE_DURATION, Phaser.Easing.Quadratic.Out, false);
   this.putDarkTween.onComplete.add(this.putDarkTweenCompleted, this);
 
   // create the brightness tween
@@ -317,7 +320,7 @@ BasicGame.Game.prototype.levelEnded = function () {
     this.savingText.alpha = 1;
     this.game.world.bringToTop(this.savingText);
 
-    this.helper.timer(1500, function () {
+    this.helper.timer(this.GO_TO_NEXT_LEVEL_DELAY, function () {
       // set the flag for loading level
       this.isLoadingLevel = true;
 
@@ -444,16 +447,17 @@ BasicGame.Game.prototype.subtractLife = function () {
 };
 
 BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
+  var lifeTween = null;
+
   // if the player collected all the pieces, don't kill him
   if (this.level.endTimer) {
     return;
   }
 
   this.saveGame(BasicGame.addDeath());
-
   this.lifes = 0;
 
-  var lifeTween = this.game.add.tween(this.lifesGroup);
+  lifeTween = this.game.add.tween(this.lifesGroup);
   lifeTween.to({ alpha: 0 },
     180,
     Phaser.Easing.Quadratic.Out,
@@ -504,7 +508,6 @@ BasicGame.Game.prototype.hideDarkness = function (durationInMS) {
 };
 
 BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
-  // this.eye.eyeStateTimer = this.eye.searchingTime;
   this.isLoadingLevel = false;
 
   if (BasicGame.isRetrying === false) {

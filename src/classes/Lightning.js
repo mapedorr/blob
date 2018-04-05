@@ -58,7 +58,7 @@ BasicGame.Lightning.prototype.update = function () {
       this.fakeThing.right < this.playerObj.playerSprite.right &&
       this.fakeThing.top > this.playerObj.playerSprite.top &&
       this.fakeThing.bottom < this.playerObj.playerSprite.bottom) {
-      this.gameObj.subtractLife();
+      // this.gameObj.subtractLife();
       this.gameObj.shakeCamera();
     }
     this.fakeThing.x = this.fakeThing.y = -10;
