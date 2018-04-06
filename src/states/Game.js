@@ -607,7 +607,7 @@ BasicGame.Game.prototype.saveGame = function (data) {
     return;
   }
 
-  this.saveGame(data);
+  localStorage.setItem("oh-my-blob", data);
 };
 
 BasicGame.Game.prototype.showPlayerDialogue = function (immediateHide) {
