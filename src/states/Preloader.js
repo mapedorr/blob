@@ -48,6 +48,8 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('dialogue_mark', 'assets/sprites/dialogue_mark.png');
   this.load.image('noise', 'assets/sprites/noise.png');
   this.load.image('chat', 'assets/sprites/chat.png');
+  this.load.image('pause_es', 'assets/sprites/pause_es.png');
+  this.load.image('pause_en', 'assets/sprites/pause_en.png');
 
   // this.load.spritesheet('noise', 'assets/sprites/noise.png', 1024, 640);
   this.load.spritesheet('player', 'assets/sprites/player.png', 32, 32, 1);
@@ -104,6 +106,6 @@ BasicGame.Preloader.prototype.create = function () {
 BasicGame.Preloader.prototype.update = function () {
   if (this.ready === false) {
     this.ready = true;
-    this.state.start('Game');
+    this.state.start('MainMenu');
   }
 };

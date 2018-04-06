@@ -10,6 +10,8 @@ BasicGame.Game = function (game) {
   this.GO_TO_NEXT_LEVEL_DELAY
   this.DARKNESS_ALPHA = 1;
   this.GO_TO_NEXT_LEVEL_DELAY = 1500;
+  this.PAUSE_WIDTH = 660; // Illustrator
+  this.PAUSE_HEIGHT = 470; // Illustrator
 
   // destroyable objects (sprites, sounds, groups, tweens...)
   this.background = null;
@@ -22,6 +24,7 @@ BasicGame.Game = function (game) {
   this.noiseImage = null;
   this.savingText = null;
   this.uiGroup = null;
+  this.pauseGroup = null;
 
   // references to other classes
   this.days = null;
@@ -52,7 +55,7 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
-BasicGame.ignoreSave = true;
+BasicGame.ignoreSave = false;
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ PHASER STATE METHODS                                                     ║
@@ -125,6 +128,10 @@ BasicGame.Game.prototype.create = function () {
   // ═══════════════════
   // create the UI group
   this.createUIGroup();
+
+  // ═══════════════════
+  // create the Pause group
+  this.createPauseGroup();
 
   // ═══════════════════
   // create the darkness
@@ -206,6 +213,10 @@ BasicGame.Game.prototype.update = function () {
 
   // update the lightning
   this.lightning.update();
+
+  if (this.showingDarkness === true) {
+    return;
+  }
 
   if (this.inputIsActive(this.KEY_PAUSE) === true) {
     this.pausedOn = this.game.time.now;
@@ -293,6 +304,27 @@ BasicGame.Game.prototype.createUIGroup = function () {
 
   this.uiGroup.x = this.game.world.width - this.uiGroup.width - 16;
   this.uiGroup.y = 16;
+};
+
+BasicGame.Game.prototype.createPauseGroup = function () {
+  var pauseBackgroundImage = null;
+  var textImage = null;
+  var center = { x: this.game.world.width / 2, y: this.game.world.height / 2 };
+
+  this.pauseGroup = this.game.add.group();
+
+  pauseBackgroundImage = this.game.add.image(center.x, center.y, 'credits_background');
+  pauseBackgroundImage.width = this.PAUSE_WIDTH;
+  pauseBackgroundImage.height = this.PAUSE_HEIGHT;
+  pauseBackgroundImage.anchor.set(0.5, 0.5);
+
+  textImage = this.game.add.image(center.x, center.y, 'pause_' + BasicGame.language);
+  textImage.anchor.set(0.5, 0.5);
+
+  this.pauseGroup.addChild(pauseBackgroundImage);
+  this.pauseGroup.addChild(textImage);
+
+  this.pauseGroup.alpha = 0;
 };
 
 BasicGame.Game.prototype.arrangeRenderLayers = function () {
@@ -485,6 +517,10 @@ BasicGame.Game.prototype.showDarkness = function (durationInMS) {
   this.game.world.bringToTop(this.darknessGroup);
   this.putDarkTween.updateTweenData("duration", durationInMS || this.FADE_DURATION);
   this.putDarkTween.start();
+
+  this.chatImage.input.enabled = false;
+  this.muteButton.input.enabled = false;
+  this.pauseButton.input.enabled = false;
 };
 
 BasicGame.Game.prototype.putDarkTweenCompleted = function () {
@@ -505,6 +541,10 @@ BasicGame.Game.prototype.hideDarkness = function (durationInMS) {
   this.showingDarkness = false;
   this.removeDarkTween.updateTweenData("duration", durationInMS || this.FADE_DURATION);
   this.removeDarkTween.start();
+
+  this.chatImage.input.enabled = true;
+  this.muteButton.input.enabled = true;
+  this.pauseButton.input.enabled = true;
 };
 
 BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
@@ -583,11 +623,12 @@ BasicGame.Game.prototype.pauseGame = function () {
   this.game.paused = !this.game.paused;
   this.pauseButton.frame = 0;
   this.darknessGroup.getChildAt(0).alpha = 0;
+  this.pauseGroup.alpha = 0;
 
   if (this.game.paused === true) {
     this.pauseButton.frame = 1;
-    // this.darknessGroup.getChildAt(0).alpha = 0.8;
-    // this.game.world.bringToTop(this.darknessGroup);
+    this.pauseGroup.alpha = 1;
+    this.game.world.bringToTop(this.pauseGroup);
   }
 };
 
