@@ -5,7 +5,7 @@ var BasicGame = require('BasicGame');
 BasicGame.Days = function () {
   this.days = {
     1: {
-      "number": 387,
+      "number": 1095,
       "text": {
         "en": "Maybe it will be there forever",
         "es": "Tal vez siempre estará ahí"
@@ -13,7 +13,7 @@ BasicGame.Days = function () {
       "waitTime": 3
     },
     2: {
-      "number": 349,
+      "number": 998,
       "text": {
         "en": "Sometimes it comes back",
         "es": "A veces vuelve"

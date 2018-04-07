@@ -1,6 +1,6 @@
 var BasicGame = {
   language: "en",
-  currentLevel: 1,
+  currentLevel: 21,
   deaths: 0,
   rest: 0,
   setLanguage: function (newLanguage) {
