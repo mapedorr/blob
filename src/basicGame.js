@@ -1,5 +1,5 @@
 var BasicGame = {
-  language: "en",
+  language: "es",
   currentLevel: 1,
   deaths: 0,
   rest: 0,
