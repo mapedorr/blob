@@ -31,16 +31,20 @@ BasicGame.MainMenu = function (game) {
       'use C to show the dialogues'
   };
   this.CONTINUE_DAY_MSG = {
-    "es": "Día",
-    "en": "Day"
+    'es': 'Día',
+    'en': 'Day'
   };
   this.SPANISH_LANG_MSG = {
-    "es": "Español",
-    "en": "Spanish"
+    'es': 'Español',
+    'en': 'Spanish'
   };
   this.ENGLISH_LANG_MSG = {
-    "es": "Inglés",
-    "en": "English"
+    'es': 'Inglés',
+    'en': 'English'
+  };
+  this.END_SCENE_MSG = {
+    'es': 'Escena final',
+    'en': 'End scene'
   };
 
   // destroyable objects (sprites, sounds, groups, tweens...)
@@ -70,6 +74,9 @@ BasicGame.MainMenu = function (game) {
 BasicGame.MainMenu.prototype.create = function () {
   var _self = this;
 
+  this.translatableTexts = [];
+  this.menuButtons = [];
+
   // set the background
   this.backgroundImage = this.game.add.image(0, 0, 'main_menu_background');
   this.backgroundImage.width = this.game.world.width;
@@ -88,7 +95,7 @@ BasicGame.MainMenu.prototype.create = function () {
     'In the Shadows',
     72);
   this.titleText.anchor.set(0.5, 0);
-  this.titleText.align = "center";
+  this.titleText.align = 'center';
   this.titleText.tint = 0x303c42;
 
   // add the text for key inputs
@@ -97,7 +104,7 @@ BasicGame.MainMenu.prototype.create = function () {
     this.KEYS_DESCRIPTION_MSG[BasicGame.language],
     18);
   this.keysDescriptionText.anchor.set(0.5, 0);
-  this.keysDescriptionText.align = "center";
+  this.keysDescriptionText.align = 'center';
   this.keysDescriptionText.tint = 0x303c42;
   this.keysDescriptionText.x = this.game.world.width / 2;
   this.keysDescriptionText.bottom = this.game.world.height - this.SCREEN_PADDING;
@@ -129,30 +136,7 @@ BasicGame.MainMenu.prototype.create = function () {
 };
 
 BasicGame.MainMenu.prototype.update = function () {
-  // afstand van middenpunt oog tot cursor
-  dx = this.game.input.activePointer.x - this.fakeEye.centerX;
-  dy = this.game.input.activePointer.y - this.fakeEye.centerY;
-  // stelling van pythagoras
-  c = Math.sqrt((dx * dx) + (dy * dy));
-
-  // afstand middelpunt tot pupil
-  r = this.fakeEye.radius * 0.3;
-
-  // cursor op oog
-  if (Math.abs(dx) < r && Math.abs(dy) < r && c < r) {
-    r = c;
-  }
-
-  // hoek bepalen
-  alfa = Math.asin(dy / c);
-
-  // coordinaten op rand cirkel bepalen
-  this.giantPupilImage.x = (Math.cos(alfa) * r) + this.fakeEye.centerX;
-  // 180 graden fout herstellen
-  if (dx < 0) {
-    this.giantPupilImage.x = this.fakeEye.centerX * 2 - this.giantPupilImage.x;
-  }
-  this.giantPupilImage.y = (Math.sin(alfa) * r) + this.fakeEye.centerY;
+  // this.followPointer();
 };
 
 /**
@@ -176,7 +160,6 @@ BasicGame.MainMenu.prototype.shutdown = function () {
   this.menuButtons = null;
   this.closeButton = null;
 };
-
 // ║                                                                           ║
 // ╚═══════════════════════════════════════════════════════════════════════════╝
 
@@ -191,9 +174,17 @@ BasicGame.MainMenu.prototype.createOptionsGroup = function () {
       hSpace: 0,
       vSpace: 1,
       group: this.optionsGroup,
-      overCallback: this.showKeysDescription.bind(this, true),
-      outCallback: this.showKeysDescription.bind(this, false),
-      clickCallback: this.showIntro
+      overCallback: (function() {
+        if (BasicGame.currentLevel <= 30) {
+          this.showKeysDescription(true);
+        }
+      }).bind(this),
+      outCallback: (function() {
+        if (BasicGame.currentLevel <= 30) {
+          this.showKeysDescription(false);
+        }
+      }).bind(this),
+      clickCallback: this.nextScene
     });
   }
   this.addOptionTo({
@@ -318,7 +309,7 @@ BasicGame.MainMenu.prototype.addOptionTo = function (prop) {
     button.centerY,
     this.FONT_REGULAR, prop.msg[BasicGame.language], 18);
   text.anchor.set(1, 0.5);
-  text.align = prop.textAlign || "right";
+  text.align = prop.textAlign || 'right';
   text.tint = prop.textColor || 0xfafafa;
   text.defaultTint = text.tint;
   text.linkedButton = button;
@@ -398,10 +389,10 @@ BasicGame.MainMenu.prototype.newGame = function () {
   var levelData = null;
   var skyName = null;
 
-  localStorage.removeItem("oh-my-blob");
+  localStorage.removeItem('oh-my-blob');
   BasicGame.reset();
 
-  this.game.load.onLoadComplete.addOnce(this.showIntro, this);
+  this.game.load.onLoadComplete.addOnce(this.nextScene, this);
   levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);
   skyName = BasicGame.Helper.prototype.getSkyName(BasicGame.currentLevel);
   this.load.image(skyName, 'assets/sprites/' + skyName + '.png');
@@ -412,9 +403,8 @@ BasicGame.MainMenu.prototype.newGame = function () {
   this.game.load.start();
 };
 
-BasicGame.MainMenu.prototype.showIntro = function () {
-  // this.state.start((BasicGame.currentLevel === 1) ? 'Intro' : 'Game');
-  this.state.start('Game');
+BasicGame.MainMenu.prototype.nextScene = function () {
+  this.state.start((BasicGame.currentLevel <= 30) ? 'Game' : 'TheEnd');
 };
 
 BasicGame.MainMenu.prototype.setLanguage = function (newLang) {
@@ -425,7 +415,7 @@ BasicGame.MainMenu.prototype.setLanguage = function (newLang) {
   this.spanishCheckbox.frame = 0;
   this.englishCheckbox.frame = 0;
 
-  localStorage.setItem("oh-my-blob", BasicGame.setLanguage(newLang));
+  localStorage.setItem('oh-my-blob', BasicGame.setLanguage(newLang));
 
   if (newLang === 'es') {
     this.spanishCheckbox.frame = 1;
@@ -496,8 +486,39 @@ BasicGame.MainMenu.prototype.showCredits = function (show) {
   });
 };
 
+BasicGame.MainMenu.prototype.followPointer = function () {
+  // afstand van middenpunt oog tot cursor
+  dx = this.game.input.activePointer.x - this.fakeEye.centerX;
+  dy = this.game.input.activePointer.y - this.fakeEye.centerY;
+  // stelling van pythagoras
+  c = Math.sqrt((dx * dx) + (dy * dy));
+
+  // afstand middelpunt tot pupil
+  r = this.fakeEye.radius * 0.3;
+
+  // cursor op oog
+  if (Math.abs(dx) < r && Math.abs(dy) < r && c < r) {
+    r = c;
+  }
+
+  // hoek bepalen
+  alfa = Math.asin(dy / c);
+
+  // coordinaten op rand cirkel bepalen
+  this.giantPupilImage.x = (Math.cos(alfa) * r) + this.fakeEye.centerX;
+  // 180 graden fout herstellen
+  if (dx < 0) {
+    this.giantPupilImage.x = this.fakeEye.centerX * 2 - this.giantPupilImage.x;
+  }
+  this.giantPupilImage.y = (Math.sin(alfa) * r) + this.fakeEye.centerY;
+};
+
 BasicGame.MainMenu.prototype.getDayString = function (newLang) {
   var days = new BasicGame.Days();
-  return this.CONTINUE_DAY_MSG[BasicGame.language] +
-    ' ' + days.getDay(BasicGame.currentLevel).number;
+  if (BasicGame.currentLevel <= 30) {
+    return this.CONTINUE_DAY_MSG[BasicGame.language] +
+      ' ' + days.getDay(BasicGame.currentLevel).number;
+  }
+  
+  return this.END_SCENE_MSG[BasicGame.language];
 };

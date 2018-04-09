@@ -51,11 +51,12 @@ BasicGame.Game = function (game) {
     "es": "Guardando progreso...",
     "en": "Saving progress..."
   };
+  this.levelCompleted = null;
 };
 
 BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
-BasicGame.ignoreSave = true;
+BasicGame.ignoreSave = false;
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ PHASER STATE METHODS                                                     ║
@@ -91,6 +92,7 @@ BasicGame.Game.prototype.create = function () {
   this.lifes = this.LIFES_AMOUNT;
   this.showFPS = false;
   this.inDarkness = true;
+  this.levelCompleted = false;
 
   // set stage background
   this.background = this.game.add.image(0, 0, this.getSkyName());
@@ -346,6 +348,7 @@ BasicGame.Game.prototype.inputIsActive = function (key) {
 };
 
 BasicGame.Game.prototype.levelEnded = function () {
+  this.levelCompleted = true;
   BasicGame.isRetrying = false;
   this.putDarkTween.onComplete.addOnce(function () {
     // show the Progress saved message
@@ -365,6 +368,8 @@ BasicGame.Game.prototype.levelEnded = function () {
 };
 
 BasicGame.Game.prototype.loadLevel = function (levelNumber) {
+  this.saveGame(BasicGame.setDay(levelNumber));
+
   if (levelNumber > 30) {
     // congrats, you ended the game
     this.state.start('TheEnd');
@@ -393,8 +398,6 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
     Phaser.Tilemap.TILED_JSON);
 
   this.game.load.start();
-
-  this.saveGame(BasicGame.setDay(levelNumber));
 };
 
 BasicGame.Game.prototype.levelReady = function () {
@@ -406,6 +409,7 @@ BasicGame.Game.prototype.levelReady = function () {
     this.arrangeRenderLayers();
   }
 
+  this.levelCompleted = false;
   this.hideDarkness();
 };
 
@@ -531,7 +535,7 @@ BasicGame.Game.prototype.putDarkTweenCompleted = function () {
 
   this.showLifes();
 
-  if (this.lifes <= 0) {
+  if (this.lifes <= 0 && !this.levelCompleted) {
     this.restartLevel(true);
   }
 };
@@ -569,6 +573,7 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
 
 BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {
   // restore the alpha for life indicators and lifes' group
+  BasicGame.isRetrying = true;
   this.lifes = this.LIFES_AMOUNT;
   this.showLifes();
 

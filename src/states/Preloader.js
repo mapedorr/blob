@@ -40,7 +40,6 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('pupil', 'assets/sprites/pupil_normal.png');
   this.load.image('light', 'assets/sprites/light.png');
   this.load.image('view_zone', 'assets/sprites/view_zone.png');
-  // this.load.image('invisible_zone', 'assets/sprites/invisible_zone.png');
   this.load.image('piece', 'assets/sprites/piece.png');
   this.load.image('platform', 'assets/sprites/platform.png');
   this.load.image('life', 'assets/sprites/life.png');
@@ -99,7 +98,8 @@ BasicGame.Preloader.prototype.preload = function () {
 };
 
 BasicGame.Preloader.prototype.create = function () {
-  //Once the load has finished we disable the crop because we're going to sit in the update loop for a short while as the music decodes
+  // Once the load has finished we disable the crop because we're going to sit in
+  // the update loop for a short while as the music decodes
   this.preloadBar.cropEnabled = false;
 };
 

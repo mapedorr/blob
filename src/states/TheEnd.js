@@ -1,269 +1,187 @@
 var BasicGame = require('BasicGame');
 
 BasicGame.TheEnd = function (game) {
+  // constants
+  this.PANELS_SPACING = 16;
+  this.FADEIN_DELAY = 800;
+  this.NEXT_PANEL_DELAY = 1500;
+  this.KEY_NEXT1 = Phaser.Keyboard.D;
+  this.KEY_NEXT2 = Phaser.Keyboard.RIGHT;
+  this.FONT_REGULAR = 'font';
+  this.FONT_MEDIUM = 'font-medium';
+  this.FOOTER_MSG = {
+    'es': 'Hace un par de horas\nPasada la media noche',
+    'en': 'A couple of hours ago\nPast midnight'
+  };
+  this.NEXT_MSG = {
+    'es': 'siguiente',
+    'en': 'next'
+  };
+  this.MAINMENU_MSG = {
+    'es': 'ir al menú principal',
+    'en': 'go to main menu'
+  };
+  this.PANELS_KEYS = [
+    'end_scene_p1v1',
+    'end_scene_p1v2',
+    'end_scene_p1v3',
+    'end_scene_p2v1',
+    'end_scene_p2v2',
+    'end_scene_p2v3'
+  ];
+
+  // destroyable objects (sprites, sounds, groups, tweens...)
   this.background = null;
-  this.fontId = 'font';
-  this.textColors = {
-    'H': 0x000000,
-    'B': 0xFFFFFF
-  };
-  this.dialogs = {
-    "es": [
-      {
-        character: 'B',
-        text: 'Han pasado 388 días desde que acabé con la vida de Margareth.',
-        bips: 3,
-        waitTime: 3
-      },
-      {
-        character: 'B',
-        text: 'Estuve a punto de darme por vencido unas # veces; de contarlo todo a la policía.',
-        bips: 5,
-        waitTime: 5
-      },
-      {
-        character: 'B',
-        text: 'Los primeros días fueron muy difíciles. Me costaba mucho evitar El Remordimiento.',
-        bips: 4,
-        waitTime: 5
-      },
-      {
-        character: 'B',
-        text: 'Pero lo he logrado.',
-        bips: 1,
-        waitTime: 2
-      },
-      {
-        character: 'B',
-        text: 'Ahora que lo pienso, beneficiarse de la muerte de otro no es algo malo.',
-        bips: 4,
-        waitTime: 5
-      },
-      {
-        character: 'B',
-        text: 'Creo que empiezo a entender la forma de pensar de mi hermano.',
-        bips: 3,
-        waitTime: 3
-      }
-    ],
-    "en": [
-      {
-        character: 'B',
-        text: '388 days has passed since I murdered Margareth.',
-        bips: 2,
-        waitTime: 3
-      },
-      {
-        character: 'B',
-        text: 'I was tempted to tell all to the police like 30 times.',
-        bips: 3,
-        waitTime: 4
-      },
-      {
-        character: 'B',
-        text: 'The first days were the hardest. It was very difficult to avoid The Remorse.',
-        bips: 4,
-        waitTime: 5
-      },
-      {
-        character: 'B',
-        text: 'But I succeeded.',
-        bips: 1,
-        waitTime: 2
-      },
-      {
-        character: 'B',
-        text: 'Now that I think about it, get benefit from another\'s death is not such bad thing.',
-        bips: 4,
-        waitTime: 5
-      },
-      {
-        character: 'B',
-        text: 'I think I start to understand the way my brother thinks.',
-        bips: 3,
-        waitTime: 3
-      }
-    ]
-  };
-  this.textBitmapsGroup = null;
-  this.dialogNumber = 0;
-  this.BSound = null;
-  this.soundLoopTimer = null;
-  this.cloudsLimit = 9;
-
+  this.panelsGroup = null;
+  this.buttonGroup = null;
+  this.footerText = null;
   this.music = null;
+
+  // global properties
+  this.currentPanelIndex = 0;
+  this.nextClicked = false;
 };
 
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ PHASER STATE METHODS                                                     ║
 BasicGame.TheEnd.prototype.preload = function() {
-  this.load.image('end_scene', 'assets/images/end_scene-min.png');
-  this.load.image('sun_light', 'assets/images/sun_light-min.png');
-  this.load.atlas('clouds', 'assets/sprites/clouds.png', 'assets/sprites/clouds.xml', null, Phaser.Loader.TEXTURE_ATLAS_XML_STARLING);
-  this.load.audio('the_end', 'assets/music/the_end.ogg', true);
+  if (BasicGame.language === 'es') {
+    this.load.image(this.PANELS_KEYS[0], 'assets/sprites/end_es_1-1.png');
+    this.load.image(this.PANELS_KEYS[1], 'assets/sprites/end_es_1-2.png');
+    this.load.image(this.PANELS_KEYS[2], 'assets/sprites/end_es_1-3.png');
+    this.load.image(this.PANELS_KEYS[3], 'assets/sprites/end_es_2-1.png');
+    this.load.image(this.PANELS_KEYS[4], 'assets/sprites/end_es_2-2.png');
+    this.load.image(this.PANELS_KEYS[5], 'assets/sprites/end_es_2-3.png');
+  }
+  else if (BasicGame.language === 'en') {
+    this.load.image(this.PANELS_KEYS[0], 'assets/sprites/end_en_1-1.png');
+    this.load.image(this.PANELS_KEYS[1], 'assets/sprites/end_en_1-2.png');
+    this.load.image(this.PANELS_KEYS[2], 'assets/sprites/end_en_1-3.png');
+    this.load.image(this.PANELS_KEYS[3], 'assets/sprites/end_en_2-1.png');
+    this.load.image(this.PANELS_KEYS[4], 'assets/sprites/end_en_2-2.png');
+    this.load.image(this.PANELS_KEYS[5], 'assets/sprites/end_en_2-3.png');
+  }
+
+  this.load.audio('exit_music', 'assets/music/the_end.ogg', true);
 };
 
-BasicGame.TheEnd.prototype.create = function() {
+BasicGame.TheEnd.prototype.create = function () {
+  var index = 0;
+  var panelImage = null;
+  var panelCounter = 0;
+  var nextButton = null;
+  var nextText = null;
+
+  this.nextClicked = false;
+
   // set the background for the scene
-  // this.game.stage.backgroundColor = 0x000000;
-  this.background = this.game.add.tileSprite(0, 0,
-    this.game.world.width, this.game.world.height, "end_scene");
+  this.background = this.game.add.image(0, 0, 'credits_background');
+  this.background.width = this.game.world.width;
+  this.background.height = this.game.world.height;
 
-  // load the sound for B's voice
-  this.BSound = this.game.add.sound('b', 0.2);
+  // add the footer message
+  this.footerText = this.game.add.bitmapText(this.game.world.width - 16,
+    this.game.world.height - 16,
+    this.FONT_MEDIUM, this.FOOTER_MSG[BasicGame.language], 24);
+  this.footerText.anchor.set(1, 1);
+  this.footerText.align = 'right';
 
-  // show the first line of The Confession
-  var firstDialogTimer = this.game.time.create(true);
-  firstDialogTimer.add(2500,
-    function(){
-      this.updateDialog();
-    },
-    this);
-  firstDialogTimer.start();
+  // add the panels group
+  this.panelsGroup = this.game.add.group();
+  for (index = 0; index < this.PANELS_KEYS.length; index++) {
+    panelImage = this.game.add.image(0, 0, this.PANELS_KEYS[index], 0, this.panelsGroup);
+    panelImage.x = panelCounter * (panelCounter > 0 ? panelImage.width + this.PANELS_SPACING : 0);
+    panelImage.alpha = 0;
 
-  // create the loop that will generate clouds
-  this.cloudsContainer = this.game.add.group();
+    if (++panelCounter > 2) {
+      panelCounter = 0;
+    }
+  }
+  this.panelsGroup.x = 16;
+  this.panelsGroup.y = 16;
 
-  // fill the scene with 3 clouds
-  this.createCloud(true);
-  this.createCloud(true);
-  this.createCloud(true);
-
-  this.cloudsTimer = this.game.time.create(true);
-  this.cloudsTimer.loop(8000, function(){
-    this.createCloud();
-  }, this);
-  this.cloudsTimer.start();
+  // add the next group
+  this.createButton({
+    buttonText: this.NEXT_MSG[BasicGame.language],
+    clickCallback: function () {
+      this.buttonGroup.destroy();
+      this.nextClicked = true;
+      this.showPanel();
+    }
+  });
+  this.buttonGroup.children[0].input.enabled = false;
+  this.buttonGroup.alpha = 0;
 
   // play the music
-  this.music = this.game.add.sound('the_end', 0.1, true);
-  this.music.play();
+  this.music = this.game.add.sound('exit_music', 0.1, true);
 
-  // add the sun light for the clouds
-  this.game.add.image(0, -96, 'sun_light').alpha = 0.5;
-
-  // create the group that will contain the dialog
-  this.textBitmapsGroup = this.game.add.group();
-  this.textBitmapsGroup.y = 10;
-  this.textBitmapsGroup.x = 0;
+  // init the animations for the first page
+  this.currentPanelIndex = 0;
+  this.showPanel();
 };
 
-BasicGame.TheEnd.prototype.update = function(){};
+BasicGame.TheEnd.prototype.update = function () {
 
-BasicGame.TheEnd.prototype.updateDialog = function(){
-  if(this.dialogNumber <= this.dialogs[BasicGame.language].length - 1){
-    var dialogObj = this.dialogs[BasicGame.language][this.dialogNumber];
-    // there are still dialogs to be shown
-    var currentDialogLine = dialogObj.text;
-    var character = dialogObj.character;
+};
 
-    if (currentDialogLine.indexOf("#") !== -1) {
-      currentDialogLine = currentDialogLine.replace("#", BasicGame.getDeaths() || 500);
+/**
+ * This method will be called when the State is shutdown (i.e. you switch to another state from this one).
+ */
+BasicGame.TheEnd.prototype.shutdown = function () {
+  this.background.destroy();
+  this.panelsGroup.destroy();
+  this.buttonGroup.destroy();
+  this.footerText.destroy();
+  this.music.destroy();
+};
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+BasicGame.TheEnd.prototype.showPanel = function () {
+  var fadeTween = null;
+
+  if (this.currentPanelIndex > 2) {
+    if (this.currentPanelIndex > 5) {
+      // show main menu button
+      this.createButton({
+        buttonText: this.MAINMENU_MSG[BasicGame.language],
+        clickCallback: function () {
+          this.state.start('MainMenu');
+        }
+      });
+      return;
     }
-
-    this.showText(this.createText(currentDialogLine, this.textColors[character]),
-      dialogObj.waitTime);
-
-    // play the bips of the dialog
-    if (dialogObj.bips > 0) {
-      this.soundLoopTimer = this.game.time.create(true);
-      this.soundLoopTimer.repeat(100, dialogObj.bips, function(){
-        this[dialogObj.character + "Sound"].play();
-      }, this);
-      this.soundLoopTimer.start();
+    else if (this.buttonGroup.alpha === 0 && !this.nextClicked) {
+      // show next button
+      this.buttonGroup.children[0].input.enabled = true;
+      this.buttonGroup.alpha = 1;
+      return;
     }
-
-    this.dialogNumber++;
   }
-};
-
-BasicGame.TheEnd.prototype.createText = function(text, tint) {
-  if (!this.yPosDialog) {
-    this.yPosDialog = 30;
-  }
-
-  var textBitmapsGroupChilds = this.textBitmapsGroup.children;
-  if (textBitmapsGroupChilds.length > 0) {
-    this.yPosDialog += textBitmapsGroupChilds[textBitmapsGroupChilds.length - 1].y + textBitmapsGroupChilds[textBitmapsGroupChilds.length - 1].height;
-    this.yPosDialog += 10;
-  }
-
-  var textsGroup = this.game.add.group(this.textBitmapsGroup);
-  textsGroup.alpha = 0;
-
-  var dialogTextShadowBitmap = this.add.bitmapText(42,
-    this.yPosDialog + 2,
-    this.fontId,
-    text,
-    40,
-    textsGroup);
-  dialogTextShadowBitmap.align = "left";
-  dialogTextShadowBitmap.anchor.set(0, 0);
-  dialogTextShadowBitmap.tint = 0x000000;
-  dialogTextShadowBitmap.maxWidth = this.game.world.width - 100;
-  dialogTextShadowBitmap.alpha = 0.6;
-
-  var dialogTextBitmap = this.add.bitmapText(40,
-    this.yPosDialog,
-    this.fontId,
-    text,
-    40,
-    textsGroup);
-  dialogTextBitmap.align = "left";
-  dialogTextBitmap.anchor.set(0, 0);
-  dialogTextBitmap.tint = tint || 0xFFFFFF;
-  dialogTextBitmap.maxWidth = this.game.world.width - 100;
-
-  return textsGroup;
-};
-
-BasicGame.TheEnd.prototype.showText = function(displayObj, timeForRead) {
-  this.dialogTween = this.game.add.tween(displayObj);
-  this.dialogTween.to({alpha: 1},
-    400,
-    Phaser.Easing.Quadratic.In,
-    false);
-  this.dialogTween.onComplete.addOnce(function() {
-    this.dialogTween.stop();
-
-    var nextDialogTimer = this.game.time.create(true);
-    nextDialogTimer.add(timeForRead * 1000,
-      function(){
-        this.updateDialog();
-      },
-      this);
-    nextDialogTimer.start();
+  
+  fadeTween = this.game.add.tween(this.panelsGroup.children[this.currentPanelIndex++]);
+  fadeTween.to({ alpha: 1 }, this.FADEIN_DELAY, Phaser.Easing.Quadratic.Out, false);
+  fadeTween.onComplete.addOnce(function () {
+    this.game.time.create(this.game, true)
+    .add(this.NEXT_PANEL_DELAY, this.showPanel, this)
+    .timer.start(100);
   }, this);
-  this.dialogTween.start();
+  fadeTween.start();
 };
 
-BasicGame.TheEnd.prototype.getRandom = function(min, max) {
-  return Math.floor(Math.random()*(max-min+1)+min);
-};
+BasicGame.TheEnd.prototype.createButton = function (prop) {
+  this.buttonGroup = this.game.add.group();
 
-BasicGame.TheEnd.prototype.createCloud = function(insideScreen) {
-  // add the cloud out of the screen
-  var cloudX = 0;
+  nextButton = this.game.add.button(this.game.world.width / 2,
+    this.footerText.centerY, 'button_background', prop.clickCallback, this);
+  nextButton.anchor.set(.5, .5);
 
-  if (insideScreen === true) {
-    cloudX = this.getRandom(100, this.game.world.width - 150);
-  }
-  else {
-    cloudX = this.game.world.width + this.getRandom(10, 20);
-  }
+  nextText = this.game.add.bitmapText(nextButton.x, nextButton.y,
+    this.FONT_REGULAR, prop.buttonText, 18);
+  nextText.anchor.set(.5, .5);
 
-  var cloudImg = this.game.add.image(cloudX, 0,
-    'clouds', 'cloud0' + this.getRandom(1, 9) + '.png', this.cloudsContainer);
-  cloudImg.y = this.getRandom(0-cloudImg.height/2, this.game.world.height - cloudImg.height - 210);
-  cloudImg.alpha = Math.min(Math.random(), 0.3);
+  nextButton.width = nextText.textWidth + 32;
+  nextButton.height = nextText.textHeight + 16;
 
-  // create the tween that will move the cloud
-  this.cloudTween = this.game.add.tween(cloudImg);
-  this.cloudTween.to({x: 0 - cloudImg.width - 20},
-    30000,
-    null,
-    false);
-  this.cloudTween.onComplete.addOnce(function() {
-    this.target.destroy();
-    this.stop();
-  }, this.cloudTween);
-  this.cloudTween.start();
+  this.buttonGroup.addChild(nextButton);
+  this.buttonGroup.addChild(nextText);
 };

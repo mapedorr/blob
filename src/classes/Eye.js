@@ -260,9 +260,10 @@ BasicGame.Eye.prototype.shutdown = function () {
   this.pupil.destroy();
   this.pupilMask.destroy();
   this.eye.destroy();
-  this.bitmap.destroy();
-  this.viewZoneMovementTween.stop();
-  this.pupilMovementTween.stop();
+  if (this.bitmap) {
+    this.bitmap.destroy();
+  }
+  this.stopEyeTweens();
   this.laughSound.destroy();
   this.angerSound.destroy();
 };
@@ -569,7 +570,7 @@ BasicGame.Eye.prototype.levelEndedEvent = function (levelCompleted) {
   this.usedPatterns = 0
   this.currentPatternCompleted = true;
   this.destroyTimers();
-  this.stopEyeTweens(true);
+  this.stopEyeTweens();
 };
 
 BasicGame.Eye.prototype.gameInDarkness = function () {
@@ -710,11 +711,10 @@ BasicGame.Eye.prototype.restartLevel = function () {
 
 BasicGame.Eye.prototype.stopEyeTweens = function (resetPosition) {
   if (this.viewZoneMovementTween && this.pupilMovementTween) {
-    this.viewZoneMovementTween.stop();
-    this.pupilMovementTween.stop();
-
     this.viewZoneMovementTween.onComplete.removeAll();
     this.pupilMovementTween.onComplete.removeAll();
+    this.viewZoneMovementTween.stop();
+    this.pupilMovementTween.stop();
   }
 
   if (resetPosition === true) {
