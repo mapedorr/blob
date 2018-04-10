@@ -138,7 +138,7 @@ BasicGame.MainMenu.prototype.create = function () {
 };
 
 BasicGame.MainMenu.prototype.update = function () {
-  // this.followPointer();
+  this.followPointer();
 };
 
 /**

@@ -335,6 +335,7 @@ BasicGame.Game.prototype.arrangeRenderLayers = function () {
   }
   this.game.world.bringToTop(this.level.walls);
   this.game.world.bringToTop(this.noiseImage);
+  this.game.world.bringToTop(this.eye.viewZone);
   this.game.world.bringToTop(this.light.lightBitmap);
   this.game.world.bringToTop(this.level.pieces);
   this.game.world.bringToTop(this.lifesGroup);

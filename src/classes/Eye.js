@@ -274,7 +274,11 @@ BasicGame.Eye.prototype.shutdown = function () {
  * Method that checks if the player is inside the view zone of the EYE.
  */
 BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
-  if (this.viewZone.alpha > 0) {
+  if (this.viewZone.alpha > 0 &&
+      this.playerObj.playerSprite.centerX > 0 &&
+      this.playerObj.playerSprite.centerX < this.game.world.width &&
+      this.playerObj.playerSprite.centerY > 0 &&
+      this.playerObj.playerSprite.centerY < this.game.world.height) {
     if ((this.playerObj.playerSprite.right >= this.viewZone.left + this.playerObj.playerSprite.width) &&
       this.playerObj.playerSprite.right < this.viewZone.right) {
       return true;
