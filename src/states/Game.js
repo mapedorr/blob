@@ -350,20 +350,6 @@ BasicGame.Game.prototype.inputIsActive = function (key) {
 BasicGame.Game.prototype.levelEnded = function () {
   this.levelCompleted = true;
   BasicGame.isRetrying = false;
-  this.putDarkTween.onComplete.addOnce(function () {
-    // show the Progress saved message
-    this.savingText.alpha = 1;
-    this.game.world.bringToTop(this.savingText);
-
-    this.helper.timer(this.GO_TO_NEXT_LEVEL_DELAY, function () {
-      // set the flag for loading level
-      this.isLoadingLevel = true;
-
-      // notify to the eye that the level was ended
-      this.eye.levelEndedEvent(true);
-      this.loadLevel(++BasicGame.currentLevel);
-    }, this);
-  }, this);
   this.showDarkness();
 };
 
@@ -535,7 +521,21 @@ BasicGame.Game.prototype.putDarkTweenCompleted = function () {
 
   this.showLifes();
 
-  if (this.lifes <= 0 && !this.levelCompleted) {
+  if (this.levelCompleted === true) {
+    // show the Progress saved message
+    this.savingText.alpha = 1;
+    this.game.world.bringToTop(this.savingText);
+
+    this.helper.timer(this.GO_TO_NEXT_LEVEL_DELAY, function () {
+      // set the flag for loading level
+      this.isLoadingLevel = true;
+
+      // notify to the eye that the level was ended
+      this.eye.levelEndedEvent(true);
+      this.loadLevel(++BasicGame.currentLevel);
+    }, this);
+  }
+  else if (this.lifes <= 0) {
     this.restartLevel(true);
   }
 };

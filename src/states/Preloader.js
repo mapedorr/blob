@@ -23,7 +23,6 @@ BasicGame.Preloader.prototype.preload = function () {
 
   //  --------------------------------------
   //  ---| load the assets for the Main menu
-  // this.load.image('title', 'assets/images/title.png');
   this.load.image('main_menu_background', 'assets/sprites/main_menu_background.png');
   this.load.image('button_background', 'assets/sprites/button_background.png');
   this.load.image('giant_pupil', 'assets/sprites/giant_pupil.png');
@@ -31,7 +30,6 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('credits_background', 'assets/sprites/credits_background.png');
   this.load.image('credits_en', 'assets/sprites/credits_en.png');
   this.load.image('credits_es', 'assets/sprites/credits_es.png');
-  this.load.image('social', 'assets/sprites/social.png');
 
   this.load.audio('splash_music', 'assets/music/splash_music.ogg', true);
 

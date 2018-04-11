@@ -25,12 +25,14 @@ BasicGame.MainMenu = function (game) {
   this.KEYS_DESCRIPTION_MSG = {
     'es': 'usa A y D o IZQUIERA y DERECHA para moverte\n' +
       'usa W, Z, ESPACIO o ARRIBA para saltar\n' +
-      'usa C para ver los diálogos\n' +
-      'toma las píldoras para superar el día',
+      'usa C para ver los diálogos, M para silencia y P para pausar\n' +
+      'toma todas las píldoras para superar el día\n' +
+      'la partida se guardará al inicio de cada nivel',
     'en': 'use A and D or LEFT and RIGHT to move\n' +
       'use W, Z, SPACE or UP to jump\n' +
-      'use C to show the dialogues' +
-      'take pills to get over the day'
+      'use C to show the dialogues, M to mute and P to pause\n' +
+      'take all the pills to get over the day\n' +
+      'you progress will be saved at the start of each level'
   };
   this.CONTINUE_DAY_MSG = {
     'es': 'Día',
@@ -109,7 +111,7 @@ BasicGame.MainMenu.prototype.create = function () {
   this.keysDescriptionText.align = 'center';
   this.keysDescriptionText.tint = 0x303c42;
   this.keysDescriptionText.x = this.game.world.width / 2;
-  this.keysDescriptionText.bottom = this.game.world.height - this.SCREEN_PADDING;
+  this.keysDescriptionText.bottom = this.game.world.height - this.SCREEN_PADDING / 2;
   this.keysDescriptionText.alpha = 0;
 
   this.translatableTexts.push({
@@ -176,12 +178,12 @@ BasicGame.MainMenu.prototype.createOptionsGroup = function () {
       hSpace: 0,
       vSpace: 1,
       group: this.optionsGroup,
-      overCallback: (function() {
+      overCallback: (function () {
         if (BasicGame.currentLevel <= 30) {
           this.showKeysDescription(true);
         }
       }).bind(this),
-      outCallback: (function() {
+      outCallback: (function () {
         if (BasicGame.currentLevel <= 30) {
           this.showKeysDescription(false);
         }
@@ -438,7 +440,6 @@ BasicGame.MainMenu.prototype.createCreditsGroup = function (newLang) {
   var backgroundImage = null;
   var englishImage = null;
   var spanishImage = null;
-  var socialImage = null;
 
   this.creditsGroup = this.game.add.group();
 
@@ -451,11 +452,6 @@ BasicGame.MainMenu.prototype.createCreditsGroup = function (newLang) {
 
   spanishImage = this.game.add.image(this.game.world.width / 2, 32, 'credits_en', 0, this.creditsGroup);
   spanishImage.anchor.set(.5, 0);
-
-  social = this.game.add.image(this.game.world.width / 2,
-    this.game.world.height - 16,
-    'social', 0, this.creditsGroup);
-  social.anchor.set(.5, 1);
 
   this.closeButton = this.game.add.button(this.game.world.width - 32, 32,
     'close', function (button, pointer, isOver) {
@@ -521,6 +517,6 @@ BasicGame.MainMenu.prototype.getDayString = function (newLang) {
     return this.CONTINUE_DAY_MSG[BasicGame.language] +
       ' ' + days.getDay(BasicGame.currentLevel).number;
   }
-  
+
   return this.END_SCENE_MSG[BasicGame.language];
 };

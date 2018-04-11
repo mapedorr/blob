@@ -53,6 +53,7 @@ BasicGame.Player = function (game, input, gameObj) {
   this.flipDialogueH = false;
   this.dialogueFadeOutStarted = false;
   this.jumpFeedbackStarted = false;
+  this.dialogueMarkHeight = null;
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // define movement constants
@@ -242,6 +243,7 @@ BasicGame.Player.prototype.create = function (level) {
 
   this.dialogueMark = this.game.add.image(0, 0, 'dialogue_mark', 0, this.dialogueGroup);
   this.dialogueMark.y = this.dialogueBackground.height + 8;
+  this.dialogueMarkHeight = this.dialogueMark.height;
 
   // create the bitmap for the day phrase
   this.dialogueText = this.game.add.bitmapText(0, 0, this.fontId, '', 18, this.dialogueGroup);
@@ -895,11 +897,11 @@ BasicGame.Player.prototype.placeDialogueGroup = function () {
     this.dialogueGroup.x = this.playerSprite.centerX;
   }
 
-  if (this.flipDialogueV) {
+  if (this.flipDialogueV === true) {
     this.dialogueGroup.y = this.playerSprite.bottom + 6.8;
   }
   else {
-    this.dialogueGroup.y = this.playerSprite.top - this.dialogueGroup.height - 6.8;
+    this.dialogueGroup.y = this.playerSprite.top - 6.8 - this.dialogueGroup.height;
   }
 };
 
@@ -913,7 +915,7 @@ BasicGame.Player.prototype.showDialogue = function (immediateHide) {
     this.dialogueText.text = dayObj.text[BasicGame.language];
     this.dialogueBackground.height = this.dialogueText.textHeight + this.DIALOGUE_TEXT_V_PADDING * 2;
     this.dialogueMark.y = this.dialogueBackground.height + 8;
-    dialogueHeight = this.dialogueMark.bottom;
+    dialogueHeight = this.dialogueBackground.height + 8 + this.dialogueMarkHeight;
     this.game.world.bringToTop(this.dialogueGroup);
 
     if (this.DIALOGUE_WIDTH + this.playerSprite.centerX > this.game.width) {
@@ -926,22 +928,20 @@ BasicGame.Player.prototype.showDialogue = function (immediateHide) {
     }
 
     if (this.playerSprite.top - 6.8 - dialogueHeight <= 0) {
+      this.flipDialogueV = true;
       this.dialogueMark.scale.set((this.flipDialogueH === true) ? -1 : 1, -1);
       this.dialogueMark.bottom = 0;
       this.dialogueBackground.top = this.dialogueMark.y + 8;
       this.dialogueText.top = this.dialogueBackground.top + this.DIALOGUE_TEXT_V_PADDING;
       this.dialogueGroup.y = this.playerSprite.bottom + 6.8;
-
-      this.flipDialogueV = true;
     }
     else {
-      this.dialogueMark.scale.set(1, 1);
-      this.dialogueText.y = this.dialogueBackground.top + this.DIALOGUE_TEXT_V_PADDING;
-      this.dialogueBackground.y = 0;
-      this.dialogueMark.y = this.dialogueBackground.height + 8;
-      this.dialogueGroup.y = this.playerSprite.top - this.dialogueGroup.height - 6.8;
-
       this.flipDialogueV = false;
+      this.dialogueMark.scale.set((this.flipDialogueH === true) ? -1 : 1, 1);
+      this.dialogueBackground.y = 0;
+      this.dialogueText.y = this.DIALOGUE_TEXT_V_PADDING;
+      this.dialogueMark.y = this.dialogueBackground.height + 8;
+      this.dialogueGroup.y = this.playerSprite.top - dialogueHeight - 6.8;
     }
 
     this.dialogueGroup.alpha = 0;

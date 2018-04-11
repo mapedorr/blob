@@ -127,10 +127,7 @@ function build() {
         paths: [path.join(__dirname, 'src')],
         entries: [
             './src/states/Boot.js',
-            './src/states/Credits.js',
             './src/states/Game.js',
-            './src/states/GameOver.js',
-            './src/states/Intro.js',
             './src/states/MainMenu.js',
             './src/states/Preloader.js',
             './src/states/TheEnd.js',

@@ -278,10 +278,10 @@ BasicGame.Eye.prototype.shutdown = function () {
  */
 BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
   if (this.viewZone.alpha > 0 &&
-      this.playerObj.playerSprite.centerX > 0 &&
-      this.playerObj.playerSprite.centerX < this.game.world.width &&
-      this.playerObj.playerSprite.centerY > 0 &&
-      this.playerObj.playerSprite.centerY < this.game.world.height) {
+    this.playerObj.playerSprite.centerX > 0 &&
+    this.playerObj.playerSprite.centerX < this.game.world.width &&
+    this.playerObj.playerSprite.centerY > 0 &&
+    this.playerObj.playerSprite.centerY < this.game.world.height) {
     if ((this.playerObj.playerSprite.right >= this.viewZone.left + this.playerObj.playerSprite.width) &&
       this.playerObj.playerSprite.right < this.viewZone.right) {
       return true;
@@ -569,16 +569,16 @@ BasicGame.Eye.prototype.levelStart = function (levelRestarted) {
 };
 
 BasicGame.Eye.prototype.levelEndedEvent = function (levelCompleted) {
-  // this event is called when the level has been ended and all is in darkness (saving progress... message)
-  if (this.levelEnded === true) {
-    return;
-  }
-
   this.levelEnded = true;
   this.searching = false;
   this.shooting = false;
   this.usedPatterns = 0
   this.currentPatternCompleted = true;
+  this.currentPattern = null;
+  this.currentPatternId = null;
+  this.currentPatternIdIndex = -1;
+  this.currentPatternStep = 0;
+
   this.destroyTimers();
   this.stopEyeTweens();
 };
@@ -589,10 +589,12 @@ BasicGame.Eye.prototype.gameInDarkness = function () {
   this.viewZone.alpha = 0;
   this.pupil.x = this.pupilImagePositions['0'];
   this.pupil.alpha = 0;
-  this.levelEnded = true;
+  this.invisibleZoneImage.alpha = 0;
 
   this.destroyTimers();
   this.stopEyeTweens();
+
+  this.levelEnded = true;
 };
 
 BasicGame.Eye.prototype.destroyTimers = function () {
@@ -731,13 +733,11 @@ BasicGame.Eye.prototype.stopEyeTweens = function (resetPosition) {
 
   if (resetPosition === true) {
     this.viewZone.x = this.viewZone.positions['0'];
-    this.viewZone.alpha = 1;
     this.pupil.x = this.pupilImagePositions['0'];
-    this.pupil.alpha = 1;
-    this.invisibleZoneImage.alpha = .5;
   }
 
   this.viewZone.alpha = 0;
+  this.invisibleZoneImage.alpha = 0;
   this.pupil.alpha = 0;
 };
 
