@@ -15,13 +15,13 @@ BasicGame.Level = function (game, gameObj) {
   // destroyable objects
   this.levelTextGroup = null;
   this.dayNumberText = null;
-  this.daySound = null;
   this.spikeSound = null;
   this.map = null;
   this.ground = null;
   this.walls = null;
   this.spikes = null;
   this.pieces = null;
+  this.spikeSound = null;
 
   // global properties
   this.game = game;
@@ -39,9 +39,6 @@ BasicGame.Level = function (game, gameObj) {
   this.fontId = 'font-medium';
   this.hasFloor = false;
   this.hasSpikes = false;
-
-  this.daySound = null;
-  this.spikeSound = null;
 };
 
 BasicGame.Level.prototype.create = function () {
@@ -59,10 +56,6 @@ BasicGame.Level.prototype.create = function () {
   this.dayNumberText.align = "center";
   this.dayNumberText.tint = 0x8d8d8e;
   this.dayNumberText.oriY = this.dayNumberText.y;
-
-  if (!this.daySound) {
-    this.daySound = this.game.add.sound('day', 0.15);
-  }
 
   if (!this.spikeSound) {
     this.spikeSound = this.game.add.sound('spike', 0.2);
@@ -189,35 +182,6 @@ BasicGame.Level.prototype.render = function () {
       });
     }
   }
-};
-
-BasicGame.Level.prototype.showDay = function () {
-  // if (this.isShowingDays === true) {
-  //   return;
-  // }
-
-  // this.isShowingDays = true;
-
-  // this.levelTextGroup.getChildAt(0).alpha = 1;
-  // this.levelTextGroup.alpha = 1;
-
-  // this.game.world.bringToTop(this.levelTextGroup);
-
-  // this.daySound.play();
-
-  /* // create the timer
-  var dayTimer = this.game.time.create(true);
-
-  // set the timer to stop showing the day
-  var currentDayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
-  dayTimer.add((currentDayObj.waitTime || 2) * 1000,
-    function () {
-      this.levelTextGroup.alpha = 0;
-      this.isShowingDays = false;
-      this.gameObj.hideDarkness();
-    },
-    this);
-  dayTimer.start(); */
 };
 
 BasicGame.Level.prototype.addWidthSpike = function (platformSprite, inBottom) {
@@ -371,7 +335,6 @@ BasicGame.Level.prototype.restartLevel = function () {
 BasicGame.Level.prototype.shutdown = function () {
   this.levelTextGroup.destroy();
   this.dayNumberText.destroy();
-  this.daySound.destroy();
   this.spikeSound.destroy();
   this.map.destroy();
   this.ground.destroy();

@@ -31,7 +31,7 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('credits_en', 'assets/sprites/credits_en.png');
   this.load.image('credits_es', 'assets/sprites/credits_es.png');
 
-  this.load.audio('splash_music', 'assets/music/splash_music.ogg', true);
+  this.load.audio('splash_music', 'assets/audio/music/splash_music.ogg', true);
 
   //  ---------------------------------
   //  ---| load the assets for the Game
@@ -55,19 +55,16 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.spritesheet('mute', 'assets/sprites/mute.png', 24, 24, 2);
   this.load.spritesheet('pause', 'assets/sprites/pause.png', 24, 24, 2);
 
-  this.load.audio('b', 'assets/soundfx/b.ogg', true);
-  this.load.audio('h', 'assets/soundfx/h.ogg', true);
-  this.load.audio('jump', 'assets/soundfx/jump.ogg', true);
-  this.load.audio('walk', 'assets/soundfx/walk.ogg', true);
-  this.load.audio('slide', 'assets/soundfx/slide.ogg', true);
-  this.load.audio('fall', 'assets/soundfx/fall.ogg', true);
-  this.load.audio('death', 'assets/soundfx/death.ogg', true);
-  this.load.audio('day', 'assets/soundfx/day.ogg', true);
-  this.load.audio('ray', 'assets/soundfx/ray.ogg', true);
-  this.load.audio('eye', 'assets/soundfx/eye.ogg', true);
-  this.load.audio('eye-anger', 'assets/soundfx/anger.ogg', true);
-  this.load.audio('level_music', 'assets/music/levels_music.ogg', true);
-  this.load.audio('piece', 'assets/soundfx/piece01.ogg', true);
+  this.load.audio('jump', 'assets/audio/sfx/jump.ogg', true);
+  this.load.audio('walk', 'assets/audio/sfx/walk.ogg', true);
+  this.load.audio('slide', 'assets/audio/sfx/slide.ogg', true);
+  this.load.audio('fall', 'assets/audio/sfx/fall.ogg', true);
+  this.load.audio('death', 'assets/audio/sfx/death.ogg', true);
+  this.load.audio('ray', 'assets/audio/sfx/ray.ogg', true);
+  this.load.audio('eye', 'assets/audio/sfx/eye.ogg', true);
+  this.load.audio('eye-anger', 'assets/audio/sfx/anger.ogg', true);
+  this.load.audio('level_music', 'assets/audio/music/levels_music.ogg', true);
+  this.load.audio('piece', 'assets/audio/sfx/piece01.ogg', true);
 
   this.load.bitmapFont('font', 'assets/fonts/FiraCode_0.png',
     'assets/fonts/FiraCode.fnt', null);
@@ -86,7 +83,7 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('spike-r', 'assets/sprites/spike-r.png');
   this.load.image('spike-l', 'assets/sprites/spike-l.png');
   this.load.image('spike-d', 'assets/sprites/spike-d.png');
-  this.load.audio('spike', 'assets/soundfx/spike.ogg', true);
+  this.load.audio('spike', 'assets/audio/sfx/spike.ogg', true);
 
   levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);
   this.game.load.tilemap(levelData.id,

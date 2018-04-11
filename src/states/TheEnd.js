@@ -29,6 +29,10 @@ BasicGame.TheEnd = function (game) {
     'end_scene_p2v2',
     'end_scene_p2v3'
   ];
+  this.THANKS_MSG = {
+    'es': 'gracias por jugar',
+    'en': 'thanks for playing'
+  };
 
   // destroyable objects (sprites, sounds, groups, tweens...)
   this.background = null;
@@ -36,6 +40,7 @@ BasicGame.TheEnd = function (game) {
   this.buttonGroup = null;
   this.footerText = null;
   this.music = null;
+  this.thanksText = null;
 
   // global properties
   this.currentPanelIndex = 0;
@@ -44,7 +49,7 @@ BasicGame.TheEnd = function (game) {
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ PHASER STATE METHODS                                                     ║
-BasicGame.TheEnd.prototype.preload = function() {
+BasicGame.TheEnd.prototype.preload = function () {
   if (BasicGame.language === 'es') {
     this.load.image(this.PANELS_KEYS[0], 'assets/sprites/end_es_1-1.png');
     this.load.image(this.PANELS_KEYS[1], 'assets/sprites/end_es_1-2.png');
@@ -62,7 +67,7 @@ BasicGame.TheEnd.prototype.preload = function() {
     this.load.image(this.PANELS_KEYS[5], 'assets/sprites/end_en_2-3.png');
   }
 
-  this.load.audio('exit_music', 'assets/music/the_end.ogg', true);
+  this.load.audio('exit_music', 'assets/audio/music/the_end.ogg', true);
 };
 
 BasicGame.TheEnd.prototype.create = function () {
@@ -114,6 +119,7 @@ BasicGame.TheEnd.prototype.create = function () {
 
   // play the music
   this.music = this.game.add.sound('exit_music', 0.1, true);
+  this.music.play();
 
   // init the animations for the first page
   this.currentPanelIndex = 0;
@@ -133,6 +139,7 @@ BasicGame.TheEnd.prototype.shutdown = function () {
   this.buttonGroup.destroy();
   this.footerText.destroy();
   this.music.destroy();
+  this.thanksText.destroy();
 };
 // ║                                                                           ║
 // ╚═══════════════════════════════════════════════════════════════════════════╝
@@ -141,11 +148,12 @@ BasicGame.TheEnd.prototype.showPanel = function () {
 
   if (this.currentPanelIndex > 2) {
     if (this.currentPanelIndex > 5) {
-      // show main menu button
+      // show another next button
       this.createButton({
-        buttonText: this.MAINMENU_MSG[BasicGame.language],
+        buttonText: this.NEXT_MSG[BasicGame.language],
         clickCallback: function () {
-          this.state.start('MainMenu');
+          this.buttonGroup.destroy();
+          this.showThanks();
         }
       });
       return;
@@ -157,13 +165,13 @@ BasicGame.TheEnd.prototype.showPanel = function () {
       return;
     }
   }
-  
+
   fadeTween = this.game.add.tween(this.panelsGroup.children[this.currentPanelIndex++]);
   fadeTween.to({ alpha: 1 }, this.FADEIN_DELAY, Phaser.Easing.Quadratic.Out, false);
   fadeTween.onComplete.addOnce(function () {
     this.game.time.create(this.game, true)
-    .add(this.NEXT_PANEL_DELAY, this.showPanel, this)
-    .timer.start(100);
+      .add(this.NEXT_PANEL_DELAY, this.showPanel, this)
+      .timer.start(100);
   }, this);
   fadeTween.start();
 };
@@ -184,4 +192,22 @@ BasicGame.TheEnd.prototype.createButton = function (prop) {
 
   this.buttonGroup.addChild(nextButton);
   this.buttonGroup.addChild(nextText);
+};
+
+BasicGame.TheEnd.prototype.showThanks = function () {
+  this.footerText.alpha = 0;
+  this.panelsGroup.alpha = 0;
+
+  this.thanksText = this.game.add.bitmapText(this.game.world.width / 2,
+    this.game.world.height / 2,
+    this.FONT_MEDIUM, this.THANKS_MSG[BasicGame.language], 32);
+  this.thanksText.anchor.set(.5, .5);
+
+  // show main menu button
+  this.createButton({
+    buttonText: this.MAINMENU_MSG[BasicGame.language],
+    clickCallback: function () {
+      this.state.start('MainMenu');
+    }
+  });
 };

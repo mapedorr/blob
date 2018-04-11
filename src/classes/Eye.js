@@ -631,18 +631,13 @@ BasicGame.Eye.prototype.rejoice = function (callback) {
   this.invisibleZoneImage.alpha = 0;
 
   shakeTween = this.game.add.tween(this.eye);
-  shakeTween.to({ y: this.eye.originalY + 10 },
-    150,
-    null,
-    false,
-    0,
-    4,
-    true).start();
+  shakeTween.to({ y: this.eye.originalY + 10 }, 150, null, false, 0, 4, true);
   shakeTween.onComplete.add(function () {
     this.eye.y = this.eye.originalY;
     this.laughSound.stop();
     callback();
   }, this);
+  shakeTween.start();
 
   this.laughSound.play();
 };
@@ -664,6 +659,10 @@ BasicGame.Eye.prototype.getTired = function () {
   this.getMadTimer = this.game.time.create(true);
   this.getMadTimer.add(1200,
     function () {
+      if (this.levelEnded === true) {
+        return;
+      }
+
       this.getMad();
     },
     this);
@@ -675,21 +674,21 @@ BasicGame.Eye.prototype.getTired = function () {
  * restarts the seeking for the player.
  */
 BasicGame.Eye.prototype.getMad = function () {
-  var shakeTween = this.game.add.tween(this.eye);
+  this.madTween = this.game.add.tween(this.eye);
 
   // play the angry animation and the sound linked to it
   this.eye.frame = 2;
   this.angerSound.play();
 
   // shake the world
-  shakeTween.to({ x: this.eye.originalX + 10 },
+  this.madTween.to({ x: this.eye.originalX + 10 },
     40,
     Phaser.Easing.Sinusoidal.InOut,
     false,
     0,
     4,
     true);
-  shakeTween.onComplete.addOnce(function () {
+  this.madTween.onComplete.addOnce(function () {
     // restart the search after a while
     this.searchAgain = this.game.time.create(true);
     this.searchAgain.add(this.RESTART_SEARCH_DELAY,
@@ -703,7 +702,7 @@ BasicGame.Eye.prototype.getMad = function () {
       this);
     this.searchAgain.start();
   }, this);
-  shakeTween.start();
+  this.madTween.start();
 
 };
 
@@ -729,6 +728,12 @@ BasicGame.Eye.prototype.stopEyeTweens = function (resetPosition) {
     this.pupilMovementTween.onComplete.removeAll();
     this.viewZoneMovementTween.stop();
     this.pupilMovementTween.stop();
+  }
+
+  if (this.madTween && this.madTween.isRunning) {
+    this.madTween.onComplete.removeAll();
+    this.madTween.stop();
+    this.eye.x = this.eye.originalX;
   }
 
   if (resetPosition === true) {

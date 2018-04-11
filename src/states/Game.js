@@ -428,7 +428,7 @@ BasicGame.Game.prototype.subtractLife = function () {
   var that = this;
 
   // if the player collected all the pieces, don't kill him
-  if (this.level.endTimer) {
+  if (this.levelCompleted === true) {
     return;
   }
 
@@ -472,7 +472,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
   var lifeTween = null;
 
   // if the player collected all the pieces, don't kill him
-  if (this.level.endTimer) {
+  if (this.levelCompleted === true) {
     return;
   }
 
@@ -485,7 +485,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
     Phaser.Easing.Quadratic.Out,
     true);
 
-  this.eye.levelEndedEvent(false);
+  // this.eye.levelEndedEvent(false);
 
   if (destroyPlayer) {
     // play the animation of death of the player
