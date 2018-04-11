@@ -12,26 +12,31 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  */
 
 BasicGame.Light = function (game, gameObj) {
-  this.game = game;
-  this.gameObj = gameObj;
+  // destroyable objects
   this.lightGroup = null;
-  this.light = null;
   this.bitmap = null;
+  this.lightBitmap = null;
   this.rayBitmap = null;
   this.rayBitmapImage = null;
+
+  // global properties
+  this.game = game;
+  this.gameObj = gameObj;
   this.walls = null;
   this.level = null;
   this.shadowsDrawn = null;
 };
 
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ PHASER STATE METHODS                                                     ║
 BasicGame.Light.prototype.create = function (level) {
+  var light = null;
+
   this.level = level;
   this.walls = this.level.walls;
   this.shadowsDrawn = false;
 
-  var light = null;
-
-  //Add the light(s)
+  // Add the light(s)
   this.lightGroup = this.game.add.group();
   light = this.game.add.sprite((this.game.world.width / 2), -16, 'light');
   // light = this.game.add.sprite((this.game.world.width / 2) - 16, -16, 'light');
@@ -64,16 +69,33 @@ BasicGame.Light.prototype.create = function (level) {
   this.rayBitmapImage.visible = false;
 };
 
+BasicGame.Light.prototype.update = function () {
+  // if (this.shadowsDrawn === false) {
+  this.drawShadows();
+  // }
+  // draw shadows if light is moving in the level
+};
+
+BasicGame.Light.prototype.shutdown = function () {
+  this.lightGroup.destroy();
+  this.bitmap.destroy();
+  this.lightBitmap.destroy();
+  this.rayBitmap.destroy();
+  this.rayBitmapImage.destroy();
+};
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
 BasicGame.Light.prototype.drawShadows = function () {
   // Move the light to the pointer/touch location
   this.rayBitmapImage.visible = BasicGame.Game.developmentMode || false;
 
-  if(this.gameObj.inDarkness == true){
+  if (this.gameObj.inDarkness == true) {
     return;
   }
 
   // Next, fill the entire light bitmap with a dark shadow color.
-  this.bitmap.context.fillStyle = 'rgb(81, 81, 81)';
+  this.bitmap.context.fillStyle = 'rgb(102, 185, 204)';
   this.bitmap.context.fillRect(0, 0, this.game.world.width, this.game.height);
 
   // An array of the stage corners that we'll use later
@@ -209,7 +231,7 @@ BasicGame.Light.prototype.drawShadows = function () {
     //
     // Here's a pseudo-code implementation if you want to code it yourself:
     // http://en.wikipedia.org/wiki/Graham_scan
-    var center = {x: light.x, y: light.y};
+    var center = { x: light.x, y: light.y };
     points = points.sort(function (a, b) {
       if (a.x - center.x >= 0 && b.x - center.x < 0)
         return 1;
@@ -248,7 +270,7 @@ BasicGame.Light.prototype.drawShadows = function () {
     this.bitmap.context.closePath();
     this.bitmap.context.fill();
 
-    if(BasicGame.Game.developmentMode){
+    if (BasicGame.Game.developmentMode) {
       // Draw each of the rays on the rayBitmap
       this.rayBitmap.context.clearRect(0, 0, this.game.world.width, this.game.height);
       this.rayBitmap.context.beginPath();
@@ -267,18 +289,11 @@ BasicGame.Light.prototype.drawShadows = function () {
 
   // This just tells the engine it should update the texture cache
   this.bitmap.dirty = true;
-  if(BasicGame.Game.developmentMode){
+  if (BasicGame.Game.developmentMode) {
     this.rayBitmap.dirty = true;
   }
 
   this.shadowsDrawn = true;
-};
-
-BasicGame.Light.prototype.update = function(){
-  if(this.shadowsDrawn === false){
-    this.drawShadows();
-  }
-  // draw shadows if light is moving in the level
 };
 
 // Given a ray, this function iterates through all of the walls and
@@ -317,9 +332,6 @@ BasicGame.Light.prototype.getWallIntersection = function (ray) {
   }, this);
 
   return closestIntersection;
-};
-
-BasicGame.Light.prototype.destroyCurrentWalls = function (walls) {
 };
 
 BasicGame.Light.prototype.updateWalls = function (level) {

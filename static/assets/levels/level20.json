@@ -1,0 +1,358 @@
+{
+  "height": 20,
+  "layers": [
+    {
+      "draworder": "topdown",
+      "height": 0,
+      "name": "floor",
+      "objects": [
+        {
+          "height": 32,
+          "id": 52,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 64,
+          "x": 768,
+          "y": 608
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "height": 0,
+      "name": "platforms",
+      "objects": [
+        {
+          "height": 32,
+          "id": 59,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 128,
+          "y": 96
+        },
+        {
+          "height": 128,
+          "id": 62,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 864,
+          "y": 320
+        },
+        {
+          "height": 128,
+          "id": 63,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 192,
+          "y": 288
+        },
+        {
+          "height": 224,
+          "id": 75,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 640,
+          "y": 160
+        },
+        {
+          "height": 224,
+          "id": 79,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 544,
+          "y": 160
+        },
+        {
+          "height": 256,
+          "id": 82,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 96,
+          "y": 128
+        },
+        {
+          "height": 32,
+          "id": 86,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 64,
+          "x": 128,
+          "y": 384
+        },
+        {
+          "height": 32,
+          "id": 92,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 96,
+          "x": 768,
+          "y": 416
+        },
+        {
+          "height": 128,
+          "id": 93,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 736,
+          "y": 320
+        },
+        {
+          "height": 128,
+          "id": 101,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 480,
+          "y": 416
+        },
+        {
+          "height": 32,
+          "id": 102,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 992,
+          "y": 480
+        },
+        {
+          "height": 32,
+          "id": 104,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 64,
+          "x": 448,
+          "y": 576
+        },
+        {
+          "height": 32,
+          "id": 106,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 288,
+          "y": 448
+        },
+        {
+          "height": 32,
+          "id": 107,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 160,
+          "y": 128
+        },
+        {
+          "height": 32,
+          "id": 108,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 128,
+          "y": 512
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "height": 0,
+      "name": "pieces",
+      "objects": [
+        {
+          "height": 16,
+          "id": 58,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 16,
+          "x": 176,
+          "y": 368
+        },
+        {
+          "height": 16,
+          "id": 67,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 16,
+          "x": 144,
+          "y": 496
+        },
+        {
+          "height": 16,
+          "id": 83,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 16,
+          "x": 816,
+          "y": 400
+        },
+        {
+          "height": 16,
+          "id": 84,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 16,
+          "x": 144,
+          "y": 176
+        },
+        {
+          "height": 16,
+          "id": 85,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 16,
+          "x": 528,
+          "y": 528
+        },
+        {
+          "height": 16,
+          "id": 94,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 16,
+          "x": 592,
+          "y": 368
+        },
+        {
+          "height": 16,
+          "id": 95,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 16,
+          "x": 1008,
+          "y": 464
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "height": 0,
+      "name": "player_pos",
+      "objects": [
+        {
+          "height": 8,
+          "id": 13,
+          "name": "plyr",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 800,
+          "y": 576
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "nextobjectid": 109,
+  "orientation": "orthogonal",
+  "properties": {},
+  "renderorder": "right-down",
+  "tileheight": 32,
+  "tilesets": [
+    {
+      "tiles": {}
+    }
+  ],
+  "tilewidth": 32,
+  "version": 1,
+  "width": 32
+}

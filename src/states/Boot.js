@@ -5,9 +5,11 @@ BasicGame.Boot = function (game) {
 
 BasicGame.Boot.prototype.preload = function () {
   //  Here we load the assets required for our preloader (in this case a background and a loading bar)
-  this.load.image('preloaderBackground', 'assets/images/preloader_background-min.png');
-  this.load.image('preloaderBar', 'assets/images/preloader_bar.png');
-  this.load.image('loading_banner', 'assets/images/loading_banner.png');
+  this.load.image('preloaderBackground', 'assets/sprites/preloader_background.png');
+  this.load.image('preloaderBar', 'assets/sprites/preloader_bar.png');
+
+  // Add the plugin for debugging
+  // this.game.add.plugin(Phaser.Plugin.Debug);
 };
 
 BasicGame.Boot.prototype.create = function () {

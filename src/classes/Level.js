@@ -12,19 +12,23 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 BasicGame.Level = function (game, gameObj) {
+  // destroyable objects
+  this.levelTextGroup = null;
+  this.dayNumberText = null;
+  this.daySound = null;
+  this.spikeSound = null;
+  this.map = null;
+  this.ground = null;
+  this.walls = null;
+  this.spikes = null;
+  this.pieces = null;
+
+  // global properties
   this.game = game;
   this.gameObj = gameObj;
-  this.levelMusic = null;
-  this.walls = null;
-  this.ground = null;
-  this.map = null;
   this.endTimer = null;
-  this.isEnded = null;
-  this.initPlayerPos = {x: 0, y: 0};
+  this.initPlayerPos = { x: 0, y: 0 };
   this.daysShown = false;
-  this.dayNumberTextBitmap = null;
-  this.dayPhraseTextBitmap = null;
-  this.isReady = false;
   this.isShowingDays = false;
   this.dayText = {
     "es": "Día",
@@ -32,7 +36,7 @@ BasicGame.Level = function (game, gameObj) {
   };
 
   // font attributes
-  this.fontId = 'font';
+  this.fontId = 'font-medium';
   this.hasFloor = false;
   this.hasSpikes = false;
 
@@ -43,44 +47,18 @@ BasicGame.Level = function (game, gameObj) {
 BasicGame.Level.prototype.create = function () {
   // create the background for the day
   this.levelTextGroup = this.game.add.group();
-  var dayTextBitmap = new Phaser.BitmapData(this.game,
-    'dayTextBitmap',
-    this.game.world.width,
-    this.game.world.height);
-  dayTextBitmap.ctx.rect(0, 0, this.game.world.width, this.game.world.height);
-  dayTextBitmap.ctx.fillStyle = '#FFF';
-  dayTextBitmap.ctx.fill();
-
-  var dayTextSprite = new Phaser.Sprite(this.game, 0, 0, dayTextBitmap);
-  dayTextSprite.anchor.set(0.5, 0.5);
-  dayTextSprite.position.set(this.game.world.width / 2, this.game.world.height / 2);
-  dayTextSprite.height = 200;
-  dayTextSprite.alpha = 0;
-
-  this.levelTextGroup.addChild(dayTextSprite);
 
   // create the bitmap for the day number
-  this.dayNumberTextBitmap = this.game.add.bitmapText(this.game.world.width/2,
-    this.game.world.height/2 - 15,
+  this.dayNumberText = this.game.add.bitmapText(this.game.world.width / 2,
+    this.game.world.height / 2 - 15,
     this.fontId,
     '',
     72,
     this.levelTextGroup);
-  this.dayNumberTextBitmap.anchor.set(0.5, 0.5);
-  this.dayNumberTextBitmap.align = "center";
-  this.dayNumberTextBitmap.tint = 0x1e3137;
-  this.dayNumberTextBitmap.oriY = this.dayNumberTextBitmap.y;
-
-  // create the bitmap for the day phrase
-  this.dayPhraseTextBitmap = this.game.add.bitmapText(0,
-    this.dayNumberTextBitmap.bottom + 20,
-    this.fontId,
-    '',
-    48,
-    this.levelTextGroup);
-  this.dayPhraseTextBitmap.maxWidth = this.game.world.width;
-  this.dayPhraseTextBitmap.align = "center";
-  this.dayPhraseTextBitmap.tint = 0x515151;
+  this.dayNumberText.anchor.set(0.5, 0.5);
+  this.dayNumberText.align = "center";
+  this.dayNumberText.tint = 0x8d8d8e;
+  this.dayNumberText.oriY = this.dayNumberText.y;
 
   if (!this.daySound) {
     this.daySound = this.game.add.sound('day', 0.15);
@@ -93,34 +71,13 @@ BasicGame.Level.prototype.create = function () {
   this.createLevel(parseInt(BasicGame.currentLevel));
 };
 
-BasicGame.Level.prototype.destroyCurrentLevel = function () {
-  this.map.destroy();
-  if(this.ground) {
-    this.ground.destroy();
-  }
-  this.walls.destroy();
-  if(this.hasSpikes) {
-    this.spikes.forEach(function (spikeSprite) {
-      if (!spikeSprite || !spikeSprite.showTween || !spikeSprite.hideTween) return;
-      spikeSprite.showTween.stop();
-      spikeSprite.hideTween.stop();
-    });
-    this.spikes.destroy();
-  }
-  if(this.pieces) {
-    this.pieces.destroy();
-  }
-  this.dayNumberTextBitmap.setText("");
-  this.dayPhraseTextBitmap.setText("");
-};
-
 BasicGame.Level.prototype.createLevel = function (num) {
   var _self = this;
   this.map = this.game.add.tilemap('lvl' + ((num < 10) ? '0' + num : num));
 
   // create the floor of the level
   this.hasFloor = false;
-  if(this.map.objects.floor) {
+  if (this.map.objects.floor) {
     this.hasFloor = true;
     this.ground = this.game.add.group();
 
@@ -149,7 +106,7 @@ BasicGame.Level.prototype.createLevel = function (num) {
 
   // create the spikes (and platform) of the level
   this.hasSpikes = false;
-  if(this.map.objects.spikes) {
+  if (this.map.objects.spikes) {
     this.hasSpikes = true;
 
     this.spikes = this.game.add.group();
@@ -158,7 +115,7 @@ BasicGame.Level.prototype.createLevel = function (num) {
     this.map.createFromObjects("spikes", "", 'spike-platform', 0, true, false,
       this.walls, Phaser.Sprite, false);
     this.walls.forEach(function (platformSprite) {
-      if(platformSprite["spike-platform"] == "1") {
+      if (platformSprite["spike-platform"] == "1") {
         var createdSpike = null;
         if (platformSprite["spike-side"]) {
           createdSpike = _self.addHeightSpike(platformSprite, platformSprite["spike-side"]);
@@ -189,78 +146,66 @@ BasicGame.Level.prototype.createLevel = function (num) {
   });
 
   // get the player initial position
-  if(this.map.objects.player_pos) {
+  if (this.map.objects.player_pos) {
     this.initPlayerPos.x = this.map.objects.player_pos[0].x;
     this.initPlayerPos.y = this.map.objects.player_pos[0].y;
   }
 
-  this.game.world.bringToTop(this.levelTextGroup);
-
   // show the days of the level
-  var dayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
-  this.dayNumberTextBitmap.setText(this.dayText[BasicGame.language] + ' ' + dayObj.number);
-  this.dayNumberTextBitmap.y = this.dayNumberTextBitmap.oriY;
-  if(dayObj.text) {
-    this.dayPhraseTextBitmap.setText(dayObj.text[BasicGame.language]);
-    this.dayPhraseTextBitmap.x = this.game.world.width/2 - this.dayPhraseTextBitmap.width/2;
-  }
-  else {
-    this.dayNumberTextBitmap.y += 15;
-  }
+  var dayObj = this.gameObj.days.getDay(parseInt(BasicGame.currentLevel));
+  this.dayNumberText.setText(this.dayText[BasicGame.language] + ' ' + dayObj.number);
+  this.dayNumberText.y = this.dayNumberText.oriY;
 
-  // set the level as not ended
-  this.isEnded = false;
+  // notify to the game that the level is ready
+  this.gameObj.levelReady();
+};
 
-  // TODO: remove this property
-  this.isReady = true;
+BasicGame.Level.prototype.destroyCurrentLevel = function () {
+  this.map.destroy();
+  if (this.ground) {
+    this.ground.destroy();
+  }
+  this.walls.destroy();
+  if (this.hasSpikes) {
+    this.spikes.forEach(function (spikeSprite) {
+      if (!spikeSprite || !spikeSprite.showTween || !spikeSprite.hideTween) return;
+      spikeSprite.showTween.stop();
+      spikeSprite.hideTween.stop();
+    });
+    this.spikes.destroy();
+  }
+  if (this.pieces) {
+    this.pieces.destroy();
+  }
+  this.dayNumberText.setText("");
 };
 
 BasicGame.Level.prototype.render = function () {
-  if(BasicGame.Game.developmentMode === true) {
+  if (BasicGame.Game.developmentMode === true) {
     var _self = this;
-    this.spikes.forEach(function (pieceSprite) {
-      _self.game.debug.body(pieceSprite, 'rgba(0,0,255,0.8)');
-    });
+    if (this.spikes) {
+      this.spikes.forEach(function (pieceSprite) {
+        _self.game.debug.body(pieceSprite, 'rgba(0,0,255,0.8)');
+      });
+    }
   }
-};
-
-BasicGame.Level.prototype.endLevel = function () {
-  BasicGame.isRetrying = false;
-  var secondsToEnd = this.gameObj.countdownDuration;
-
-  // create the timer
-  this.endTimer = this.game.time.create(true);
-
-  // starts the timer that will end the level
-  this.endTimer.add(secondsToEnd * 1000,
-    function () {
-      // enable the flag that indicates the other objects the level is finished
-      this.endTimer = undefined;
-      this.isEnded = true;
-
-      this.gameObj.levelEnded();
-    },
-    this);
-
-  this.endTimer.start();
-  this.gameObj.showDarkness();
 };
 
 BasicGame.Level.prototype.showDay = function () {
-  if(this.isShowingDays === true) {
-    return;
-  }
+  // if (this.isShowingDays === true) {
+  //   return;
+  // }
 
-  this.isShowingDays = true;
+  // this.isShowingDays = true;
 
-  this.levelTextGroup.getChildAt(0).alpha = 1;
-  this.levelTextGroup.alpha = 1;
+  // this.levelTextGroup.getChildAt(0).alpha = 1;
+  // this.levelTextGroup.alpha = 1;
 
-  this.game.world.bringToTop(this.levelTextGroup);
+  // this.game.world.bringToTop(this.levelTextGroup);
 
-  this.daySound.play();
+  // this.daySound.play();
 
-  // create the timer
+  /* // create the timer
   var dayTimer = this.game.time.create(true);
 
   // set the timer to stop showing the day
@@ -272,21 +217,20 @@ BasicGame.Level.prototype.showDay = function () {
       this.gameObj.hideDarkness();
     },
     this);
-
-  dayTimer.start();
+  dayTimer.start(); */
 };
 
 BasicGame.Level.prototype.addWidthSpike = function (platformSprite, inBottom) {
   // add the spikes to the platform
   var spikeSprite = null;
 
-  if(!inBottom) {
+  if (!inBottom) {
     spikeSprite = this.game.add.tileSprite(platformSprite.x,
       platformSprite.y + 5,
       platformSprite.width, 16, "spike", 0, this.spikes);
     spikeSprite.isHidden = true;
     spikeSprite.oriY = spikeSprite.y;
-    spikeSprite.desY = platformSprite.y -16;
+    spikeSprite.desY = platformSprite.y - 16;
     this.spikes.openedSpikes++;
   }
   else {
@@ -298,17 +242,17 @@ BasicGame.Level.prototype.addWidthSpike = function (platformSprite, inBottom) {
     // spikeSprite.desY = platformSprite.y -16;
   }
 
-  if(!inBottom) {
+  if (!inBottom) {
     // create the tweens for showing and hiding the spikes
     var showSpikeTween = this.createShowSpikeTween(spikeSprite,
-      {y: spikeSprite.desY}, 100, 300);
+      { y: spikeSprite.desY }, 100, 300);
 
     var hideSpikeTween = this.game.add.tween(spikeSprite)
-    .to({y: spikeSprite.oriY},
-      300,
-      Phaser.Easing.Exponential.Out,
-      false,
-      1000);
+      .to({ y: spikeSprite.oriY },
+        300,
+        Phaser.Easing.Exponential.Out,
+        false,
+        1000);
     hideSpikeTween.onComplete.add(function () {
       this.isHidden = true;
       this.parent.openedSpikes--;
@@ -328,8 +272,8 @@ BasicGame.Level.prototype.addWidthSpike = function (platformSprite, inBottom) {
   spikeSprite.body.width = platformSprite.width * (numofspikes / (numofspikes + 0.5));
   spikeSprite.body.height = 8;
   spikeSprite.body.offset.x = (platformSprite.width / 2) - (spikeSprite.body.width / 2);
-  
-  if(!inBottom)
+
+  if (!inBottom)
     spikeSprite.body.offset.y = 8;
   else
     spikeSprite.body.offset.y = 0;
@@ -349,7 +293,7 @@ BasicGame.Level.prototype.addHeightSpike = function (platformSprite, side) {
     spikeSprite.oriX = spikeSprite.x;
     spikeSprite.desX = platformSprite.right;
   }
-  else if(side === 'l') {
+  else if (side === 'l') {
     spikeSprite = this.game.add.tileSprite(platformSprite.x + 5,
       platformSprite.top,
       16, platformSprite.height,
@@ -363,14 +307,14 @@ BasicGame.Level.prototype.addHeightSpike = function (platformSprite, side) {
 
   // create the tweens for showing and hiding the spikes
   var showSpikeTween = this.createShowSpikeTween(spikeSprite,
-    {x: spikeSprite.desX}, 100, 500);
+    { x: spikeSprite.desX }, 100, 500);
 
   var hideSpikeTween = this.game.add.tween(spikeSprite)
-  .to({x: spikeSprite.oriX},
-    300,
-    Phaser.Easing.Exponential.Out,
-    false,
-    1000);
+    .to({ x: spikeSprite.oriX },
+      300,
+      Phaser.Easing.Exponential.Out,
+      false,
+      1000);
   hideSpikeTween.onComplete.add(function () {
     this.isHidden = true;
     this.parent.openedSpikes--;
@@ -388,7 +332,7 @@ BasicGame.Level.prototype.addHeightSpike = function (platformSprite, side) {
   spikeSprite.body.width = 8;
   spikeSprite.body.height = platformSprite.height * (numofspikes / (numofspikes + 0.5));
   spikeSprite.body.offset.y = (platformSprite.height / 2) - (spikeSprite.body.height / 2);
-  
+
   if (side === 'r')
     spikeSprite.body.offset.x = 0;
   else
@@ -400,11 +344,11 @@ BasicGame.Level.prototype.addHeightSpike = function (platformSprite, side) {
 BasicGame.Level.prototype.createShowSpikeTween = function (spikeSprite, properties, duration, delay) {
   var _self = this;
   var showSpikeTween = this.game.add.tween(spikeSprite)
-  .to(properties,
-    duration,
-    null,
-    false,
-    delay);
+    .to(properties,
+      duration,
+      null,
+      false,
+      delay);
 
   showSpikeTween.onComplete.add(function () {
     this.isHidden = false;
@@ -422,3 +366,17 @@ BasicGame.Level.prototype.restartLevel = function () {
     pieceSprite.body.enable = true;
   });
 };
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+BasicGame.Level.prototype.shutdown = function () {
+  this.levelTextGroup.destroy();
+  this.dayNumberText.destroy();
+  this.daySound.destroy();
+  this.spikeSound.destroy();
+  this.map.destroy();
+  this.ground.destroy();
+  this.walls.destroy();
+  this.spikes.destroy();
+  this.pieces.destroy();
+};
+// ╚═══════════════════════════════════════════════════════════════════════════╝

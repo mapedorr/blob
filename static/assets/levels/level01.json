@@ -1,0 +1,156 @@
+{
+  "height": 20,
+  "layers": [
+    {
+      "draworder": "topdown",
+      "height": 0,
+      "name": "floor",
+      "objects": [
+        {
+          "height": 32,
+          "id": 1,
+          "name": "",
+          "properties": {
+            "gid": "p2"
+          },
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 1024,
+          "x": 0,
+          "y": 608
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "height": 0,
+      "name": "platforms",
+      "objects": [
+        {
+          "height": 32,
+          "id": 2,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 288,
+          "x": 0,
+          "y": 512
+        },
+        {
+          "height": 32,
+          "id": 3,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 192,
+          "x": 384,
+          "y": 512
+        },
+        {
+          "height": 32,
+          "id": 10,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 256,
+          "x": 672,
+          "y": 512
+        },
+        {
+          "height": 480,
+          "id": 11,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 928,
+          "y": 0
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "height": 0,
+      "name": "pieces",
+      "objects": [
+        {
+          "height": 16,
+          "id": 5,
+          "name": "",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 16,
+          "x": 1008,
+          "y": 592
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "height": 0,
+      "name": "player_pos",
+      "objects": [
+        {
+          "height": 8,
+          "id": 6,
+          "name": "plyr",
+          "properties": {},
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 32,
+          "x": 0,
+          "y": 576
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "nextobjectid": 13,
+  "orientation": "orthogonal",
+  "properties": {},
+  "renderorder": "right-down",
+  "tileheight": 32,
+  "tilesets": [
+    {
+      "tiles": {}
+    }
+  ],
+  "tilewidth": 32,
+  "version": 1,
+  "width": 32
+}

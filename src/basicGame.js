@@ -1,37 +1,54 @@
 var BasicGame = {
-  language: "en",
+  language: "es",
   currentLevel: 1,
   deaths: 0,
   rest: 0,
-  setDay: function(n) {
-    this.currentLevel = (n < 10) ? ('0' + n) : n;
+  setLanguage: function (newLanguage) {
+    this.language = newLanguage;
     return this.getCode();
   },
-  addDeath: function() {
+  setDay: function (n) {
+    this.currentLevel = n;
+    return this.getCode();
+  },
+  addDeath: function () {
     this.deaths++;
     return this.getCode();
   },
-  setRest: function() {
+  setRest: function () {
     this.rest = 1;
     return this.getCode();
   },
-  getCode: function() {
-    return this.rest + '' + this.deaths + '' + this.currentLevel;
+  getCode: function () {
+    var level = this.currentLevel;
+    return this.rest +
+      '' + this.deaths +
+      '' + ((level < 10) ? ('0' + level) : level) +
+      '' + this.language;
   },
-  readCode: function(code) {
+  readCode: function (code) {
     if (code.length < 4) return;
 
-    this.currentLevel = parseInt(code.slice(code.length -2, code.length));
+    if (code.length > 4) {
+      this.language = code.slice(code.length - 2) || this.language;
+      code = code.slice(0, code.length - 2);
+    }
+
+    this.currentLevel = parseInt(code.slice(code.length - 2));
     this.deaths = parseInt(code.slice(1, code.length - 2));
     this.rest = parseInt(code.charAt(0));
   },
-  getDeaths: function() {
+  getDeaths: function () {
     return this.deaths;
   },
-  reset: function() {
+  reset: function () {
     this.currentLevel = 1;
     this.deaths = 0;
     this.rest = 0;
+  },
+  changeHTMLBackground: function (color) {
+    document.body.style.backgroundColor = color;
+
   }
 };
 

@@ -11,20 +11,22 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-BasicGame.Lightning = function (game, gameObj){
-  this.game = game;
-  this.gameObj = gameObj;
+BasicGame.Lightning = function (game, gameObj) {
+  // destroyable objects
   this.lightningBitmap = null;
   this.lightning = null;
-  this.player = null;
+  this.fakeThing = null;
+  this.lightningSound = null;
+
+  this.game = game;
+  this.gameObj = gameObj;
+  this.playerObj = null;
   this.eye = null;
   this.level = null;
-
-  this.lightningSound = null;
 };
 
-BasicGame.Lightning.prototype.create = function(eye, player, level){
-  this.player = player;
+BasicGame.Lightning.prototype.create = function (eye, player, level) {
+  this.playerObj = player;
   this.eye = eye;
   this.level = level;
 
@@ -33,7 +35,7 @@ BasicGame.Lightning.prototype.create = function(eye, player, level){
 
   // Create a sprite to hold the lightning bolt texture
   this.lightning = this.game.add.image(this.eye.x,
-    this.eye.y,
+    this.eye.y + 32,
     this.lightningBitmap);
   this.lightning.anchor.setTo(0.5, 0);
 
@@ -41,10 +43,6 @@ BasicGame.Lightning.prototype.create = function(eye, player, level){
   this.fakeThing.anchor.setTo(0.5, 0.5);
   this.fakeThing.width = this.fakeThing.height = 16;
   this.fakeThing.alpha = 0;
-  
-  // this.game.physics.arcade.enable(this.fakeThing);
-  // this.fakeThing.body.immovable = true;
-  // this.fakeThing.body.allowGravity = false;
 
   this.lightningTimer = 0;
 
@@ -55,13 +53,11 @@ BasicGame.Lightning.prototype.create = function(eye, player, level){
 
 BasicGame.Lightning.prototype.update = function () {
   // check if the ray hits the player
-  if (this.player.player && this.fakeThing)
-  {
-    if (this.fakeThing.left > this.player.player.left &&
-        this.fakeThing.right < this.player.player.right &&
-        this.fakeThing.top > this.player.player.top &&
-        this.fakeThing.bottom < this.player.player.bottom)
-    {
+  if (this.playerObj.playerSprite && this.fakeThing) {
+    if (this.fakeThing.left > this.playerObj.playerSprite.left &&
+      this.fakeThing.right < this.playerObj.playerSprite.right &&
+      this.fakeThing.top > this.playerObj.playerSprite.top &&
+      this.fakeThing.bottom < this.playerObj.playerSprite.bottom) {
       this.gameObj.subtractLife();
       this.gameObj.shakeCamera();
     }
@@ -72,21 +68,21 @@ BasicGame.Lightning.prototype.update = function () {
 BasicGame.Lightning.prototype.shoot = function (target) {
   this.fakeThing.x = this.fakeThing.y = 0;
   var targetPos = {
-    x: target.x,
-    y: target.y
+    x: target.centerX,
+    y: target.centerY
   };
 
   // Rotate the lightning sprite so it goes in the
   // direction of the pointer
   this.lightning.rotation = this.game.math.angleBetween(
     this.lightning.x, this.lightning.y,
-    targetPos.x + 16, targetPos.y + 16
+    targetPos.x, targetPos.y
   ) - Math.PI / 2;
 
   // Calculate the distance from the lightning source to the pointer
   var distance = this.game.math.distance(
     this.lightning.x, this.lightning.y,
-    targetPos.x + 16, targetPos.y + 16
+    targetPos.x, targetPos.y
   );
 
   // Create the lightning texture
@@ -98,15 +94,15 @@ BasicGame.Lightning.prototype.shoot = function (target) {
   // Fade out the lightning sprite using a tween on the alpha property
   // Check out the "Easing function" examples for more info.
   this.game.add.tween(this.lightning)
-    .to({alpha: 0.5}, 100, Phaser.Easing.Bounce.Out)
-    .to({alpha: 1.0}, 100, Phaser.Easing.Bounce.Out)
-    .to({alpha: 0.5}, 100, Phaser.Easing.Bounce.Out)
-    .to({alpha: 1.0}, 100, Phaser.Easing.Bounce.Out)
-    .to({alpha: 0}, 250, Phaser.Easing.Cubic.In)
+    .to({ alpha: 0.5 }, 100, Phaser.Easing.Bounce.Out)
+    .to({ alpha: 1.0 }, 100, Phaser.Easing.Bounce.Out)
+    .to({ alpha: 0.5 }, 100, Phaser.Easing.Bounce.Out)
+    .to({ alpha: 1.0 }, 100, Phaser.Easing.Bounce.Out)
+    .to({ alpha: 0 }, 250, Phaser.Easing.Cubic.In)
     .start();
 
-  this.fakeThing.x = targetPos.x + 16;
-  this.fakeThing.y = targetPos.y + 16;
+  this.fakeThing.x = targetPos.x;
+  this.fakeThing.y = targetPos.y;
 
   this.lightningSound.play();
 };
@@ -184,47 +180,11 @@ BasicGame.Lightning.prototype.updateLevel = function (level) {
   this.level = level;
 };
 
-/*
-// Fragment shaders are small programs that run on the graphics card and alter
-// the pixels of a texture. Every framework implements shaders differently but
-// the concept is the same. This shader takes the lightning texture and alters
-// the pixels so that it appears to be glowing. Shader programming itself is
-// beyond the scope of this tutorial.
-//
-// There are a ton of good resources out there to learn it. Odds are that your
-// framework already includes many of the most popular shaders out of the box.
-//
-// This is an OpenGL/WebGL feature. Because it runs in your web browser
-// you need a browser that support WebGL for this to work.
-Phaser.Filter.Glow = function (game) {
-  Phaser.Filter.call(this, game);
-
-  this.fragmentSrc = [
-    "precision lowp float;",
-    "varying vec2 vTextureCoord;",
-    "varying vec4 vColor;",
-    'uniform sampler2D uSampler;',
-
-    'void main() {',
-    'vec4 sum = vec4(0);',
-    'vec2 texcoord = vTextureCoord;',
-    'for(int xx = -4; xx <= 4; xx++) {',
-    'for(int yy = -3; yy <= 3; yy++) {',
-    'float dist = sqrt(float(xx*xx) + float(yy*yy));',
-    'float factor = 0.0;',
-    'if (dist == 0.0) {',
-    'factor = 2.0;',
-    '} else {',
-    'factor = 2.0/abs(float(dist));',
-    '}',
-    'sum += texture2D(uSampler, texcoord + vec2(xx, yy) * 0.002) * factor;',
-    '}',
-    '}',
-    'gl_FragColor = sum * 0.025 + texture2D(uSampler, texcoord);',
-    '}'
-  ];
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+BasicGame.Lightning.prototype.shutdown = function () {
+  this.lightningBitmap.destroy();
+  this.lightning.destroy();
+  this.fakeThing.destroy();
+  this.lightningSound.destroy();
 };
-
-Phaser.Filter.Glow.prototype = Object.create(Phaser.Filter.prototype);
-Phaser.Filter.Glow.prototype.constructor = Phaser.Filter.Glow;
-*/
+// ╚═══════════════════════════════════════════════════════════════════════════╝

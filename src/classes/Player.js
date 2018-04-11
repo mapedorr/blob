@@ -12,10 +12,35 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 BasicGame.Player = function (game, input, gameObj) {
+  // constants
+  this.DIALOGUE_TEXT_MAX_WIDTH = 292;
+  this.DIALOGUE_TEXT_H_PADDING = 10;
+  this.DIALOGUE_TEXT_V_PADDING = 5;
+  this.FADE_SPEED = 300;
+  this.DIALOGUE_WIDTH = this.DIALOGUE_TEXT_MAX_WIDTH + this.DIALOGUE_TEXT_H_PADDING * 2;
+  this.STRETCH_SQUASH_VALUE = 8;
+  this.BASE_SIZE = 32;
+  this.HALF_SIZE = this.BASE_SIZE / 2;
+
+  // destroyable objects
+  this.playerSprite = null;
+  this.particlesGroup = null;
+  this.jumpSound = null;
+  this.walkSound = null;
+  this.slideSound = null;
+  this.fallSound = null;
+  this.deathSound = null;
+  this.pieceSound = null;
+  this.dialogueGroup = null;
+  this.dialogueBackground = null;
+  this.dialogueMark = null;
+  this.dialogueText = null;
+
+  // global properties
   this.game = game;
   this.input = input;
   this.gameObj = gameObj;
-  this.player = null;
+  this.playerSprite = null;
   this.level = null;
   this.bitmap = null;
   this.collectedPieces = 0;
@@ -23,6 +48,12 @@ BasicGame.Player = function (game, input, gameObj) {
   this.currentJumpMultiplier = 0;
   this.jumpChance = false;
   this.walkInAirTimer = null;
+  this.fontId = 'font';
+  this.dialogueDisplayed = false;
+  this.flipDialogueH = false;
+  this.dialogueFadeOutStarted = false;
+  this.jumpFeedbackStarted = false;
+  this.dialogueMarkHeight = null;
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // define movement constants
@@ -38,10 +69,10 @@ BasicGame.Player = function (game, input, gameObj) {
   // base speed of movement in X axis when an arrow key (left, right) is pressed
   // while jumping from a wall
   this.ACCELERATION_WALL = 12000;
-  
+
   // pixels per second used in character falls
   this.GRAVITY = 2600;
-  
+
   // base speed used to make the character jump
   this.JUMP_SPEED = -850;
 
@@ -56,10 +87,16 @@ BasicGame.Player = function (game, input, gameObj) {
   this.JUMP_MULTIPLIER = 0.3;
 
   // define gameplay keys
-  this.leftKey = Phaser.Keyboard.LEFT;
-  this.rightKey = Phaser.Keyboard.RIGHT;
+  this.leftKey1 = Phaser.Keyboard.LEFT;
+  this.leftKey2 = Phaser.Keyboard.A;
+  this.rightKey1 = Phaser.Keyboard.RIGHT;
+  this.rightKey2 = Phaser.Keyboard.D;
   this.jumpKey1 = Phaser.Keyboard.Z;
   this.jumpKey2 = Phaser.Keyboard.SPACEBAR;
+  this.jumpKey3 = Phaser.Keyboard.UP;
+  this.jumpKey4 = Phaser.Keyboard.W;
+  this.downKey1 = Phaser.Keyboard.DOWN;
+  this.downKey2 = Phaser.Keyboard.S;
 
   this.justLeaveGround = false;
 
@@ -81,45 +118,45 @@ BasicGame.Player = function (game, input, gameObj) {
   this.PARTICLES_AMOUNT = 4;
 };
 
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ PHASER STATE METHODS                                                     ║
 BasicGame.Player.prototype.create = function (level) {
   var particle = null,
-      particleX = null,
-      particleY = null,
-      increaseAmount = null;
+    particleX = null,
+    particleY = null,
+    increaseAmount = null;
 
   //Save the walls in the level
   this.level = level;
 
   //Put the player in the game's world
-  this.player = this.game.add.sprite(this.level.initPlayerPos.x,
-    this.level.initPlayerPos.y,
-    'player');
-
-  // configure the player animations
-  this.player.animations.add('normal', [0], 1, false);
-  this.player.animations.add('dying', null, 70, false);
+  this.playerSprite = this.game.add.sprite(0, 0, 'player');
+  this.playerSprite.anchor.setTo(0.5, 1);
 
   //Enable physics on the player
-  this.game.physics.arcade.enable(this.player);
+  this.game.physics.arcade.enable(this.playerSprite);
 
   //Set player minimum and maximum movement speed
-  this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 20); // x, y
+  this.playerSprite.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 20);
 
   //Since we're jumping we need gravity
   this.game.physics.arcade.gravity.y = this.GRAVITY;
+
+  this.setPlayerPositionInLevel();
 
   //Capture certain keys to prevent their default actions in the browser.
   //This is only necessary because this is an HTML5 game. Games on other
   //platforms may not need code like this.
   this.game.input.keyboard.addKeyCapture([
-    this.leftKey,
-    this.rightKey,
+    this.leftKey1,
+    this.rightKey1,
     this.jumpKey1,
-    this.jumpKey2
+    this.jumpKey2,
+    this.downKey1
   ]);
 
   // disable physics in the player's body while the game starts
-  this.player.body.enable = false;
+  this.playerSprite.body.enable = false;
 
   // create a bitmap texture for drawing lines
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
@@ -131,18 +168,18 @@ BasicGame.Player.prototype.create = function (level) {
 
   if (!this.jumpSound) {
     this.jumpSound = this.game.add.sound('jump', 0.2);
-    this.jumpSound.onPlay.add(function() {
+    this.jumpSound.onPlay.add(function () {
       this.slideSound.stop();
     }, this);
   }
 
   if (!this.walkSound) {
     this.walkSound = this.game.add.sound('walk', 0.1);
-    this.walkSound.onPlay.add(function() {
+    this.walkSound.onPlay.add(function () {
       this.slideSound.stop();
     }, this);
-    this.walkSound.onStop.add(function() {
-      if (this.onTheGround === true) {
+    this.walkSound.onStop.add(function () {
+      if (this.onGround === true) {
         this.slideSound.play();
       }
     }, this);
@@ -158,7 +195,7 @@ BasicGame.Player.prototype.create = function (level) {
 
   if (!this.deathSound) {
     this.deathSound = this.game.add.sound('death', 0.3);
-    this.deathSound.onPlay.add(function() {
+    this.deathSound.onPlay.add(function () {
       this.slideSound.stop();
     }, this);
   }
@@ -167,11 +204,6 @@ BasicGame.Player.prototype.create = function (level) {
   if (!this.pieceSound) {
     this.pieceSound = this.game.add.sound('piece', 0.2);
   }
-  // if (!this.piecesSound || this.piecesSound.length === 0) {
-  //   for(var i = 1; i <= 20; i++) {
-  //     this.piecesSound.push(this.game.add.sound('piece' + ((i < 10) ? '0' : '') + i, 0.2));
-  //   }
-  // }
 
   // create the group that will contain the particles that will be used during
   // player death
@@ -179,11 +211,10 @@ BasicGame.Player.prototype.create = function (level) {
 
   particleX = 0;
   particleY = 0;
-  increaseAmount = this.player.width / this.PARTICLES_AMOUNT;
+  increaseAmount = this.playerSprite.width / this.PARTICLES_AMOUNT;
 
-  while (this.particlesGroup.children.length < Math.pow(this.PARTICLES_AMOUNT,2)) {
+  while (this.particlesGroup.children.length < Math.pow(this.PARTICLES_AMOUNT, 2)) {
     particle = this.game.add.sprite(particleX, particleY, 'player');
-    // particle.tint = this.gameObj.helper.randomColor();
     particle.width = particle.height = increaseAmount;
     particle.originalX = particle.x;
     particle.originalY = particle.y;
@@ -194,7 +225,7 @@ BasicGame.Player.prototype.create = function (level) {
     this.particlesGroup.addChild(particle);
 
     particleX += particle.width;
-    if (particleX >= this.player.width) {
+    if (particleX >= this.playerSprite.width) {
       particleX = 0;
       particleY += particle.height;
     }
@@ -202,33 +233,58 @@ BasicGame.Player.prototype.create = function (level) {
 
   this.particlesGroup.x = -100;
   this.particlesGroup.y = -100;
+
+  // ═ dialogue ═══════════════════════════════════════════════════════════════╗
+  this.dialogueGroup = this.game.add.group();
+
+  this.dialogueBackground = this.game.add.image(0, 0, 'dialogue_background', 0, this.dialogueGroup);
+  this.dialogueBackground.width = this.DIALOGUE_WIDTH;
+  this.dialogueBackground.height = this.DIALOGUE_TEXT_V_PADDING * 2;
+
+  this.dialogueMark = this.game.add.image(0, 0, 'dialogue_mark', 0, this.dialogueGroup);
+  this.dialogueMark.y = this.dialogueBackground.height + 8;
+  this.dialogueMarkHeight = this.dialogueMark.height;
+
+  // create the bitmap for the day phrase
+  this.dialogueText = this.game.add.bitmapText(0, 0, this.fontId, '', 18, this.dialogueGroup);
+  this.dialogueText.x = this.DIALOGUE_TEXT_H_PADDING;
+  this.dialogueText.y = this.DIALOGUE_TEXT_V_PADDING;
+  this.dialogueText.maxWidth = this.DIALOGUE_TEXT_MAX_WIDTH;
+  this.dialogueText.tint = 0x161a1e;
+
+  this.dialogueGroup.alpha = 0;
+  // ══════════════════════════════════════════════════════════════════════════╝
 };
 
 BasicGame.Player.prototype.update = function () {
   var leftPressed = false;
   var rightPressed = false;
   var upPressed = false;
+  var downPressed = false;
   var onRightWall = false;
   var onLeftWall = false;
   var headHit = false;
   var jumpMul = 0;
 
+  // update the position of the dialogue bubble based on the player's position
+  this.placeDialogueGroup();
+
   this.game.physics.arcade.isPaused = this.gameObj.isLoadingLevel;
   if (this.gameObj.isLoadingLevel) {
-    this.player.body.velocity.y = 0;
+    this.playerSprite.body.velocity.y = 0;
     return;
   }
 
   if (this.gameObj.isLoadingLevel === true || this.dead === true) {
     if (this.dead === true) {
-      this.player.body.acceleration.x = 0;
-      
+      this.playerSprite.body.acceleration.x = 0;
+
       // check if a particle is out of the world to disable its gravity
       this.particlesGroup.forEach(function (particle) {
         var particleX = this.particlesGroup.x + particle.x;
         var particleY = this.particlesGroup.y + particle.y;
         if (particleX < 0 || particleX > this.game.world.width ||
-            particleY > this.game.world.height) {
+          particleY > this.game.world.height) {
           particle.body.allowGravity = false;
           particle.body.acceleration.x = 0;
           particle.body.velocity.y = 0;
@@ -238,10 +294,10 @@ BasicGame.Player.prototype.update = function () {
     return;
   }
 
-  if (this.player.y > this.game.world.height) {
+  if (this.playerSprite.top > this.game.world.height) {
     this.dead = true;
-    this.player.body.velocity.y = 0;
-    this.player.body.allowGravity = false;
+    this.playerSprite.body.velocity.y = 0;
+    this.playerSprite.body.allowGravity = false;
     this.gameObj.subtractAllLifes();
     return;
   }
@@ -249,9 +305,7 @@ BasicGame.Player.prototype.update = function () {
   // ___________________________________________________________________________
   // check collisions
   // ___________________________________________________________________________
-
   this.checkCollisions();
-
 
   // ___________________________________________________________________________
   // handle player movement
@@ -260,31 +314,56 @@ BasicGame.Player.prototype.update = function () {
   leftPressed = this.leftInputIsActive() === true;
   rightPressed = this.rightInputIsActive() === true;
   upPressed = this.upInputIsActive() === true;
+  downPressed = this.downInputIsActive() === true;
 
-  if (this.player.touchingPiece === false) {
-    this.onTheGround = this.player.body.touching.down === true;
-    onRightWall = this.player.body.touching.right === true && this.player.body.velocity.y > -500;
-    onLeftWall = this.player.body.touching.left === true && this.player.body.velocity.y > -500;
-    headHit = this.player.body.touching.up === true && this.onTheGround === false;
+  if (this.duckTweenPlaying === true && !downPressed) {
+    this.playBaseSizeTween();
+    this.duckTweenPlaying = false;
   }
 
-  if (this.onTheGround || onRightWall || onLeftWall) {
+  if (leftPressed || rightPressed || upPressed) {
+    if (this.dialogueDisplayed === true && this.dialogueFadeOutStarted === false) {
+      // if the player is moving and the dialogue box is visible, start the timer
+      // to fade it out
+      this.dialogueFadeOutStarted = true;
+      this.gameObj.helper.timer(this.waitTime, this.hideDialogue, this);
+    }
+
+    if (this.gameObj.eye.eye.frame === 3) {
+      this.gameObj.eye.initSearch();
+    }
+  }
+
+  if (this.playerSprite.touchingPiece === false) {
+    this.onGround = this.playerSprite.body.touching.down === true;
+    onRightWall = this.playerSprite.body.touching.right === true && this.playerSprite.body.velocity.y > -500;
+    onLeftWall = this.playerSprite.body.touching.left === true && this.playerSprite.body.velocity.y > -500;
+    headHit = this.playerSprite.body.touching.up === true && this.onGround === false;
+  }
+
+  if (headHit) {
+    this.isJumping = false;
+  }
+
+  // jump jump jump
+  if (this.isJumping && this.jumpFeedbackStarted === false) {
+    this.jumpFeedback();
+  }
+
+  if (this.onGround || onRightWall || onLeftWall) {
     this.jumpCount = 0;
   }
 
   // reset some values to default if the player is touching the ground
-  if (this.onTheGround) {
-    this.isFalling = false;
-    this.isJumping = false;
-    if (this.justLeaveGround === true) this.fallSound.play();
-    this.justLeaveGround = false;
+  if (this.onGround) {
+    this.onGroundFeedback();
   }
   else {
     this.walkSound.stop();
     this.slideSound.stop();
 
     // check if the character just left the ground
-    if (this.justLeaveGround === false && this.player.body.velocity.y > 0) {
+    if (this.justLeaveGround === false && this.playerSprite.body.velocity.y > 0) {
       this.justLeaveGround = true;
 
       // create a time to allow the player walk in the air for a while after
@@ -302,27 +381,23 @@ BasicGame.Player.prototype.update = function () {
 
   // handle behaviour of player on walls
   if (onRightWall || onLeftWall) {
-    this.player.body.velocity.y = this.SLID_SPEED;
+    this.onWallFeedback();
+    this.playerSprite.body.velocity.y = this.SLID_SPEED;
 
     this.currentJumpMultiplier = 0;
     this.jumpChance = false;
-
-    if (!this.slideSound.isPlaying) this.slideSound.play();
   }
 
-  if (this.player.x < 0) this.player.x = 0;
-  if (this.player.right > this.game.world.width) this.player.x = this.game.world.width - this.player.width;
-
-  if (leftPressed && this.player.x > 0) {
+  if (leftPressed && this.playerSprite.left > 0) {
     // set the player velocity to move left
     this.rightFirstPress = false;
-    this.player.body.acceleration.x = -this.ACCELERATION;
+    this.playerSprite.body.acceleration.x = -this.ACCELERATION;
 
-    if (this.onTheGround) {
+    if (this.onGround) {
       if (!this.leftFirstPress) {
         this.leftFirstPress = true;
         this.currentJumpMultiplier = 0;
-        this.walkSound.play();
+        this.walkFeedback(true);
       }
       else {
         this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
@@ -333,25 +408,25 @@ BasicGame.Player.prototype.update = function () {
         this.slideSound.stop();
       }
       else if (upPressed) {
-        this.player.body.acceleration.x = this.ACCELERATION_WALL;
-        this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+        this.playerSprite.body.acceleration.x = this.ACCELERATION_WALL;
+        this.playerSprite.body.velocity.y = this.JUMP_SPEED_WALL;
 
-        // jump jump jump
-        this.currentJumpMultiplier = 0;
-        this.jumpSound.play();
+        if (this.isJumping && this.jumpFeedbackStarted === false) {
+          this.jumpFeedback();
+        }
       }
     }
   }
-  else if (rightPressed && this.player.right < this.game.world.width) {
+  else if (rightPressed && this.playerSprite.right < this.game.world.width) {
     // If the RIGHT key is down, set the player velocity to move right
     this.leftFirstPress = false;
-    this.player.body.acceleration.x = this.ACCELERATION;
+    this.playerSprite.body.acceleration.x = this.ACCELERATION;
 
-    if (this.onTheGround) {
+    if (this.onGround) {
       if (this.rightFirstPress === false) {
         this.rightFirstPress = true;
         this.currentJumpMultiplier = 0;
-        this.walkSound.play();
+        this.walkFeedback();
       }
       else {
         this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
@@ -362,42 +437,56 @@ BasicGame.Player.prototype.update = function () {
         this.slideSound.stop();
       }
       else if (upPressed) {
-        this.player.body.acceleration.x = -this.ACCELERATION_WALL;
-        this.player.body.velocity.y = this.JUMP_SPEED_WALL;
+        this.playerSprite.body.acceleration.x = -this.ACCELERATION_WALL;
+        this.playerSprite.body.velocity.y = this.JUMP_SPEED_WALL;
 
-        // jump jump jump
-        this.currentJumpMultiplier = 0;
-        this.jumpSound.play();
+        if (this.isJumping && this.jumpFeedbackStarted === false) {
+          this.jumpFeedback();
+        }
       }
     }
   }
   else {
     // not moving in X direction
     this.leftFirstPress = this.rightFirstPress = false;
-    this.player.body.acceleration.x = 0;
-    this.player.body.velocity.x = 0;
+    this.playerSprite.body.acceleration.x = 0;
+    this.playerSprite.body.velocity.x = 0;
     this.currentJumpMultiplier = 0;
     this.walkSound.stop();
     this.slideSound.stop();
+
+    if (downPressed) {
+      this.duckFeedback();
+    }
+
+    /* if (this.walkTweenPlayed === true) {
+      this.playBaseSizeTween();
+      this.walkTweenPlayed = false;
+    } */
   }
 
-  if (upPressed) {
+  if (upPressed && !headHit) {
     jumpMul = Math.min(this.currentJumpMultiplier, this.JUMP_MULTIPLIER_MAX);
-    this.player.body.velocity.y = this.JUMP_SPEED;
-    this.player.body.velocity.y += this.JUMP_SPEED * jumpMul;
-    this.isJumping = true;
+    this.playerSprite.body.velocity.y = this.JUMP_SPEED;
+    this.playerSprite.body.velocity.y += this.JUMP_SPEED * jumpMul;
     this.jumpMultiplier = this.JUMP_MULTIPLIER;
-
-    // jump jump jump
-    this.currentJumpMultiplier = 0;
-    this.jumpSound.play();
+    if (!this.isJumping) {
+      this.isJumping = true;
+    }
   }
+  else {
+    this.isJumping = false;
+  }
+
+  // sprite out of the bounds of the game world
+  if (this.playerSprite.left < 0) this.playerSprite.left = 0;
+  if (this.playerSprite.right > this.game.world.width) this.playerSprite.left = this.game.world.width - this.playerSprite.width;
 
   // make the jump a bit higher if the player keeps pressing the jump button
   // if (this.input.keyboard.downDuration(this.jumpKey1, this.JUMP_TIME) === true ||
   //     this.input.keyboard.downDuration(this.jumpKey2, this.JUMP_TIME)
   // ) {
-  //   this.player.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
+  //   this.playerSprite.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
   //   if (this.jumpMultiplier > 0.1)
   //     this.jumpMultiplier *= 0.95;
   //   else
@@ -416,11 +505,11 @@ BasicGame.Player.prototype.update = function () {
   }
 };
 
-BasicGame.Player.prototype.render = function() {
+BasicGame.Player.prototype.render = function () {
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
     // Sprite debug info
-    this.game.debug.bodyInfo(this.player, 0, 100, 'rgba(0,255,0,0.4)');
-    this.game.debug.body(this.player, 'rgba(0,255,0,0.4)');
+    this.game.debug.bodyInfo(this.playerSprite, 0, 100, 'rgba(0,255,0,0.4)');
+    // this.game.debug.body(this.playerSprite, 'rgba(0,255,0,0.4)');
   }
 
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
@@ -429,17 +518,35 @@ BasicGame.Player.prototype.render = function() {
   }
 };
 
+BasicGame.Player.prototype.shutdown = function () {
+  this.playerSprite.destroy();
+  this.particlesGroup.destroy();
+  this.jumpSound.destroy();
+  this.walkSound.destroy();
+  this.slideSound.destroy();
+  this.fallSound.destroy();
+  this.deathSound.destroy();
+  this.pieceSound.destroy();
+};
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
 BasicGame.Player.prototype.leftInputIsActive = function () {
-  return this.input.keyboard.isDown(this.leftKey);
+  return this.input.keyboard.isDown(this.leftKey1) ||
+    this.input.keyboard.isDown(this.leftKey2);
 };
 
 BasicGame.Player.prototype.rightInputIsActive = function () {
-  return this.input.keyboard.isDown(this.rightKey);
+  return this.input.keyboard.isDown(this.rightKey1) ||
+    this.input.keyboard.isDown(this.rightKey2);
 };
 
 BasicGame.Player.prototype.upInputIsActive = function (duration) {
   if ((this.input.keyboard.downDuration(this.jumpKey1, duration) ||
-       this.input.keyboard.downDuration(this.jumpKey2, duration)) && this.jumpCount === 0) {
+    this.input.keyboard.downDuration(this.jumpKey2, duration) ||
+    this.input.keyboard.downDuration(this.jumpKey3, duration) ||
+    this.input.keyboard.downDuration(this.jumpKey4, duration)) &&
+    this.jumpCount === 0) {
     this.jumpCount++;
     return true;
   }
@@ -447,19 +554,135 @@ BasicGame.Player.prototype.upInputIsActive = function (duration) {
   return false;
 };
 
+BasicGame.Player.prototype.downInputIsActive = function () {
+  return this.input.keyboard.isDown(this.downKey1) ||
+    this.input.keyboard.isDown(this.downKey2);
+};
+
+BasicGame.Player.prototype.onGroundFeedback = function () {
+  var squashTween = null;
+  if (this.justLeaveGround === true && !this.squashTweenPlaying) {
+    squashTween = this.game.add.tween(this.playerSprite);
+    squashTween.to({
+      width: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE,
+      height: this.BASE_SIZE - this.STRETCH_SQUASH_VALUE
+    }, 150, Phaser.Easing.Exponential.Out);
+    squashTween.onComplete.add(function () {
+      this.playBaseSizeTween();
+      this.squashTweenPlaying = false;
+    }, this);
+    squashTween.start();
+    this.squashTweenPlaying = true;
+  }
+
+  this.isFalling = false;
+  this.isJumping = false;
+
+  if (this.justLeaveGround === true) {
+    this.fallSound.play();
+  }
+
+  this.justLeaveGround = false;
+};
+
+BasicGame.Player.prototype.walkFeedback = function (left) {
+  var squashTween = null;
+
+  if (!this.walkTweenPlayed) {
+    squashTween = this.game.add.tween(this.playerSprite);
+    squashTween.to({
+      width: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE / 1.5
+    }, 150, Phaser.Easing.Exponential.Out);
+    squashTween.onComplete.add(function () {
+      this.playBaseSizeTween();
+      this.walkTweenPlayed = false;
+    }, this);
+    squashTween.start();
+    this.walkTweenPlayed = true;
+  }
+
+  if (!this.walkSound.isPlaying) {
+    this.walkSound.play();
+  }
+};
+
+BasicGame.Player.prototype.duckFeedback = function () {
+  var squashTween = null;
+
+  if (!this.duckTweenPlaying) {
+    squashTween = this.game.add.tween(this.playerSprite);
+    squashTween.to({
+      width: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE,
+      height: this.BASE_SIZE - this.STRETCH_SQUASH_VALUE
+    }, 150, Phaser.Easing.Exponential.Out);
+    // squashTween.onComplete.add(function () {
+    //   this.playBaseSizeTween();
+    //   this.duckTweenPlaying = false;
+    // }, this);
+    squashTween.start();
+    this.duckTweenPlaying = true;
+  }
+};
+
+BasicGame.Player.prototype.onWallFeedback = function () {
+  this.playBaseSizeTween();
+  if (!this.slideSound.isPlaying) this.slideSound.play();
+};
+
+BasicGame.Player.prototype.playBaseSizeTween = function () {
+  var baseSizeTween = null;
+  if (this.playerSprite.width !== this.BASE_SIZE && !this.baseSizeTweenPlaying) {
+    baseSizeTween = this.game.add.tween(this.playerSprite);
+    baseSizeTween.to({
+      width: this.BASE_SIZE,
+      height: this.BASE_SIZE
+    }, 150, Phaser.Easing.Exponential.Out);
+    baseSizeTween.onComplete.add(function () {
+      this.playerSprite.width = this.BASE_SIZE;
+      this.playerSprite.height = this.BASE_SIZE;
+      this.baseSizeTweenPlaying = false;
+    }, this);
+    baseSizeTween.start();
+    this.baseSizeTweenPlaying = true;
+  }
+};
+
+BasicGame.Player.prototype.jumpFeedback = function () {
+  var stretchTween;
+
+  this.jumpFeedbackStarted = true;
+
+  stretchTween = this.game.add.tween(this.playerSprite);
+  stretchTween.to({
+    width: this.BASE_SIZE - this.STRETCH_SQUASH_VALUE,
+    height: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE
+  }, 200, Phaser.Easing.Exponential.Out);
+  stretchTween.onComplete.add(function () {
+    this.jumpFeedbackStarted = false;
+  }, this);
+  stretchTween.start();
+
+  // this.isJumping = true;
+  this.currentJumpMultiplier = 0;
+
+  if (!this.jumpSound.isPlaying) {
+    this.jumpSound.play();
+  }
+};
+
 /**
  * Method that checks collisions against walls, the ground and collectable pieces
  */
 BasicGame.Player.prototype.checkCollisions = function () {
-  this.player.touchingPiece = false;
+  this.playerSprite.touchingPiece = false;
 
   if (this.level.hasFloor === true) {
-    this.game.physics.arcade.collide(this.player, this.level.ground);
+    this.game.physics.arcade.collide(this.playerSprite, this.level.ground);
   }
 
   // check if the player touches a piece
-  this.game.physics.arcade.overlap(this.player, this.level.pieces,
-    function(player, piece) {
+  this.game.physics.arcade.overlap(this.playerSprite, this.level.pieces,
+    function (player, piece) {
       player.touchingPiece = true;
       piece.body.enable = false;
       piece.alpha = 0;
@@ -470,15 +693,15 @@ BasicGame.Player.prototype.checkCollisions = function () {
 
       if (this.collectedPieces === this.level.pieces.children.length) {
         // the level has been finished
-        this.level.endLevel();
+        this.gameObj.levelEnded();
       }
     },
     null,
     this);
 
   if (this.level.hasSpikes === true) {
-    this.game.physics.arcade.collide(this.player, this.level.walls,
-      function(player, spikePlatform) {
+    this.game.physics.arcade.collide(this.playerSprite, this.level.walls,
+      function (player, spikePlatform) {
         if (spikePlatform.spikeRef && spikePlatform.spikeRef.isHidden === true) {
           if (this.gameObj.level.spikeSound.isPlaying === false) {
             this.gameObj.level.spikeSound.play();
@@ -488,15 +711,15 @@ BasicGame.Player.prototype.checkCollisions = function () {
       }, null, this);
 
     if (this.level.spikes.openedSpikes > 0) {
-      this.game.physics.arcade.overlap(this.player, this.level.spikes,
-        function(player, spike) {
+      this.game.physics.arcade.overlap(this.playerSprite, this.level.spikes,
+        function (player, spike) {
           if (this.dead === false) {
             this.gameObj.subtractAllLifes(true);
           }
         }, null, this);
     }
   } else {
-    this.game.physics.arcade.collide(this.player, this.level.walls);
+    this.game.physics.arcade.collide(this.playerSprite, this.level.walls);
   }
 };
 
@@ -508,30 +731,32 @@ BasicGame.Player.prototype.isInShadow = function (checkLeft, checkRight) {
   var lightImage = BasicGame.light.lightGroup.getAt(0);
   var raysToLight = [];
   var offset = 8;
-  
+
   if (checkLeft === true) {
     // top left corner
-    raysToLight.push(new Phaser.Line(this.player.x + offset,
-      this.player.y + offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.left + offset,
+      this.playerSprite.top + offset,
       lightImage.x,
       lightImage.y));
 
     // bottom left corner
-    raysToLight.push(new Phaser.Line(this.player.x + offset,
-      this.player.y + this.player.height - offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.left + offset,
+      // this.playerSprite.bottom - offset,
+      this.playerSprite.bottom,
       lightImage.x,
       lightImage.y));
   }
 
   if (checkRight === true) {
     // top right corner
-    raysToLight.push(new Phaser.Line(this.player.x + this.player.width - offset,
-      this.player.y + offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.right - offset,
+      this.playerSprite.top + offset,
       lightImage.x, lightImage.y));
 
     // bottom right corner
-    raysToLight.push(new Phaser.Line(this.player.x + this.player.width - offset,
-      this.player.y + this.player.height - offset,
+    raysToLight.push(new Phaser.Line(this.playerSprite.right - offset,
+      // this.playerSprite.bottom - offset,
+      this.playerSprite.bottom,
       lightImage.x, lightImage.y));
   }
 
@@ -577,12 +802,12 @@ BasicGame.Player.prototype.allRaysIntersectWall = function (rays) {
       // this edge is hidden. :D
       hiddenRays++;
     }
-  },this);
+  }, this);
 
   return (hiddenRays === rays.length);
 };
 
-BasicGame.Player.prototype.drawLinesToLight = function(lightImage, raysToLight) {
+BasicGame.Player.prototype.drawLinesToLight = function (lightImage, raysToLight) {
   // draw a line from the light to the targets
   for (var i = 0; i < raysToLight.length; i++) {
     this.bitmap.context.beginPath();
@@ -594,18 +819,18 @@ BasicGame.Player.prototype.drawLinesToLight = function(lightImage, raysToLight) 
 
 BasicGame.Player.prototype.updateLevel = function (level) {
   this.collectedPieces = 0;
-  this.player.body.reset(this.player.x, this.player.y);
-  this.player.body.enable = false;
+  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
+  this.playerSprite.body.enable = false;
   this.level = level;
   this.justLeaveGround = false;
   this.slideSound.stop();
-  this.player.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
-  this.player.body.enable = true;
-  this.player.body.allowGravity = true;
+  this.enableBody();
+  this.setPlayerPositionInLevel();
   this.dead = false;
+  this.dialogueFadeOutStarted = false;
 };
 
-BasicGame.Player.prototype.explote = function() {
+BasicGame.Player.prototype.explote = function () {
   var timer;
 
   this.dead = true;
@@ -616,21 +841,21 @@ BasicGame.Player.prototype.explote = function() {
   this.walkSound.stop();
   this.fallSound.stop();
 
-  this.player.body.enable = false;
-  this.player.body.acceleration.x = 0;
-  this.player.body.velocity.y = 0;
-  this.player.body.allowGravity = false;
+  this.playerSprite.body.enable = false;
+  this.playerSprite.body.acceleration.x = 0;
+  this.playerSprite.body.velocity.y = 0;
+  this.playerSprite.body.allowGravity = false;
 
   timer = this.game.time.create(true);
-  timer.add(100, function() {
+  timer.add(100, function () {
     this.deathSound.play();
   }, this);
   timer.start();
 
-  this.player.alpha = 0;
+  this.playerSprite.alpha = 0;
 
-  this.particlesGroup.x = this.player.x;
-  this.particlesGroup.y = this.player.y;
+  this.particlesGroup.x = this.playerSprite.x;
+  this.particlesGroup.y = this.playerSprite.y;
 
   this.particlesGroup.forEach(function (particle) {
     particle.x = particle.originalX;
@@ -646,26 +871,116 @@ BasicGame.Player.prototype.explote = function() {
   }, this);
 };
 
-BasicGame.Player.prototype.restartLevel = function () {
+BasicGame.Player.prototype.restartLevel = function (hideDarknessDelay) {
   this.collectedPieces = 0;
-
   this.walkSound.stop();
   this.slideSound.stop();
-
-  this.player.position.set(this.level.initPlayerPos.x, this.level.initPlayerPos.y);
-
-  this.player.animations.play('normal');
-
-  this.player.body.reset(this.player.x, this.player.y);
-  this.game.time.create(true)
-  .add(100, function () {
-    this.player.body.enable = true;
-    this.player.body.allowGravity = true;
-  }, this)
-  .timer.start();
+  this.setPlayerPositionInLevel();
+  // this.game.time
+  //   .create(true)
+  //   .add(hideDarknessDelay || 100, function () {
+  //     this.enableBody();
+  //   }, this)
+  //   .timer.start();
   this.dead = false;
 };
 
 BasicGame.Player.prototype.gameInDarkness = function () {
-  this.player.alpha = 1;
+  this.playerSprite.alpha = 1;
+};
+
+BasicGame.Player.prototype.placeDialogueGroup = function () {
+  if (this.flipDialogueH === true) {
+    this.dialogueGroup.x = this.playerSprite.centerX - this.dialogueGroup.width + 16;
+  }
+  else {
+    this.dialogueGroup.x = this.playerSprite.centerX;
+  }
+
+  if (this.flipDialogueV === true) {
+    this.dialogueGroup.y = this.playerSprite.bottom + 6.8;
+  }
+  else {
+    this.dialogueGroup.y = this.playerSprite.top - 6.8 - this.dialogueGroup.height;
+  }
+};
+
+BasicGame.Player.prototype.showDialogue = function (immediateHide) {
+  var dayObj = this.gameObj.days.getDay(BasicGame.currentLevel);
+  var displayTween = null;
+  var dialogueHeight = 0;
+
+  if (dayObj.text) {
+    this.waitTime = (immediateHide === true) ? 100 : dayObj.waitTime * 1000;
+    this.dialogueText.text = dayObj.text[BasicGame.language];
+    this.dialogueBackground.height = this.dialogueText.textHeight + this.DIALOGUE_TEXT_V_PADDING * 2;
+    this.dialogueMark.y = this.dialogueBackground.height + 8;
+    dialogueHeight = this.dialogueBackground.height + 8 + this.dialogueMarkHeight;
+    this.game.world.bringToTop(this.dialogueGroup);
+
+    if (this.DIALOGUE_WIDTH + this.playerSprite.centerX > this.game.width) {
+      this.flipDialogueH = true;
+      this.dialogueMark.x = this.DIALOGUE_WIDTH - 18;
+    }
+    else {
+      this.flipDialogueH = false;
+      this.dialogueMark.x = 0;
+    }
+
+    if (this.playerSprite.top - 6.8 - dialogueHeight <= 0) {
+      this.flipDialogueV = true;
+      this.dialogueMark.scale.set((this.flipDialogueH === true) ? -1 : 1, -1);
+      this.dialogueMark.bottom = 0;
+      this.dialogueBackground.top = this.dialogueMark.y + 8;
+      this.dialogueText.top = this.dialogueBackground.top + this.DIALOGUE_TEXT_V_PADDING;
+      this.dialogueGroup.y = this.playerSprite.bottom + 6.8;
+    }
+    else {
+      this.flipDialogueV = false;
+      this.dialogueMark.scale.set((this.flipDialogueH === true) ? -1 : 1, 1);
+      this.dialogueBackground.y = 0;
+      this.dialogueText.y = this.DIALOGUE_TEXT_V_PADDING;
+      this.dialogueMark.y = this.dialogueBackground.height + 8;
+      this.dialogueGroup.y = this.playerSprite.top - dialogueHeight - 6.8;
+    }
+
+    this.dialogueGroup.alpha = 0;
+    this.dialogueGroup.width = 0;
+    this.dialogueGroup.height = 0;
+    displayTween = this.game.add.tween(this.dialogueGroup);
+    displayTween.to({
+      alpha: 1,
+      width: this.DIALOGUE_WIDTH,
+      height: dialogueHeight
+    }, this.FADE_SPEED, Phaser.Easing.Exponential.Out);
+    displayTween.onComplete.add(function () {
+      this.dialogueDisplayed = true;
+    }, this);
+    displayTween.start();
+  }
+};
+
+BasicGame.Player.prototype.hideDialogue = function (delay) {
+  var displayTween = this.game.add.tween(this.dialogueGroup);
+  displayTween.to({
+    alpha: 0
+  }, this.FADE_SPEED, Phaser.Easing.Cubic.Out, false, delay);
+  displayTween.onComplete.add(function () {
+    this.dialogueDisplayed = false;
+    this.dialogueFadeOutStarted = false;
+    this.dialogueGroup.width = 0;
+    this.dialogueGroup.height = 0;
+  }, this);
+  displayTween.start();
+};
+
+BasicGame.Player.prototype.enableBody = function () {
+  this.playerSprite.body.enable = true;
+  this.playerSprite.body.allowGravity = true;
+};
+
+BasicGame.Player.prototype.setPlayerPositionInLevel = function () {
+  this.playerSprite.position.set(this.level.initPlayerPos.x + this.HALF_SIZE,
+    this.level.initPlayerPos.y + this.BASE_SIZE);
+  this.playerSprite.body.reset(this.playerSprite.x, this.playerSprite.y);
 };

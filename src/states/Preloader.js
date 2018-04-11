@@ -6,16 +6,14 @@ BasicGame.Preloader = function (game) {
   this.ready = false;
 };
 
-BasicGame.Preloader.prototype.preload = function(){
+BasicGame.Preloader.prototype.preload = function () {
   var i = 0;
+  var skyName = null;
+  var levelData = null;
 
   // these are the assets we loaded in Boot.js
   // a nice sparkly background and a loading progress bar
   this.background = this.add.sprite(0, 0, 'preloaderBackground');
-  this.banner = this.add.image(this.game.world.width / 2,
-    this.game.world.height - 40,
-    'loading_banner');
-  this.banner.anchor.set(0.5, 0);
   this.preloadBar = this.add.sprite(0, 0, 'preloaderBar');
 
   // set the preloadBar sprite as a loader sprite.
@@ -23,27 +21,40 @@ BasicGame.Preloader.prototype.preload = function(){
   // files below are loaded in.
   this.load.setPreloadSprite(this.preloadBar, 1);
 
+  //  --------------------------------------
   //  ---| load the assets for the Main menu
-  this.load.image('splash_view', 'assets/images/splash_view.png');
-  this.load.image('title', 'assets/images/title.png');
-  this.load.spritesheet('playButton','assets/sprites/play_button.png', 400, 256);
-  this.load.spritesheet('jugarButton','assets/sprites/jugar_button.png', 400, 256);
-  this.load.spritesheet('continueButton','assets/sprites/continue_button.png', 400, 256);
-  this.load.spritesheet('continuarButton','assets/sprites/continuar_button.png', 400, 256);
-  this.load.image('pupil', 'assets/images/pupil.png');
-  this.load.audio('splash_music', 'assets/music/splash_music.ogg', true);
-  this.load.audio('en-lang', 'assets/soundfx/en.ogg', true);
-  this.load.audio('es-lang', 'assets/soundfx/es.ogg', true);
-  this.game.load.tilemap('splash_lvl', 'assets/tilemaps/maps/splash.json',
-    null, Phaser.Tilemap.TILED_JSON);
+  this.load.image('main_menu_background', 'assets/sprites/main_menu_background.png');
+  this.load.image('button_background', 'assets/sprites/button_background.png');
+  this.load.image('giant_pupil', 'assets/sprites/giant_pupil.png');
+  this.load.image('close', 'assets/sprites/close.png');
+  this.load.image('credits_background', 'assets/sprites/credits_background.png');
+  this.load.image('credits_en', 'assets/sprites/credits_en.png');
+  this.load.image('credits_es', 'assets/sprites/credits_es.png');
 
+  this.load.audio('splash_music', 'assets/music/splash_music.ogg', true);
+
+  //  ---------------------------------
   //  ---| load the assets for the Game
-  this.load.image('light', 'assets/images/light.png');
-  this.load.image('view_zone', 'assets/images/view_zone.png');
-  this.load.image('piece', 'assets/images/piece.png');
-  this.load.image('platform', 'assets/images/platform.png');
-  this.load.spritesheet('player','assets/sprites/player.png', 32, 32);
-  this.load.spritesheet('eye','assets/sprites/eye.png', 192, 96);
+  this.load.image('pupil', 'assets/sprites/pupil_normal.png');
+  this.load.image('light', 'assets/sprites/light.png');
+  this.load.image('view_zone', 'assets/sprites/view_zone.png');
+  this.load.image('piece', 'assets/sprites/piece.png');
+  this.load.image('platform', 'assets/sprites/platform.png');
+  this.load.image('life', 'assets/sprites/life.png');
+  this.load.image('dialogue_background', 'assets/sprites/dialogue_background.png');
+  this.load.image('dialogue_mark', 'assets/sprites/dialogue_mark.png');
+  this.load.image('noise', 'assets/sprites/noise.png');
+  this.load.image('chat', 'assets/sprites/chat.png');
+  this.load.image('pause_es', 'assets/sprites/pause_es.png');
+  this.load.image('pause_en', 'assets/sprites/pause_en.png');
+
+  // this.load.spritesheet('noise', 'assets/sprites/noise.png', 1024, 640);
+  this.load.spritesheet('player', 'assets/sprites/player.png', 32, 32, 1);
+  this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 118, 4);
+  this.load.spritesheet('checkbox', 'assets/sprites/checkbox.png', 24, 24, 2);
+  this.load.spritesheet('mute', 'assets/sprites/mute.png', 24, 24, 2);
+  this.load.spritesheet('pause', 'assets/sprites/pause.png', 24, 24, 2);
+
   this.load.audio('b', 'assets/soundfx/b.ogg', true);
   this.load.audio('h', 'assets/soundfx/h.ogg', true);
   this.load.audio('jump', 'assets/soundfx/jump.ogg', true);
@@ -56,42 +67,48 @@ BasicGame.Preloader.prototype.preload = function(){
   this.load.audio('eye', 'assets/soundfx/eye.ogg', true);
   this.load.audio('eye-anger', 'assets/soundfx/anger.ogg', true);
   this.load.audio('level_music', 'assets/music/levels_music.ogg', true);
-  this.load.bitmapFont('font','assets/fonts/teko-light_0.png',
-    'assets/fonts/teko-light.fnt', null, 5);
-
-  // load the sound for pieces
   this.load.audio('piece', 'assets/soundfx/piece01.ogg', true);
+
+  this.load.bitmapFont('font', 'assets/fonts/FiraCode_0.png',
+    'assets/fonts/FiraCode.fnt', null);
+  this.load.bitmapFont('font-medium', 'assets/fonts/FiraCodeMedium_0.png',
+    'assets/fonts/FiraCodeMedium.fnt', null);
 
   // it will not be necessary to load this one if the player already passed the
   // first part of the game
-  var skyName = BasicGame.Helper.prototype.getSkyName(BasicGame.currentLevel);
-  this.load.image(skyName, 'assets/images/' + skyName + '-min.png');
+  skyName = BasicGame.Helper.prototype.getSkyName(BasicGame.currentLevel);
+  this.load.image(skyName, 'assets/sprites/' + skyName + '.png');
 
   // load this if the current level stored requires it, otherwise load it
   // when the player is near the end of the corresponding chapter
-  // this.load.image('spike-platform', 'assets/images/spike-platform.png');
-  // this.load.image('spike', 'assets/images/spike.png');
-  // this.load.image('spike-r', 'assets/images/spike-r.png');
-  // this.load.image('spike-l', 'assets/images/spike-l.png');
-  // this.load.image('spike-d', 'assets/images/spike-d.png');
-  // this.load.audio('spike', 'assets/soundfx/spike.ogg', true);
+  this.load.spritesheet('spike-platform', 'assets/sprites/spike-platform.png', 32, 32);
+  this.load.image('spike', 'assets/sprites/spike.png');
+  this.load.image('spike-r', 'assets/sprites/spike-r.png');
+  this.load.image('spike-l', 'assets/sprites/spike-l.png');
+  this.load.image('spike-d', 'assets/sprites/spike-d.png');
+  this.load.audio('spike', 'assets/soundfx/spike.ogg', true);
 
-  var levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);
+  levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);
   this.game.load.tilemap(levelData.id,
-    'assets/tilemaps/maps/' + levelData.name + '.json',
+    'assets/levels/' + levelData.name + '.json',
     null,
     Phaser.Tilemap.TILED_JSON);
 };
 
-BasicGame.Preloader.prototype.create = function(){
-  //Once the load has finished we disable the crop because we're going to sit in the update loop for a short while as the music decodes
+BasicGame.Preloader.prototype.create = function () {
+  // Once the load has finished we disable the crop because we're going to sit in
+  // the update loop for a short while as the music decodes
   this.preloadBar.cropEnabled = false;
 };
 
-BasicGame.Preloader.prototype.update = function(){
-  //this.cache.isSoundDecoded('mainMenuMusic')
+BasicGame.Preloader.prototype.update = function () {
   if (this.ready === false) {
     this.ready = true;
-    this.state.start('MainMenu');
+    if (BasicGame.currentLevel <= 30) {
+      this.state.start('MainMenu');
+    }
+    else {
+      this.state.start('TheEnd');
+    }
   }
 };
