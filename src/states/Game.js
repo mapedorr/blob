@@ -7,7 +7,6 @@ BasicGame.Game = function (game) {
   this.KEY_PAUSE = Phaser.Keyboard.P;
   this.KEY_MUTE = Phaser.Keyboard.M;
   this.KEY_CHAT = Phaser.Keyboard.C;
-  this.GO_TO_NEXT_LEVEL_DELAY
   this.DARKNESS_ALPHA = 1;
   this.GO_TO_NEXT_LEVEL_DELAY = 1500;
   this.PAUSE_WIDTH = 660; // Illustrator
@@ -569,7 +568,7 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
   }
 
   this.player.enableBody();
-  this.eye.levelStart();
+  this.eye.levelStart(BasicGame.isRetrying);
 };
 
 BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {

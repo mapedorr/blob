@@ -52,7 +52,7 @@ BasicGame.Preloader.prototype.preload = function () {
 
   // this.load.spritesheet('noise', 'assets/sprites/noise.png', 1024, 640);
   this.load.spritesheet('player', 'assets/sprites/player.png', 32, 32, 1);
-  this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 118, 3);
+  this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 118, 4);
   this.load.spritesheet('checkbox', 'assets/sprites/checkbox.png', 24, 24, 2);
   this.load.spritesheet('mute', 'assets/sprites/mute.png', 24, 24, 2);
   this.load.spritesheet('pause', 'assets/sprites/pause.png', 24, 24, 2);
@@ -106,6 +106,11 @@ BasicGame.Preloader.prototype.create = function () {
 BasicGame.Preloader.prototype.update = function () {
   if (this.ready === false) {
     this.ready = true;
-    this.state.start('Game');
+    if (BasicGame.currentLevel <= 30) {
+      this.state.start('MainMenu');
+    }
+    else {
+      this.state.start('TheEnd');
+    }
   }
 };

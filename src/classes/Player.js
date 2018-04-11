@@ -50,7 +50,7 @@ BasicGame.Player = function (game, input, gameObj) {
   this.walkInAirTimer = null;
   this.fontId = 'font';
   this.dialogueDisplayed = false;
-  this.flipDialogue = false;
+  this.flipDialogueH = false;
   this.dialogueFadeOutStarted = false;
   this.jumpFeedbackStarted = false;
 
@@ -319,12 +319,17 @@ BasicGame.Player.prototype.update = function () {
     this.duckTweenPlaying = false;
   }
 
-  if (this.dialogueDisplayed === true && this.dialogueFadeOutStarted === false &&
-    (leftPressed || rightPressed || upPressed)) {
-    // if the player is moving and the dialogue box is visible, start the timer
-    // to fade it out
-    this.dialogueFadeOutStarted = true;
-    this.gameObj.helper.timer(this.waitTime, this.hideDialogue, this);
+  if (leftPressed || rightPressed || upPressed) {
+    if (this.dialogueDisplayed === true && this.dialogueFadeOutStarted === false) {
+      // if the player is moving and the dialogue box is visible, start the timer
+      // to fade it out
+      this.dialogueFadeOutStarted = true;
+      this.gameObj.helper.timer(this.waitTime, this.hideDialogue, this);
+    }
+
+    if (this.gameObj.eye.eye.frame === 3) {
+      this.gameObj.eye.initSearch();
+    }
   }
 
   if (this.playerSprite.touchingPiece === false) {
@@ -883,13 +888,19 @@ BasicGame.Player.prototype.gameInDarkness = function () {
 };
 
 BasicGame.Player.prototype.placeDialogueGroup = function () {
-  if (this.flipDialogue === true) {
+  if (this.flipDialogueH === true) {
     this.dialogueGroup.x = this.playerSprite.centerX - this.dialogueGroup.width + 16;
   }
   else {
     this.dialogueGroup.x = this.playerSprite.centerX;
   }
-  this.dialogueGroup.y = this.playerSprite.top - this.dialogueGroup.height - 6.8;
+
+  if (this.flipDialogueV) {
+    this.dialogueGroup.y = this.playerSprite.bottom + 6.8;
+  }
+  else {
+    this.dialogueGroup.y = this.playerSprite.top - this.dialogueGroup.height - 6.8;
+  }
 };
 
 BasicGame.Player.prototype.showDialogue = function (immediateHide) {
@@ -906,12 +917,31 @@ BasicGame.Player.prototype.showDialogue = function (immediateHide) {
     this.game.world.bringToTop(this.dialogueGroup);
 
     if (this.DIALOGUE_WIDTH + this.playerSprite.centerX > this.game.width) {
-      this.flipDialogue = true;
+      this.flipDialogueH = true;
       this.dialogueMark.x = this.DIALOGUE_WIDTH - 18;
     }
     else {
-      this.flipDialogue = false;
+      this.flipDialogueH = false;
       this.dialogueMark.x = 0;
+    }
+
+    if (this.playerSprite.top - 6.8 - dialogueHeight <= 0) {
+      this.dialogueMark.scale.set((this.flipDialogueH === true) ? -1 : 1, -1);
+      this.dialogueMark.bottom = 0;
+      this.dialogueBackground.top = this.dialogueMark.y + 8;
+      this.dialogueText.top = this.dialogueBackground.top + this.DIALOGUE_TEXT_V_PADDING;
+      this.dialogueGroup.y = this.playerSprite.bottom + 6.8;
+
+      this.flipDialogueV = true;
+    }
+    else {
+      this.dialogueMark.scale.set(1, 1);
+      this.dialogueText.y = this.dialogueBackground.top + this.DIALOGUE_TEXT_V_PADDING;
+      this.dialogueBackground.y = 0;
+      this.dialogueMark.y = this.dialogueBackground.height + 8;
+      this.dialogueGroup.y = this.playerSprite.top - this.dialogueGroup.height - 6.8;
+
+      this.flipDialogueV = false;
     }
 
     this.dialogueGroup.alpha = 0;

@@ -37,9 +37,10 @@ BasicGame.Eye = function (game, gameObj) {
   this.PATTERNS = [
     [[0, 3, 1], [3, 6, 2], [6, 0, 1]], // this will be always the first pattern
     [[0, 1, 0.5], [1, 4, 1], [4, 2, 1], [2, 5, 2], [5, 0, 1]],
-    [[0, 3, 0.2], [3, 6, 0.4], [6, 0, 0.2]],
+    [[0, 3, 0.5], [3, 6, 0.6], [6, 0, 0.5]],
     [[0, 4, 0.5], [4, 1, 1], [1, 5, 1], [5, 2, 2], [2, 0, 1]]
   ];
+  this.FIRST_PATTERN_INDEX = 0;
 
   // destroyable objects
   this.eye = null;
@@ -88,10 +89,12 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.eye.originalX = this.eye.x;
   this.eye.originalY = this.eye.y;
   this.eye.anchor.setTo(0.5, 0.5);
+  this.eye.frame = 3;
 
   // add the  sprite of the pupil
   this.pupil = this.game.add.image(this.eye.x, this.eye.y + 25, 'pupil');
   this.pupil.anchor.setTo(0.5, 0.5);
+  this.pupil.alpha = 0;
 
   // create the mask for the pupil
   this.pupilMask = this.game.add.graphics(this.eye.x - 95.77, this.eye.y);
@@ -359,7 +362,7 @@ BasicGame.Eye.prototype.setPattern = function () {
   this.patternReversed = Math.random() > 0.5 ? true : false;
 
   if (this.usedPatterns === 0) {
-    this.currentPatternIdIndex = 0;
+    this.currentPatternIdIndex = this.FIRST_PATTERN_INDEX;
     this.currentPatternId = this.currentPatternIdIndex;
 
     // at level start, init the search in the opposite direction of player's spawn
@@ -552,14 +555,17 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
   this.calmDownTimer.start();
 };
 
-BasicGame.Eye.prototype.levelStart = function () {
+BasicGame.Eye.prototype.levelStart = function (levelRestarted) {
   this.levelEnded = false;
   this.shooting = false;
   this.usedPatterns = 0;
   this.currentPatternCompleted = true;
   this.destroyTimers();
+  this.stopEyeTweens();
 
-  this.initSearch();
+  if (levelRestarted === true) {
+    this.initSearch();
+  }
 };
 
 BasicGame.Eye.prototype.levelEndedEvent = function (levelCompleted) {
@@ -578,9 +584,11 @@ BasicGame.Eye.prototype.levelEndedEvent = function (levelCompleted) {
 };
 
 BasicGame.Eye.prototype.gameInDarkness = function () {
-  this.eye.frame = 0;
+  this.eye.frame = 3;
   this.viewZone.x = this.viewZone.positions['0'];
+  this.viewZone.alpha = 0;
   this.pupil.x = this.pupilImagePositions['0'];
+  this.pupil.alpha = 0;
   this.levelEnded = true;
 
   this.destroyTimers();
@@ -710,7 +718,7 @@ BasicGame.Eye.prototype.restartLevel = function () {
   this.levelEnded = true;
 
   this.destroyTimers();
-  this.stopEyeTweens(true);
+  this.stopEyeTweens();
 };
 
 BasicGame.Eye.prototype.stopEyeTweens = function (resetPosition) {
@@ -728,6 +736,9 @@ BasicGame.Eye.prototype.stopEyeTweens = function (resetPosition) {
     this.pupil.alpha = 1;
     this.invisibleZoneImage.alpha = .5;
   }
+
+  this.viewZone.alpha = 0;
+  this.pupil.alpha = 0;
 };
 
 BasicGame.Eye.prototype.drawLinesToTarget = function (target) {
