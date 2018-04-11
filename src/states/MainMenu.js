@@ -46,6 +46,10 @@ BasicGame.MainMenu = function (game) {
     'es': 'Inglés',
     'en': 'English'
   };
+  this.VULGAR_LANG_MSG = {
+    'es': 'Vulgar',
+    'en': 'Rude'
+  };
   this.END_SCENE_MSG = {
     'es': 'Escena final',
     'en': 'End scene'
@@ -105,7 +109,7 @@ BasicGame.MainMenu.prototype.create = function () {
   // add the text for key inputs
   this.keysDescriptionText = this.game.add.bitmapText(0, 0,
     this.FONT_REGULAR,
-    this.KEYS_DESCRIPTION_MSG[BasicGame.language],
+    this.KEYS_DESCRIPTION_MSG[BasicGame.language] || this.KEYS_DESCRIPTION_MSG['es'],
     18);
   this.keysDescriptionText.anchor.set(0.5, 0);
   this.keysDescriptionText.align = 'center';
@@ -244,6 +248,7 @@ BasicGame.MainMenu.prototype.createOptionsGroup = function () {
 BasicGame.MainMenu.prototype.createLanguageGroup = function () {
   var spanishOption = null;
   var englishOption = null;
+  var vulgarOption = null;
 
   this.languageGroup = this.game.add.group();
 
@@ -276,6 +281,23 @@ BasicGame.MainMenu.prototype.createLanguageGroup = function () {
   englishOption.textObj.anchor.set(0, 0.5);
   englishOption.textObj.x = englishOption.buttonObj.left + 32;
 
+  if (BasicGame.coUnlocked) {
+    vulgarOption = this.addOptionTo({
+      msg: this.VULGAR_LANG_MSG,
+      textColor: 0x303c42,
+      textAlign: 'left',
+      clickCallback: this.setLanguage.bind(this, 'co'),
+      hSpace: 0,
+      vSpace: 1,
+      fixedWidth: 115,
+      group: this.languageGroup,
+      key: 'main_menu_background'
+    });
+
+    vulgarOption.textObj.anchor.set(0, 0.5);
+    vulgarOption.textObj.x = vulgarOption.buttonObj.left + 32;
+  }
+
   // add the checkbox for spanish language option
   this.spanishCheckbox = this.addCheckboxFor({
     referenceObj: spanishOption.buttonObj,
@@ -289,6 +311,15 @@ BasicGame.MainMenu.prototype.createLanguageGroup = function () {
     group: this.languageGroup,
     checked: BasicGame.language === 'en'
   });
+
+  if (BasicGame.coUnlocked) {
+    // add the checkbox for vulgar language option
+    this.vulgarCheckbox = this.addCheckboxFor({
+      referenceObj: vulgarOption.buttonObj,
+      group: this.languageGroup,
+      checked: BasicGame.language === 'co'
+    });
+  };
 
   this.languageGroup.left = this.SCREEN_PADDING;
   this.languageGroup.bottom = this.game.world.height - this.SCREEN_PADDING;
@@ -311,7 +342,7 @@ BasicGame.MainMenu.prototype.addOptionTo = function (prop) {
 
   text = this.game.add.bitmapText(button.right - this.BUTTON_PADDING,
     button.centerY,
-    this.FONT_REGULAR, prop.msg[BasicGame.language], 18);
+    this.FONT_REGULAR, prop.msg[BasicGame.language] || prop.msg['es'], 18);
   text.anchor.set(1, 0.5);
   text.align = prop.textAlign || 'right';
   text.tint = prop.textColor || 0xfafafa;
@@ -418,18 +449,24 @@ BasicGame.MainMenu.prototype.setLanguage = function (newLang) {
 
   this.spanishCheckbox.frame = 0;
   this.englishCheckbox.frame = 0;
+  if (this.vulgarCheckbox) {
+    this.vulgarCheckbox.frame = 0;
+  }
 
   localStorage.setItem('oh-my-blob', BasicGame.setLanguage(newLang));
 
   if (newLang === 'es') {
     this.spanishCheckbox.frame = 1;
   }
-  else {
+  else if (newLang === 'en') {
     this.englishCheckbox.frame = 1;
+  }
+  else if (newLang === 'co') {
+    this.vulgarCheckbox.frame = 1;
   }
 
   this.translatableTexts.forEach(function (element, index) {
-    element.phaserObj.text = element.sourceMsg[BasicGame.language];
+    element.phaserObj.text = element.sourceMsg[BasicGame.language] || element.sourceMsg['es'];
     if (element.onChangeCallback) {
       element.onChangeCallback();
     }
@@ -514,9 +551,9 @@ BasicGame.MainMenu.prototype.followPointer = function () {
 BasicGame.MainMenu.prototype.getDayString = function (newLang) {
   var days = new BasicGame.Days();
   if (BasicGame.currentLevel <= 30) {
-    return this.CONTINUE_DAY_MSG[BasicGame.language] +
+    return (this.CONTINUE_DAY_MSG[BasicGame.language] || this.CONTINUE_DAY_MSG['es']) +
       ' ' + days.getDay(BasicGame.currentLevel).number;
   }
 
-  return this.END_SCENE_MSG[BasicGame.language];
+  return this.END_SCENE_MSG[BasicGame.language] || this.END_SCENE_MSG['es'];
 };

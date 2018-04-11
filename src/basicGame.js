@@ -3,6 +3,9 @@ var BasicGame = {
   currentLevel: 1,
   deaths: 0,
   rest: 0,
+  coUnlocked: false,
+  coId: 'c',
+  useCo: false,
   setLanguage: function (newLanguage) {
     this.language = newLanguage;
     return this.getCode();
@@ -16,7 +19,7 @@ var BasicGame = {
     return this.getCode();
   },
   setRest: function () {
-    this.rest = 1;
+    this.rest = this.coId;
     return this.getCode();
   },
   getCode: function () {
@@ -36,7 +39,11 @@ var BasicGame = {
 
     this.currentLevel = parseInt(code.slice(code.length - 2));
     this.deaths = parseInt(code.slice(1, code.length - 2));
-    this.rest = parseInt(code.charAt(0));
+    this.rest = code.charAt(0);
+
+    if (this.rest === this.coId) {
+      this.coUnlocked = true;
+    }
   },
   getDeaths: function () {
     return this.deaths;
@@ -44,7 +51,6 @@ var BasicGame = {
   reset: function () {
     this.currentLevel = 1;
     this.deaths = 0;
-    this.rest = 0;
   },
   changeHTMLBackground: function (color) {
     document.body.style.backgroundColor = color;

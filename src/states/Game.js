@@ -358,6 +358,7 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
 
   if (levelNumber > 30) {
     // congrats, you ended the game
+    this.saveGame(BasicGame.setRest());
     this.state.start('TheEnd');
     return;
   }

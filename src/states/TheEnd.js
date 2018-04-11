@@ -21,6 +21,14 @@ BasicGame.TheEnd = function (game) {
     'es': 'ir al menú principal',
     'en': 'go to main menu'
   };
+  this.THANKS_MSG = {
+    'es': 'muchas gracias por jugar',
+    'en': 'thank you so much for playing'
+  };
+  this.NEW_LANGUAGE_MSG = {
+    'es': 'nuevo lenguaje desbloqueado',
+    'en': 'new language unlocked'
+  };
   this.PANELS_KEYS = [
     'end_scene_p1v1',
     'end_scene_p1v2',
@@ -44,7 +52,11 @@ BasicGame.TheEnd = function (game) {
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ PHASER STATE METHODS                                                     ║
-BasicGame.TheEnd.prototype.preload = function() {
+BasicGame.TheEnd.prototype.init = function () {
+  localStorage.setItem("oh-my-blob", BasicGame.setRest());
+};
+
+BasicGame.TheEnd.prototype.preload = function () {
   if (BasicGame.language === 'es') {
     this.load.image(this.PANELS_KEYS[0], 'assets/sprites/end_es_1-1.png');
     this.load.image(this.PANELS_KEYS[1], 'assets/sprites/end_es_1-2.png');
@@ -157,13 +169,13 @@ BasicGame.TheEnd.prototype.showPanel = function () {
       return;
     }
   }
-  
+
   fadeTween = this.game.add.tween(this.panelsGroup.children[this.currentPanelIndex++]);
   fadeTween.to({ alpha: 1 }, this.FADEIN_DELAY, Phaser.Easing.Quadratic.Out, false);
   fadeTween.onComplete.addOnce(function () {
     this.game.time.create(this.game, true)
-    .add(this.NEXT_PANEL_DELAY, this.showPanel, this)
-    .timer.start(100);
+      .add(this.NEXT_PANEL_DELAY, this.showPanel, this)
+      .timer.start(100);
   }, this);
   fadeTween.start();
 };

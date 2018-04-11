@@ -104,11 +104,6 @@ BasicGame.Preloader.prototype.create = function () {
 BasicGame.Preloader.prototype.update = function () {
   if (this.ready === false) {
     this.ready = true;
-    if (BasicGame.currentLevel <= 30) {
-      this.state.start('MainMenu');
-    }
-    else {
-      this.state.start('TheEnd');
-    }
+    this.state.start('MainMenu');
   }
 };
