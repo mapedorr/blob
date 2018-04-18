@@ -2,13 +2,14 @@ var BasicGame = require('BasicGame');
 
 BasicGame.Game = function (game) {
   // constants
-  this.LIFES_AMOUNT = 3;
-  this.FADE_DURATION = 700;
+  this.LIFES_AMOUNT = 3; // 3
+  this.FADE_DURATION = 700; // 200
+  this.QUICK_FADE_DURATION = 200; // 200
   this.KEY_PAUSE = Phaser.Keyboard.P;
   this.KEY_MUTE = Phaser.Keyboard.M;
   this.KEY_CHAT = Phaser.Keyboard.C;
-  this.DARKNESS_ALPHA = 1;
-  this.GO_TO_NEXT_LEVEL_DELAY = 1500;
+  this.DARKNESS_ALPHA = 1; // 1
+  this.GO_TO_NEXT_LEVEL_DELAY = 1500; // 1500
   this.PAUSE_WIDTH = 660; // Illustrator
   this.PAUSE_HEIGHT = 470; // Illustrator
 
@@ -38,6 +39,7 @@ BasicGame.Game = function (game) {
   this.showFPS = null;
   this.map = null;
   this.inDarkness = null;
+  this.updateShadows = null;
   this.isLoadingLevel = null;
   this.lifes = null;
   this.pausedOn = 0;
@@ -55,7 +57,7 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
-BasicGame.ignoreSave = false;
+BasicGame.ignoreSave = true;
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ PHASER STATE METHODS                                                     ║
@@ -92,6 +94,7 @@ BasicGame.Game.prototype.create = function () {
   this.showFPS = false;
   this.inDarkness = true;
   this.levelCompleted = false;
+  this.updateShadows = true;
 
   // set stage background
   this.background = this.game.add.image(0, 0, this.getSkyName());
@@ -183,11 +186,11 @@ BasicGame.Game.prototype.create = function () {
   this.lifesGroup.x = 16;
   this.lifesGroup.y = 16;
 
-  // create the light
-  this.light.create(this.level);
-
   // create THE EYE
   this.eye.create(this.player, this.level, this.lightning);
+
+  // create the light
+  this.light.create(this.level);
 
   // ═════════════════════════════════════════════════
   // bring to top some things so the game looks better
@@ -215,7 +218,7 @@ BasicGame.Game.prototype.update = function () {
   // update the lightning
   this.lightning.update();
 
-  if (this.showingDarkness === true) {
+  if (this.inDarkness === true) {
     return;
   }
 
@@ -485,7 +488,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
     Phaser.Easing.Quadratic.Out,
     true);
 
-  // this.eye.levelEndedEvent(false);
+  this.eye.levelEndedEvent(false);
 
   if (destroyPlayer) {
     // play the animation of death of the player
@@ -494,16 +497,15 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
     // create the timer to give the player die animation time to be played
     this.helper.timer(1000,
       function () {
-        this.showDarkness(200);
+        this.showDarkness(this.QUICK_FADE_DURATION);
       },
       this);
   } else {
-    this.showDarkness(200);
+    this.showDarkness(this.QUICK_FADE_DURATION);
   }
 };
 
 BasicGame.Game.prototype.showDarkness = function (durationInMS) {
-  this.showingDarkness = true;
   this.game.world.bringToTop(this.darknessGroup);
   this.putDarkTween.updateTweenData("duration", durationInMS || this.FADE_DURATION);
   this.putDarkTween.start();
@@ -515,6 +517,7 @@ BasicGame.Game.prototype.showDarkness = function (durationInMS) {
 
 BasicGame.Game.prototype.putDarkTweenCompleted = function () {
   this.inDarkness = true;
+  this.updateShadows = false;
 
   this.eye.gameInDarkness();
   this.player.gameInDarkness();
@@ -540,9 +543,25 @@ BasicGame.Game.prototype.putDarkTweenCompleted = function () {
   }
 };
 
+BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {
+  // restore the alpha for life indicators and lifes' group
+  BasicGame.isRetrying = true;
+
+  this.lifes = this.LIFES_AMOUNT;
+  this.showLifes();
+
+  this.player.restartLevel(runHideDarkness);
+  this.level.restartLevel(runHideDarkness);
+  this.eye.restartLevel(runHideDarkness);
+
+  if (runHideDarkness === true) {
+    this.hideDarkness(this.QUICK_FADE_DURATION);
+  }
+};
+
 BasicGame.Game.prototype.hideDarkness = function (durationInMS) {
-  this.inDarkness = false;
-  this.showingDarkness = false;
+  this.updateShadows = true;
+
   this.removeDarkTween.updateTweenData("duration", durationInMS || this.FADE_DURATION);
   this.removeDarkTween.start();
 
@@ -569,21 +588,8 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
 
   this.player.enableBody();
   this.eye.levelStart(BasicGame.isRetrying);
-};
 
-BasicGame.Game.prototype.restartLevel = function (runHideDarkness) {
-  // restore the alpha for life indicators and lifes' group
-  BasicGame.isRetrying = true;
-  this.lifes = this.LIFES_AMOUNT;
-  this.showLifes();
-
-  this.player.restartLevel(runHideDarkness);
-  this.level.restartLevel(runHideDarkness);
-  this.eye.restartLevel(runHideDarkness);
-
-  if (runHideDarkness === true) {
-    this.hideDarkness(200);
-  }
+  this.inDarkness = false;
 };
 
 BasicGame.Game.prototype.createLifeIndicators = function () {

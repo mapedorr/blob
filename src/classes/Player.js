@@ -876,17 +876,13 @@ BasicGame.Player.prototype.restartLevel = function (hideDarknessDelay) {
   this.walkSound.stop();
   this.slideSound.stop();
   this.setPlayerPositionInLevel();
-  // this.game.time
-  //   .create(true)
-  //   .add(hideDarknessDelay || 100, function () {
-  //     this.enableBody();
-  //   }, this)
-  //   .timer.start();
   this.dead = false;
 };
 
 BasicGame.Player.prototype.gameInDarkness = function () {
   this.playerSprite.alpha = 1;
+  this.playerSprite.width = this.BASE_SIZE;
+  this.playerSprite.height = this.BASE_SIZE;
 };
 
 BasicGame.Player.prototype.placeDialogueGroup = function () {

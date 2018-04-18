@@ -70,10 +70,9 @@ BasicGame.Light.prototype.create = function (level) {
 };
 
 BasicGame.Light.prototype.update = function () {
-  // if (this.shadowsDrawn === false) {
+  this.lightGroup.children[0].x = this.gameObj.eye.pupil.x;
+  this.lightGroup.children[0].y = this.gameObj.eye.pupil.y;
   this.drawShadows();
-  // }
-  // draw shadows if light is moving in the level
 };
 
 BasicGame.Light.prototype.shutdown = function () {
@@ -90,7 +89,7 @@ BasicGame.Light.prototype.drawShadows = function () {
   // Move the light to the pointer/touch location
   this.rayBitmapImage.visible = BasicGame.Game.developmentMode || false;
 
-  if (this.gameObj.inDarkness == true) {
+  if (this.gameObj.updateShadows === false) {
     return;
   }
 

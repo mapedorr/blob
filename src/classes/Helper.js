@@ -12,9 +12,10 @@ BasicGame.Helper = function (game, gameObj) {
 };
 
 BasicGame.Helper.prototype.timer = function (delay, callback, context) {
-  this.game.time.create(this.game, true)
-    .add(delay, callback, context || this)
-    .timer.start(100);
+  var timer = this.game.time.create(this.game, true);
+  timer.add(delay, callback, context || this)
+  timer.start(100);
+  return timer;
 };
 
 BasicGame.Helper.prototype.randomColor = function () {

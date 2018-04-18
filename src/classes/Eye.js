@@ -37,10 +37,10 @@ BasicGame.Eye = function (game, gameObj) {
   this.PATTERNS = [
     [[0, 3, 1], [3, 6, 2], [6, 0, 1]], // this will be always the first pattern
     [[0, 1, 0.5], [1, 4, 1], [4, 2, 1], [2, 5, 2], [5, 0, 1]],
-    [[0, 3, 0.5], [3, 6, 0.6], [6, 0, 0.5]],
+    [[0, 3, 0.5], [3, 6, 0.6], [6, 0, 0.5]], // EL PUTO
     [[0, 4, 0.5], [4, 1, 1], [1, 5, 1], [5, 2, 2], [2, 0, 1]]
   ];
-  this.FIRST_PATTERN_INDEX = 0;
+  this.FIRST_PATTERN_INDEX = 0; // 0
 
   // destroyable objects
   this.eye = null;
@@ -54,6 +54,7 @@ BasicGame.Eye = function (game, gameObj) {
   this.pupilMovementTween = null;
   this.invisibleZoneImage = null;
   this.invisibleZoneMask = null;
+  this.nextStepTimer = null;
 
   // global properties
   this.game = game;
@@ -89,7 +90,6 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.eye.originalX = this.eye.x;
   this.eye.originalY = this.eye.y;
   this.eye.anchor.setTo(0.5, 0.5);
-  this.eye.frame = 3;
 
   // add the  sprite of the pupil
   this.pupil = this.game.add.image(this.eye.x, this.eye.y + 25, 'pupil');
@@ -175,6 +175,10 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   this.anger = false;
   this.xDistanceMax = Math.abs((this.pupilImagePositions['6']) - this.eye.centerX);
   this.eyeCenterYOffset = this.eye.centerY - 40;
+
+  // ---------------------------------------------------------------------------
+  // set initial state
+  this.sleep();
 };
 
 BasicGame.Eye.prototype.update = function () {
@@ -182,8 +186,6 @@ BasicGame.Eye.prototype.update = function () {
   var checkRight = false;
   var canSeePlayer = false;
 
-  this.gameObj.light.lightGroup.children[0].x = this.pupil.x;
-  this.gameObj.light.lightGroup.children[0].y = this.pupil.y;
   this.invisibleZoneMask.centerX = this.viewZone.centerX + this.ZONE_SIZE;
 
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
@@ -267,6 +269,7 @@ BasicGame.Eye.prototype.shutdown = function () {
     this.bitmap.destroy();
   }
   this.stopEyeTweens();
+  this.destroyTimers();
   this.laughSound.destroy();
   this.angerSound.destroy();
 };
@@ -469,7 +472,7 @@ BasicGame.Eye.prototype.runPupilViewZoneTweens = function (targetPosition) {
     x: this.viewZone.positions[targetPosition]
   }, this.movementTime);
   this.viewZoneMovementTween.onComplete.addOnce(function () {
-    if (this.shooting === false) {
+    if (this.shooting === false || this.levelEnded === false) {
       this.nextStepInPattern();
 
       this.viewZoneMovementTween = null;
@@ -481,7 +484,7 @@ BasicGame.Eye.prototype.runPupilViewZoneTweens = function (targetPosition) {
 
 BasicGame.Eye.prototype.nextStepInPattern = function (delay) {
   // wait a second before changing to a new pattern
-  this.gameObj.helper.timer(delay || 1000, function () {
+  this.nextStepTimer = this.gameObj.helper.timer(delay || 1000, function () {
     if (this.levelEnded === true || this.shooting === true) {
       return;
     }
@@ -519,7 +522,7 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
     tweensInPause = true;
   }
 
-  this.destroyTimers(this.getTiredTimer, this.getMadTimer, this.searchAgain);
+  this.destroyTimers(this.getTiredTimer, this.getMadTimer, this.searchAgainTimer);
 
   // init the timer that will make the EYE calm down again and restart the
   // search
@@ -557,44 +560,53 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
 
 BasicGame.Eye.prototype.levelStart = function (levelRestarted) {
   this.levelEnded = false;
+
   this.shooting = false;
-  this.usedPatterns = 0;
-  this.currentPatternCompleted = true;
+
   this.destroyTimers();
   this.stopEyeTweens();
 
-  if (levelRestarted === true) {
-    this.initSearch();
-  }
+  // if (levelRestarted === true) {
+  //   this.initSearch();
+  // }
+};
+
+BasicGame.Eye.prototype.updateLevel = function (level) {
+  this.level = level;
+  this.anger = false;
+  this.usedPatterns = 0;
+
+  // this.stopEyeTweens(true);
+};
+
+BasicGame.Eye.prototype.restartLevel = function () {
+  this.anger = false;
+  this.levelEnded = true;
+
+  // this.destroyTimers();
+  // this.stopEyeTweens();
 };
 
 BasicGame.Eye.prototype.levelEndedEvent = function (levelCompleted) {
   this.levelEnded = true;
+
   this.searching = false;
   this.shooting = false;
-  this.usedPatterns = 0
-  this.currentPatternCompleted = true;
-  this.currentPattern = null;
-  this.currentPatternId = null;
-  this.currentPatternIdIndex = -1;
-  this.currentPatternStep = 0;
 
-  this.destroyTimers();
-  this.stopEyeTweens();
+  // this.destroyTimers();
+  // this.stopEyeTweens();
 };
 
 BasicGame.Eye.prototype.gameInDarkness = function () {
-  this.eye.frame = 3;
-  this.viewZone.x = this.viewZone.positions['0'];
-  this.viewZone.alpha = 0;
-  this.pupil.x = this.pupilImagePositions['0'];
-  this.pupil.alpha = 0;
-  this.invisibleZoneImage.alpha = 0;
-
-  this.destroyTimers();
-  this.stopEyeTweens();
-
   this.levelEnded = true;
+  this.sleep();
+
+  // this.viewZone.x = this.viewZone.positions['0'];
+  // this.pupil.x = this.pupilImagePositions['0'];
+  // this.invisibleZoneImage.alpha = 0;
+
+  // this.destroyTimers();
+  // this.stopEyeTweens();
 };
 
 BasicGame.Eye.prototype.destroyTimers = function () {
@@ -611,8 +623,12 @@ BasicGame.Eye.prototype.destroyTimers = function () {
       this.getMadTimer.destroy();
     }
 
-    if (this.searchAgain) {
-      this.searchAgain.destroy();
+    if (this.searchAgainTimer) {
+      this.searchAgainTimer.destroy();
+    }
+
+    if (this.nextStepTimer) {
+      this.nextStepTimer.destroy();
     }
 
     return;
@@ -621,6 +637,40 @@ BasicGame.Eye.prototype.destroyTimers = function () {
   for (var i = arguments.length - 1; i >= 0; i--) {
     if (arguments[i]) arguments[i].destroy();
   }
+};
+
+BasicGame.Eye.prototype.stopEyeTweens = function (resetPosition) {
+  if (this.viewZoneMovementTween && this.pupilMovementTween) {
+    this.viewZoneMovementTween.onComplete.removeAll();
+    this.pupilMovementTween.onComplete.removeAll();
+    this.viewZoneMovementTween.stop();
+    this.pupilMovementTween.stop();
+  }
+
+  if (this.madTween && this.madTween.isRunning) {
+    this.madTween.onComplete.removeAll();
+    this.madTween.stop();
+    this.eye.x = this.eye.originalX;
+  }
+
+  if (resetPosition === true) {
+    this.viewZone.x = this.viewZone.positions['0'];
+    this.pupil.x = this.pupilImagePositions['0'];
+  }
+
+  this.viewZone.alpha = 0;
+  this.invisibleZoneImage.alpha = 0;
+  this.pupil.alpha = 0;
+  this.resetPatterns();
+};
+
+BasicGame.Eye.prototype.resetPatterns = function () {
+  this.usedPatterns = 0;
+  this.currentPatternCompleted = true;
+  this.currentPattern = null;
+  this.currentPatternId = null;
+  this.currentPatternIdIndex = -1;
+  this.currentPatternStep = 0;
 };
 
 BasicGame.Eye.prototype.rejoice = function (callback) {
@@ -690,8 +740,8 @@ BasicGame.Eye.prototype.getMad = function () {
     true);
   this.madTween.onComplete.addOnce(function () {
     // restart the search after a while
-    this.searchAgain = this.game.time.create(true);
-    this.searchAgain.add(this.RESTART_SEARCH_DELAY,
+    this.searchAgainTimer = this.game.time.create(true);
+    this.searchAgainTimer.add(this.RESTART_SEARCH_DELAY,
       function () {
         if (this.levelEnded === true) {
           return;
@@ -700,50 +750,18 @@ BasicGame.Eye.prototype.getMad = function () {
         this.initSearch();
       },
       this);
-    this.searchAgain.start();
+    this.searchAgainTimer.start();
   }, this);
   this.madTween.start();
-
 };
 
-BasicGame.Eye.prototype.updateLevel = function (level) {
-  this.level = level;
-  this.anger = false;
-  this.usedPatterns = 0;
-
-  this.stopEyeTweens(true);
-};
-
-BasicGame.Eye.prototype.restartLevel = function () {
-  this.anger = false;
-  this.levelEnded = true;
-
-  this.destroyTimers();
-  this.stopEyeTweens();
-};
-
-BasicGame.Eye.prototype.stopEyeTweens = function (resetPosition) {
-  if (this.viewZoneMovementTween && this.pupilMovementTween) {
-    this.viewZoneMovementTween.onComplete.removeAll();
-    this.pupilMovementTween.onComplete.removeAll();
-    this.viewZoneMovementTween.stop();
-    this.pupilMovementTween.stop();
-  }
-
-  if (this.madTween && this.madTween.isRunning) {
-    this.madTween.onComplete.removeAll();
-    this.madTween.stop();
-    this.eye.x = this.eye.originalX;
-  }
-
-  if (resetPosition === true) {
-    this.viewZone.x = this.viewZone.positions['0'];
-    this.pupil.x = this.pupilImagePositions['0'];
-  }
-
+BasicGame.Eye.prototype.sleep = function () {
+  this.eye.frame = 3;
   this.viewZone.alpha = 0;
-  this.invisibleZoneImage.alpha = 0;
   this.pupil.alpha = 0;
+  this.invisibleZoneImage.alpha = 0;
+  this.viewZone.x = this.viewZone.positions['0'];
+  this.pupil.x = this.pupilImagePositions['0'];
 };
 
 BasicGame.Eye.prototype.drawLinesToTarget = function (target) {
