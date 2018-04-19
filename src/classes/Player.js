@@ -135,6 +135,7 @@ BasicGame.Player.prototype.create = function (level) {
 
   //Enable physics on the player
   this.game.physics.arcade.enable(this.playerSprite);
+  this.game.physics.arcade.OVERLAP_BIAS = 16;
 
   //Set player minimum and maximum movement speed
   this.playerSprite.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 20);
@@ -455,14 +456,9 @@ BasicGame.Player.prototype.update = function () {
     this.walkSound.stop();
     this.slideSound.stop();
 
-    if (downPressed) {
+    if (this.onGround && downPressed) {
       this.duckFeedback();
     }
-
-    /* if (this.walkTweenPlayed === true) {
-      this.playBaseSizeTween();
-      this.walkTweenPlayed = false;
-    } */
   }
 
   if (upPressed && !headHit) {

@@ -31,7 +31,7 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('credits_en', 'assets/sprites/credits_en.png');
   this.load.image('credits_es', 'assets/sprites/credits_es.png');
 
-  this.load.audio('splash_music', 'assets/audio/music/splash_music.ogg', true);
+  this.load.audio('conscience', 'assets/audio/music/conscience.mp3', true);
 
   //  ---------------------------------
   //  ---| load the assets for the Game
@@ -63,8 +63,15 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.audio('ray', 'assets/audio/sfx/ray.ogg', true);
   this.load.audio('eye', 'assets/audio/sfx/eye.ogg', true);
   this.load.audio('eye-anger', 'assets/audio/sfx/anger.ogg', true);
-  this.load.audio('level_music', 'assets/audio/music/levels_music.ogg', true);
   this.load.audio('piece', 'assets/audio/sfx/piece01.ogg', true);
+  // this.load.audio('level_music', 'assets/audio/music/levels_music.ogg', true);
+
+  if (BasicGame.currentLevel <= 6) {
+    this.load.audio('lvl_1-6', 'assets/audio/music/lvl_1-6.mp3', true);
+  }
+  else if (BasicGame.currentLevel > 6) {
+    this.load.audio('lvl_7-10', 'assets/audio/music/lvl_7-10.mp3', true);
+  }
 
   this.load.bitmapFont('font', 'assets/fonts/FiraCode_0.png',
     'assets/fonts/FiraCode.fnt', null);

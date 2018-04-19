@@ -25,6 +25,7 @@ BasicGame.Game = function (game) {
   this.savingText = null;
   this.uiGroup = null;
   this.pauseGroup = null;
+  this.conscienceSound = null;
 
   // references to other classes
   this.days = null;
@@ -53,11 +54,12 @@ BasicGame.Game = function (game) {
     "en": "Saving progress..."
   };
   this.levelCompleted = null;
+  this.musicUpdated = false;
 };
 
 BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
-BasicGame.ignoreSave = true;
+BasicGame.ignoreSave = false;
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ PHASER STATE METHODS                                                     ║
@@ -95,6 +97,7 @@ BasicGame.Game.prototype.create = function () {
   this.inDarkness = true;
   this.levelCompleted = false;
   this.updateShadows = true;
+  this.musicUpdated = false;
 
   // set stage background
   this.background = this.game.add.image(0, 0, this.getSkyName());
@@ -120,7 +123,17 @@ BasicGame.Game.prototype.create = function () {
 
   // add the music
   if (!this.music) {
-    this.music = this.game.add.sound('level_music', 0.1, true);
+    if (BasicGame.currentLevel <= 6) {
+      this.music = this.game.add.sound('lvl_1-6', 1, true);
+    }
+    else if (BasicGame.currentLevel > 6) {
+      this.music = this.game.add.sound('lvl_7-10', 1, true);
+    }
+  }
+
+  // add the consience sound
+  if (!this.conscienceSound) {
+    this.conscienceSound = this.game.add.sound('conscience');
   }
 
   this.game.input.keyboard.addKeyCapture([
@@ -280,6 +293,9 @@ BasicGame.Game.prototype.shutdown = function () {
   this.darknessGroup.destroy();
   // destroy sounds
   this.music.destroy();
+  if (this.conscienceSound) {
+    this.conscienceSound.destroy();
+  }
   // destroy tweens
   this.putDarkTween.stop();
   this.removeDarkTween.stop();
@@ -357,6 +373,9 @@ BasicGame.Game.prototype.levelEnded = function () {
 };
 
 BasicGame.Game.prototype.loadLevel = function (levelNumber) {
+  var skyName = this.getSkyName();
+  var levelData = this.helper.getLevelIdAndName(levelNumber);
+
   this.saveGame(BasicGame.setDay(levelNumber));
 
   if (levelNumber > 30) {
@@ -367,25 +386,45 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
 
   this.level.destroyCurrentLevel();
 
-  var skyName = this.getSkyName();
   if (this.background.key != skyName) {
     this.load.image(skyName, 'assets/sprites/' + skyName + '.png');
   }
 
+  // define the assets to load
   this.game.load.onLoadComplete.addOnce(function () {
     if (this.background.key != skyName) {
       this.background.loadTexture(skyName);
     }
+
     this.savingText.alpha = 0;
     this.level.createLevel(levelNumber);
   }, this);
 
-  var levelData = this.helper.getLevelIdAndName(levelNumber);
   this.game.load.tilemap(levelData.id,
     'assets/levels/' + levelData.name + '.json',
     null,
     Phaser.Tilemap.TILED_JSON);
 
+  if (levelNumber === 7) {
+    this.music.onFadeComplete.addOnce(function () {
+      this.music.destroy();
+
+      if (levelNumber === 7) {
+        // change the music to lvl_7-10
+        this.music = this.game.add.sound('lvl_7-10', 1, true);
+        this.music.play();
+      }
+    }, this);
+
+    if (this.game.cache.checkSoundKey('lvl_7-10') === false) {
+      this.load.audio('lvl_7-10', 'assets/audio/music/lvl_7-10.mp3', true);
+    }
+
+    this.musicUpdated = true;
+    this.music.fadeOut(1000);
+  }
+
+  // start loading the assets
   this.game.load.start();
 };
 
@@ -575,6 +614,17 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
 
   if (BasicGame.isRetrying === false) {
     // make the player say a line
+    if (BasicGame.currentLevel === 7) {
+      this.conscienceSound.play();
+      // this.conscienceSound.onStop.addOnce(function () {
+      //   this.music.play();
+      // }, this);
+    }
+
+    /* if (this.musicUpdated === true) {
+      this.musicUpdated = false;
+    } */
+
     this.showPlayerDialogue();
   }
 

@@ -522,7 +522,8 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
     tweensInPause = true;
   }
 
-  this.destroyTimers(this.getTiredTimer, this.getMadTimer, this.searchAgainTimer);
+  // this.destroyTimers(this.getTiredTimer, this.getMadTimer, this.searchAgainTimer);
+  this.destroyTimers();
 
   // init the timer that will make the EYE calm down again and restart the
   // search
@@ -530,6 +531,10 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
   this.calmDownTimer.add(3000,
     function () {
       if (tweensInPause === true) {
+        if (this.levelEnded === true) {
+          return;
+        }
+
         this.eye.frame = 0;
 
         this.pupil.alpha = 1;

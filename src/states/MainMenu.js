@@ -50,6 +50,7 @@ BasicGame.MainMenu = function (game) {
     'es': 'Escena final',
     'en': 'End scene'
   };
+  this.MUSIC_FADE_DELAY = 1000;
 
   // destroyable objects (sprites, sounds, groups, tweens...)
   this.backgroundImage = null;
@@ -130,10 +131,10 @@ BasicGame.MainMenu.prototype.create = function () {
   this.creditsGroup.alpha = 0;
 
   // add the splash_music
-  this.splashMusic = this.game.add.sound('splash_music', 0.2, true);
-  this.splashMusic.onFadeComplete.addOnce(function (soundObj) {
-    soundObj.stop();
-  }, this);
+  this.splashMusic = this.game.add.sound('conscience');
+  // this.splashMusic.onFadeComplete.addOnce(function (soundObj) {
+  //   soundObj.stop();
+  // }, this);
   this.splashMusic.play();
 
   BasicGame.changeHTMLBackground(BasicGame.Helper.prototype.getSkyColor(BasicGame.currentLevel));
@@ -393,22 +394,42 @@ BasicGame.MainMenu.prototype.newGame = function () {
   var levelData = null;
   var skyName = null;
 
+  this.disableMenu();
+
   localStorage.removeItem('oh-my-blob');
   BasicGame.reset();
 
   this.game.load.onLoadComplete.addOnce(this.nextScene, this);
   levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);
   skyName = BasicGame.Helper.prototype.getSkyName(BasicGame.currentLevel);
+
   this.load.image(skyName, 'assets/sprites/' + skyName + '.png');
   this.game.load.tilemap(levelData.id,
     'assets/levels/' + levelData.name + '.json',
     null,
     Phaser.Tilemap.TILED_JSON);
+
+  if (this.game.cache.checkSoundKey('lvl_1-6') === false) {
+    this.load.audio('lvl_1-6', 'assets/audio/music/lvl_1-6.mp3', true);
+  }
+
   this.game.load.start();
 };
 
 BasicGame.MainMenu.prototype.nextScene = function () {
-  this.state.start((BasicGame.currentLevel <= 30) ? 'Game' : 'TheEnd');
+  this.disableMenu();
+
+  this.splashMusic.onFadeComplete.addOnce(function () {
+    this.state.start((BasicGame.currentLevel <= 30) ? 'Game' : 'TheEnd');
+  }, this);
+  this.splashMusic.fadeOut(this.MUSIC_FADE_DELAY);
+};
+
+BasicGame.MainMenu.prototype.disableMenu = function () {
+  this.menuButtons.forEach(function (element, index) {
+    element.onInputOutHandler(element);
+    element.input.enabled = false;
+  });
 };
 
 BasicGame.MainMenu.prototype.setLanguage = function (newLang) {
