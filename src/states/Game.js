@@ -396,6 +396,22 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
       this.background.loadTexture(skyName);
     }
 
+    if (levelNumber === 7) {
+      this.music.onFadeComplete.addOnce(function () {
+        this.music.destroy();
+        this.music = null;
+
+        if (levelNumber === 7) {
+          // change the music to lvl_7-10
+          this.music = this.game.add.sound('lvl_7-10', 1, true);
+          this.music.play();
+        }
+      }, this);
+
+      this.musicUpdated = true;
+      this.music.fadeOut(1000);
+    }
+
     this.savingText.alpha = 0;
     this.level.createLevel(levelNumber);
   }, this);
@@ -406,22 +422,9 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
     Phaser.Tilemap.TILED_JSON);
 
   if (levelNumber === 7) {
-    this.music.onFadeComplete.addOnce(function () {
-      this.music.destroy();
-
-      if (levelNumber === 7) {
-        // change the music to lvl_7-10
-        this.music = this.game.add.sound('lvl_7-10', 1, true);
-        this.music.play();
-      }
-    }, this);
-
     if (this.game.cache.checkSoundKey('lvl_7-10') === false) {
       this.load.audio('lvl_7-10', 'assets/audio/music/lvl_7-10.mp3', true);
     }
-
-    this.musicUpdated = true;
-    this.music.fadeOut(1000);
   }
 
   // start loading the assets
@@ -616,14 +619,7 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
     // make the player say a line
     if (BasicGame.currentLevel === 7) {
       this.conscienceSound.play();
-      // this.conscienceSound.onStop.addOnce(function () {
-      //   this.music.play();
-      // }, this);
     }
-
-    /* if (this.musicUpdated === true) {
-      this.musicUpdated = false;
-    } */
 
     this.showPlayerDialogue();
   }
@@ -632,7 +628,7 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
 
   // make the EYE seek for the player
 
-  if (this.music.isPlaying === false) {
+  if (this.music && this.music.isPlaying === false) {
     this.music.play();
   }
 
