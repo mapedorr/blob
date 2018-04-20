@@ -33,7 +33,7 @@ BasicGame.Light.prototype.create = function (level) {
   var light = null;
 
   this.level = level;
-  this.walls = this.level.walls;
+  this.setWalls(level);
   this.shadowsDrawn = false;
 
   // Add the light(s)
@@ -334,6 +334,10 @@ BasicGame.Light.prototype.getWallIntersection = function (ray) {
 };
 
 BasicGame.Light.prototype.updateWalls = function (level) {
-  this.walls = level.walls;
+  this.setWalls(level);
   this.shadowsDrawn = false;
+};
+
+BasicGame.Light.prototype.setWalls = function (level) {
+  this.walls = level.walls;
 };

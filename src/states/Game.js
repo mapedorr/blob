@@ -121,6 +121,16 @@ BasicGame.Game.prototype.create = function () {
   this.game.camera.setSize(this.game.world.width / 2, this.game.world.height / 2);
   this.game.camera.setPosition(0, 0);
 
+  // add the consience sound
+  if (!this.conscienceSound) {
+    this.conscienceSound = this.game.add.sound('conscience');
+    this.conscienceSound.onStop.addOnce(function () {
+      if (this.music && this.music.isPlaying === false) {
+        this.music.play();
+      }
+    }, this);
+  }
+
   // add the music
   if (!this.music) {
     if (BasicGame.currentLevel <= 6) {
@@ -129,11 +139,6 @@ BasicGame.Game.prototype.create = function () {
     else if (BasicGame.currentLevel > 6) {
       this.music = this.game.add.sound('lvl_7-10', 1, true);
     }
-  }
-
-  // add the consience sound
-  if (!this.conscienceSound) {
-    this.conscienceSound = this.game.add.sound('conscience');
   }
 
   this.game.input.keyboard.addKeyCapture([
@@ -404,7 +409,6 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
         if (levelNumber === 7) {
           // change the music to lvl_7-10
           this.music = this.game.add.sound('lvl_7-10', 1, true);
-          this.music.play();
         }
       }, this);
 
@@ -628,7 +632,7 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
 
   // make the EYE seek for the player
 
-  if (this.music && this.music.isPlaying === false) {
+  if (this.music && this.music.isPlaying === false && BasicGame.currentLevel !== 7) {
     this.music.play();
   }
 

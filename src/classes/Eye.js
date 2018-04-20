@@ -570,26 +570,17 @@ BasicGame.Eye.prototype.levelStart = function (levelRestarted) {
 
   this.destroyTimers();
   this.stopEyeTweens();
-
-  // if (levelRestarted === true) {
-  //   this.initSearch();
-  // }
 };
 
 BasicGame.Eye.prototype.updateLevel = function (level) {
   this.level = level;
   this.anger = false;
   this.usedPatterns = 0;
-
-  // this.stopEyeTweens(true);
 };
 
 BasicGame.Eye.prototype.restartLevel = function () {
   this.anger = false;
   this.levelEnded = true;
-
-  // this.destroyTimers();
-  // this.stopEyeTweens();
 };
 
 BasicGame.Eye.prototype.levelEndedEvent = function (levelCompleted) {
@@ -597,21 +588,11 @@ BasicGame.Eye.prototype.levelEndedEvent = function (levelCompleted) {
 
   this.searching = false;
   this.shooting = false;
-
-  // this.destroyTimers();
-  // this.stopEyeTweens();
 };
 
 BasicGame.Eye.prototype.gameInDarkness = function () {
   this.levelEnded = true;
   this.sleep();
-
-  // this.viewZone.x = this.viewZone.positions['0'];
-  // this.pupil.x = this.pupilImagePositions['0'];
-  // this.invisibleZoneImage.alpha = 0;
-
-  // this.destroyTimers();
-  // this.stopEyeTweens();
 };
 
 BasicGame.Eye.prototype.destroyTimers = function () {
