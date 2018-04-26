@@ -168,14 +168,14 @@ BasicGame.Player.prototype.create = function (level) {
   }
 
   if (!this.jumpSound) {
-    this.jumpSound = this.game.add.sound('jump', 0.2);
+    this.jumpSound = this.game.add.sound('jump');
     this.jumpSound.onPlay.add(function () {
       this.slideSound.stop();
     }, this);
   }
 
   if (!this.walkSound) {
-    this.walkSound = this.game.add.sound('walk', 0.1);
+    this.walkSound = this.game.add.sound('walk');
     this.walkSound.onPlay.add(function () {
       this.slideSound.stop();
     }, this);
@@ -187,15 +187,15 @@ BasicGame.Player.prototype.create = function (level) {
   }
 
   if (!this.slideSound) {
-    this.slideSound = this.game.add.sound('slide', 0.08, true);
+    this.slideSound = this.game.add.sound('slide', 1, true);
   }
 
   if (!this.fallSound) {
-    this.fallSound = this.game.add.sound('fall', 0.1);
+    this.fallSound = this.game.add.sound('fall');
   }
 
   if (!this.deathSound) {
-    this.deathSound = this.game.add.sound('death', 0.3);
+    this.deathSound = this.game.add.sound('death');
     this.deathSound.onPlay.add(function () {
       this.slideSound.stop();
     }, this);
@@ -203,7 +203,7 @@ BasicGame.Player.prototype.create = function (level) {
 
   // load the audio for pieces
   if (!this.pieceSound) {
-    this.pieceSound = this.game.add.sound('piece', 0.2);
+    this.pieceSound = this.game.add.sound('piece');
   }
 
   // create the group that will contain the particles that will be used during
@@ -689,7 +689,7 @@ BasicGame.Player.prototype.checkCollisions = function () {
 
       if (this.collectedPieces === this.level.pieces.children.length) {
         // the level has been finished
-        this.gameObj.levelEnded();
+        this.gameObj.levelComplete();
       }
     },
     null,

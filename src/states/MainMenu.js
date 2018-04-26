@@ -131,7 +131,7 @@ BasicGame.MainMenu.prototype.create = function () {
   this.creditsGroup.alpha = 0;
 
   // add the splash_music
-  this.splashMusic = this.game.add.sound('conscience');
+  this.splashMusic = this.game.add.sound('the-fact');
   // this.splashMusic.onFadeComplete.addOnce(function (soundObj) {
   //   soundObj.stop();
   // }, this);
@@ -393,6 +393,7 @@ BasicGame.MainMenu.prototype.showKeysDescription = function (show) {
 BasicGame.MainMenu.prototype.newGame = function () {
   var levelData = null;
   var skyName = null;
+  var levelMusic = BasicGame.getLevelMusicData();
 
   this.disableMenu();
 
@@ -409,8 +410,8 @@ BasicGame.MainMenu.prototype.newGame = function () {
     null,
     Phaser.Tilemap.TILED_JSON);
 
-  if (this.game.cache.checkSoundKey('lvl_1-6') === false) {
-    this.load.audio('lvl_1-6', 'assets/audio/music/lvl_1-6.mp3', true);
+  if (this.game.cache.checkSoundKey(levelMusic.key) === false) {
+    this.load.audio(levelMusic.key, levelMusic.file, true);
   }
 
   this.game.load.start();

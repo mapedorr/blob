@@ -39,7 +39,7 @@ BasicGame.TheEnd = function (game) {
   this.panelsGroup = null;
   this.buttonGroup = null;
   this.footerText = null;
-  this.music = null;
+  // this.music = null;
   this.thanksText = null;
 
   // global properties
@@ -66,8 +66,6 @@ BasicGame.TheEnd.prototype.preload = function () {
     this.load.image(this.PANELS_KEYS[4], 'assets/sprites/end_en_2-2.png');
     this.load.image(this.PANELS_KEYS[5], 'assets/sprites/end_en_2-3.png');
   }
-
-  this.load.audio('exit_music', 'assets/audio/music/the_end.ogg', true);
 };
 
 BasicGame.TheEnd.prototype.create = function () {
@@ -118,8 +116,8 @@ BasicGame.TheEnd.prototype.create = function () {
   this.buttonGroup.alpha = 0;
 
   // play the music
-  this.music = this.game.add.sound('exit_music', 0.1, true);
-  this.music.play();
+  // this.music = this.game.add.sound('exit_music', 0.1, true);
+  // this.music.play();
 
   // init the animations for the first page
   this.currentPanelIndex = 0;
@@ -138,7 +136,7 @@ BasicGame.TheEnd.prototype.shutdown = function () {
   this.panelsGroup.destroy();
   this.buttonGroup.destroy();
   this.footerText.destroy();
-  this.music.destroy();
+  // this.music.destroy();
   this.thanksText.destroy();
 };
 // ║                                                                           ║

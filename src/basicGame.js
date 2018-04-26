@@ -1,6 +1,6 @@
 var BasicGame = {
   language: "es",
-  currentLevel: 1,
+  currentLevel: 25,
   deaths: 0,
   rest: 0,
   setLanguage: function (newLanguage) {
@@ -48,7 +48,29 @@ var BasicGame = {
   },
   changeHTMLBackground: function (color) {
     document.body.style.backgroundColor = color;
+  },
+  getLevelMusicData: function (levelNumber) {
+    var data = { key: '', file: 'assets/audio/music/' };
+    var level = levelNumber || this.currentLevel;
 
+    if (level <= 6) {
+      data.key = 'dig-up-a';
+      data.file += 'DigUpA.ogg';
+    }
+    else if (level >= 7 && level <= 10) {
+      data.key = 'dig-up-b';
+      data.file += 'DigUpB.ogg';
+    } else if (level >= 11 && level <= 20) {
+
+      data.key = 'guilt';
+      data.file += 'Guilt.ogg';
+    }
+    else if (level >= 21) {
+      data.key = 'i-did-it';
+      data.file += 'IDidIt.ogg';
+    }
+
+    return data;
   }
 };
 

@@ -59,7 +59,7 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
-BasicGame.ignoreSave = false;
+BasicGame.ignoreSave = true;
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ PHASER STATE METHODS                                                     ║
@@ -89,6 +89,7 @@ BasicGame.Game.prototype.create = function () {
   var darknessSprite = null;
   var flashBitmap = null;
   var flashSprite = null;
+  var levelMusic = BasicGame.getLevelMusicData();
 
   // ═════════════════════════════════════════════
   // define game properties and setup game objects
@@ -123,22 +124,22 @@ BasicGame.Game.prototype.create = function () {
 
   // add the consience sound
   if (!this.conscienceSound) {
-    this.conscienceSound = this.game.add.sound('conscience');
+    this.conscienceSound = this.game.add.sound('the-fact');
     this.conscienceSound.onStop.addOnce(function () {
-      if (this.music && this.music.isPlaying === false) {
-        this.music.play();
+      if (BasicGame.currentLevel !== 30) {
+        if (this.music && this.music.isPlaying === false) {
+          this.music.play();
+        }
+      }
+      else {
+        this.showDarkness();
       }
     }, this);
   }
 
   // add the music
   if (!this.music) {
-    if (BasicGame.currentLevel <= 6) {
-      this.music = this.game.add.sound('lvl_1-6', 1, true);
-    }
-    else if (BasicGame.currentLevel > 6) {
-      this.music = this.game.add.sound('lvl_7-10', 1, true);
-    }
+    this.music = this.game.add.sound(levelMusic.key, 1, true);
   }
 
   this.game.input.keyboard.addKeyCapture([
@@ -371,15 +372,23 @@ BasicGame.Game.prototype.inputIsActive = function (key) {
   return this.game.input.keyboard.isDown(key);
 };
 
-BasicGame.Game.prototype.levelEnded = function () {
+BasicGame.Game.prototype.levelComplete = function () {
   this.levelCompleted = true;
   BasicGame.isRetrying = false;
+
+  if (BasicGame.currentLevel === 30) {
+    conscienceSound.play();
+    return;
+  }
+
   this.showDarkness();
 };
 
 BasicGame.Game.prototype.loadLevel = function (levelNumber) {
   var skyName = this.getSkyName();
   var levelData = this.helper.getLevelIdAndName(levelNumber);
+  var levelMusic = BasicGame.getLevelMusicData();
+  var changeMusic = false;
 
   this.saveGame(BasicGame.setDay(levelNumber));
 
@@ -396,7 +405,7 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
   }
 
   // define the assets to load
-  this.game.load.onLoadComplete.addOnce(function () {
+  this.game.load.onLoadComplete.addOnce(function (_changeMusic) {
     if (this.background.key != skyName) {
       this.background.loadTexture(skyName);
     }
@@ -406,9 +415,10 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
         this.music.destroy();
         this.music = null;
 
-        if (levelNumber === 7) {
-          // change the music to lvl_7-10
-          this.music = this.game.add.sound('lvl_7-10', 1, true);
+        if (_changeMusic === true) {
+          console.log("════ MUSIC CHANGED!!! ════");
+
+          this.music = this.game.add.sound(levelMusic.key, 1, true);
         }
       }, this);
 
@@ -418,16 +428,20 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
 
     this.savingText.alpha = 0;
     this.level.createLevel(levelNumber);
-  }, this);
+  }, this, changeMusic);
 
   this.game.load.tilemap(levelData.id,
     'assets/levels/' + levelData.name + '.json',
     null,
     Phaser.Tilemap.TILED_JSON);
 
-  if (levelNumber === 7) {
-    if (this.game.cache.checkSoundKey('lvl_7-10') === false) {
-      this.load.audio('lvl_7-10', 'assets/audio/music/lvl_7-10.mp3', true);
+  if (levelMusic.key !== BasicGame.getLevelMusicData(levelNumber - 1).key) {
+    console.log("════ CHANGE MUSIC!!! ════");
+
+    changeMusic = true;
+
+    if (this.game.cache.checkSoundKey(levelMusic.key) === false) {
+      this.load.audio(levelMusic.key, levelMusic.file, true);
     }
   }
 
@@ -534,7 +548,7 @@ BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
     Phaser.Easing.Quadratic.Out,
     true);
 
-  this.eye.levelEndedEvent(false);
+  this.eye.levelCompleteEvent(false);
 
   if (destroyPlayer) {
     // play the animation of death of the player
@@ -580,7 +594,7 @@ BasicGame.Game.prototype.putDarkTweenCompleted = function () {
       this.isLoadingLevel = true;
 
       // notify to the eye that the level was ended
-      this.eye.levelEndedEvent(true);
+      this.eye.levelCompleteEvent(true);
       this.loadLevel(++BasicGame.currentLevel);
     }, this);
   }

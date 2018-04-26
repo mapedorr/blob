@@ -58,7 +58,7 @@ BasicGame.Level.prototype.create = function () {
   this.dayNumberText.oriY = this.dayNumberText.y;
 
   if (!this.spikeSound) {
-    this.spikeSound = this.game.add.sound('spike', 0.2);
+    this.spikeSound = this.game.add.sound('spike');
   }
 
   this.createLevel(parseInt(BasicGame.currentLevel));

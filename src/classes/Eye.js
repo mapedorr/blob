@@ -62,7 +62,7 @@ BasicGame.Eye = function (game, gameObj) {
   this.anger = null;
   this.shooting = null;
   this.searching = null;
-  this.levelEnded = null;
+  this.levelComplete = null;
   this.currentPatternId = -1;
   this.usedPatterns = 0;
   this.movementTime = null;
@@ -159,18 +159,18 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
   // ---------------------------------------------------------------------------
   // setup the sounds
   if (!this.laughSound) {
-    this.laughSound = this.game.add.sound('eye', 0.1);
+    this.laughSound = this.game.add.sound('eye');
   }
 
   if (!this.angerSound) {
-    this.angerSound = this.game.add.sound('eye-anger', 0.8);
+    this.angerSound = this.game.add.sound('eye-anger');
   }
 
   // ---------------------------------------------------------------------------
   // set global properties
   this.shooting = false;
   this.searching = false;
-  this.levelEnded = false;
+  this.levelComplete = false;
   this.usedPatterns = 0;
   this.anger = false;
   this.xDistanceMax = Math.abs((this.pupilImagePositions['6']) - this.eye.centerX);
@@ -193,7 +193,7 @@ BasicGame.Eye.prototype.update = function () {
     this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
   }
 
-  if (this.levelEnded === true) {
+  if (this.levelComplete === true) {
     // the player is dead
     return;
   }
@@ -306,7 +306,7 @@ BasicGame.Eye.prototype.isPlayerInsideViewZone = function () {
  *                         starting
  */
 BasicGame.Eye.prototype.initSearch = function (delay) {
-  if (this.levelEnded === true) {
+  if (this.levelComplete === true) {
     return;
   }
 
@@ -472,7 +472,7 @@ BasicGame.Eye.prototype.runPupilViewZoneTweens = function (targetPosition) {
     x: this.viewZone.positions[targetPosition]
   }, this.movementTime);
   this.viewZoneMovementTween.onComplete.addOnce(function () {
-    if (this.shooting === false || this.levelEnded === false) {
+    if (this.shooting === false || this.levelComplete === false) {
       this.nextStepInPattern();
 
       this.viewZoneMovementTween = null;
@@ -485,7 +485,7 @@ BasicGame.Eye.prototype.runPupilViewZoneTweens = function (targetPosition) {
 BasicGame.Eye.prototype.nextStepInPattern = function (delay) {
   // wait a second before changing to a new pattern
   this.nextStepTimer = this.gameObj.helper.timer(delay || 1000, function () {
-    if (this.levelEnded === true || this.shooting === true) {
+    if (this.levelComplete === true || this.shooting === true) {
       return;
     }
 
@@ -531,7 +531,7 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
   this.calmDownTimer.add(3000,
     function () {
       if (tweensInPause === true) {
-        if (this.levelEnded === true) {
+        if (this.levelComplete === true) {
           return;
         }
 
@@ -564,7 +564,7 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
 };
 
 BasicGame.Eye.prototype.levelStart = function (levelRestarted) {
-  this.levelEnded = false;
+  this.levelComplete = false;
 
   this.shooting = false;
 
@@ -580,18 +580,18 @@ BasicGame.Eye.prototype.updateLevel = function (level) {
 
 BasicGame.Eye.prototype.restartLevel = function () {
   this.anger = false;
-  this.levelEnded = true;
+  this.levelComplete = true;
 };
 
-BasicGame.Eye.prototype.levelEndedEvent = function (levelCompleted) {
-  this.levelEnded = true;
+BasicGame.Eye.prototype.levelCompleteEvent = function (levelCompleted) {
+  this.levelComplete = true;
 
   this.searching = false;
   this.shooting = false;
 };
 
 BasicGame.Eye.prototype.gameInDarkness = function () {
-  this.levelEnded = true;
+  this.levelComplete = true;
   this.sleep();
 };
 
@@ -688,14 +688,14 @@ BasicGame.Eye.prototype.getTired = function () {
   this.viewZone.alpha = 0;
   this.invisibleZoneImage.alpha = 0;
 
-  if (this.levelEnded === true) {
+  if (this.levelComplete === true) {
     return;
   }
 
   this.getMadTimer = this.game.time.create(true);
   this.getMadTimer.add(1200,
     function () {
-      if (this.levelEnded === true) {
+      if (this.levelComplete === true) {
         return;
       }
 
@@ -729,7 +729,7 @@ BasicGame.Eye.prototype.getMad = function () {
     this.searchAgainTimer = this.game.time.create(true);
     this.searchAgainTimer.add(this.RESTART_SEARCH_DELAY,
       function () {
-        if (this.levelEnded === true) {
+        if (this.levelComplete === true) {
           return;
         }
 
