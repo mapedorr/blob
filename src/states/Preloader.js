@@ -56,15 +56,15 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.spritesheet('mute', 'assets/sprites/mute.png', 24, 24, 2);
   this.load.spritesheet('pause', 'assets/sprites/pause.png', 24, 24, 2);
 
-  this.load.audio('jump', 'assets/audio/sfx/jump.mp3', true);
-  this.load.audio('walk', 'assets/audio/sfx/walk.mp3', true);
-  this.load.audio('slide', 'assets/audio/sfx/slide.mp3', true);
-  this.load.audio('fall', 'assets/audio/sfx/fall.mp3', true);
-  this.load.audio('death', 'assets/audio/sfx/death.mp3', true);
-  this.load.audio('ray', 'assets/audio/sfx/ray.mp3', true);
-  this.load.audio('eye', 'assets/audio/sfx/eye.mp3', true);
-  this.load.audio('eye-anger', 'assets/audio/sfx/anger.mp3', true);
-  this.load.audio('piece', 'assets/audio/sfx/piece.mp3', true);
+  this.load.audio('jump', 'assets/audio/sfx/jump.ogg', true);
+  this.load.audio('walk', 'assets/audio/sfx/walk.ogg', true);
+  this.load.audio('slide', 'assets/audio/sfx/slide.ogg', true);
+  this.load.audio('fall', 'assets/audio/sfx/fall.ogg', true);
+  this.load.audio('death', 'assets/audio/sfx/death.ogg', true);
+  this.load.audio('ray', 'assets/audio/sfx/ray.ogg', true);
+  this.load.audio('eye', 'assets/audio/sfx/eye.ogg', true);
+  this.load.audio('eye-anger', 'assets/audio/sfx/anger.ogg', true);
+  this.load.audio('piece', 'assets/audio/sfx/piece.ogg', true);
 
   this.load.audio(levelMusic.key, levelMusic.file, true);
 
@@ -103,6 +103,6 @@ BasicGame.Preloader.prototype.create = function () {
 BasicGame.Preloader.prototype.update = function () {
   if (this.ready === false) {
     this.ready = true;
-    this.state.start('Game');
+    this.state.start('MainMenu');
   }
 };

@@ -1,6 +1,6 @@
 var BasicGame = {
   language: "es",
-  currentLevel: 25,
+  currentLevel: 1,
   deaths: 0,
   rest: 0,
   setLanguage: function (newLanguage) {
@@ -58,6 +58,10 @@ var BasicGame = {
       data.file += 'DigUpA.ogg';
     }
     else if (level >= 7 && level <= 10) {
+      if (level === 7) {
+        data.playFact = true;
+      }
+
       data.key = 'dig-up-b';
       data.file += 'DigUpB.ogg';
     } else if (level >= 11 && level <= 20) {

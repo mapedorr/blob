@@ -55,11 +55,12 @@ BasicGame.Game = function (game) {
   };
   this.levelCompleted = null;
   this.musicUpdated = false;
+  this.changeMusic = false;
 };
 
 BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
-BasicGame.ignoreSave = true;
+BasicGame.ignoreSave = false;
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ PHASER STATE METHODS                                                     ║
@@ -99,6 +100,7 @@ BasicGame.Game.prototype.create = function () {
   this.levelCompleted = false;
   this.updateShadows = true;
   this.musicUpdated = false;
+  this.changeMusic = false;
 
   // set stage background
   this.background = this.game.add.image(0, 0, this.getSkyName());
@@ -388,7 +390,7 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
   var skyName = this.getSkyName();
   var levelData = this.helper.getLevelIdAndName(levelNumber);
   var levelMusic = BasicGame.getLevelMusicData();
-  var changeMusic = false;
+  this.changeMusic = false;
 
   this.saveGame(BasicGame.setDay(levelNumber));
 
@@ -405,20 +407,20 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
   }
 
   // define the assets to load
-  this.game.load.onLoadComplete.addOnce(function (_changeMusic) {
+  this.game.load.onLoadComplete.addOnce(function () {
     if (this.background.key != skyName) {
       this.background.loadTexture(skyName);
     }
 
-    if (levelNumber === 7) {
+    if (this.changeMusic === true) {
+      this.changeMusic = false;
+
       this.music.onFadeComplete.addOnce(function () {
         this.music.destroy();
         this.music = null;
-
-        if (_changeMusic === true) {
-          console.log("════ MUSIC CHANGED!!! ════");
-
-          this.music = this.game.add.sound(levelMusic.key, 1, true);
+        this.music = this.game.add.sound(levelMusic.key, 1, true);
+        if (!BasicGame.getLevelMusicData().playFact) {
+          this.music.play();
         }
       }, this);
 
@@ -428,7 +430,7 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
 
     this.savingText.alpha = 0;
     this.level.createLevel(levelNumber);
-  }, this, changeMusic);
+  }, this);
 
   this.game.load.tilemap(levelData.id,
     'assets/levels/' + levelData.name + '.json',
@@ -436,9 +438,7 @@ BasicGame.Game.prototype.loadLevel = function (levelNumber) {
     Phaser.Tilemap.TILED_JSON);
 
   if (levelMusic.key !== BasicGame.getLevelMusicData(levelNumber - 1).key) {
-    console.log("════ CHANGE MUSIC!!! ════");
-
-    changeMusic = true;
+    this.changeMusic = true;
 
     if (this.game.cache.checkSoundKey(levelMusic.key) === false) {
       this.load.audio(levelMusic.key, levelMusic.file, true);
@@ -631,11 +631,12 @@ BasicGame.Game.prototype.hideDarkness = function (durationInMS) {
 };
 
 BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
+  var levelMusic = BasicGame.getLevelMusicData();
   this.isLoadingLevel = false;
 
   if (BasicGame.isRetrying === false) {
     // make the player say a line
-    if (BasicGame.currentLevel === 7) {
+    if (levelMusic.playFact === true) {
       this.conscienceSound.play();
     }
 
@@ -646,7 +647,7 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
 
   // make the EYE seek for the player
 
-  if (this.music && this.music.isPlaying === false && BasicGame.currentLevel !== 7) {
+  if (this.music && this.music.isPlaying === false && !levelMusic.playFact) {
     this.music.play();
   }
 

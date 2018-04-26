@@ -59,6 +59,6 @@ BasicGame.Helper.prototype.getSkyColor = function (levelNumber) {
   } else if (levelNumber <= 20) {
     return '#33393D';
   } else {
-    return '#4E1B1B';
+    return '#202049';
   }
 };

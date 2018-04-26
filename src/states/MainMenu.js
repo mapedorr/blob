@@ -420,10 +420,15 @@ BasicGame.MainMenu.prototype.newGame = function () {
 BasicGame.MainMenu.prototype.nextScene = function () {
   this.disableMenu();
 
-  this.splashMusic.onFadeComplete.addOnce(function () {
+  if (this.splashMusic.isPlaying === true) {
+    this.splashMusic.onFadeComplete.addOnce(function () {
+      this.state.start((BasicGame.currentLevel <= 30) ? 'Game' : 'TheEnd');
+    }, this);
+    this.splashMusic.fadeOut(this.MUSIC_FADE_DELAY);
+  }
+  else {
     this.state.start((BasicGame.currentLevel <= 30) ? 'Game' : 'TheEnd');
-  }, this);
-  this.splashMusic.fadeOut(this.MUSIC_FADE_DELAY);
+  }
 };
 
 BasicGame.MainMenu.prototype.disableMenu = function () {

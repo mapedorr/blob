@@ -54,6 +54,7 @@ BasicGame.Player = function (game, input, gameObj) {
   this.dialogueFadeOutStarted = false;
   this.jumpFeedbackStarted = false;
   this.dialogueMarkHeight = null;
+  this.playSlideSound = false;
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // define movement constants
@@ -126,6 +127,8 @@ BasicGame.Player.prototype.create = function (level) {
     particleY = null,
     increaseAmount = null;
 
+  this.playSlideSound = false;
+
   //Save the walls in the level
   this.level = level;
 
@@ -177,17 +180,19 @@ BasicGame.Player.prototype.create = function (level) {
   if (!this.walkSound) {
     this.walkSound = this.game.add.sound('walk');
     this.walkSound.onPlay.add(function () {
-      this.slideSound.stop();
-    }, this);
-    this.walkSound.onStop.add(function () {
-      if (this.onGround === true) {
-        this.slideSound.play();
+      if (this.slideSound.isPlaying === true) {
+        this.slideSound.stop();
       }
     }, this);
+    // this.walkSound.onStop.add(function () {
+    //   if (this.onGround === true) {
+    //     this.slideSound.play();
+    //   }
+    // }, this);
   }
 
   if (!this.slideSound) {
-    this.slideSound = this.game.add.sound('slide', 1, true);
+    this.slideSound = this.game.add.sound('slide');
   }
 
   if (!this.fallSound) {
@@ -357,11 +362,12 @@ BasicGame.Player.prototype.update = function () {
 
   // reset some values to default if the player is touching the ground
   if (this.onGround) {
+    this.playSlideSound = false;
     this.onGroundFeedback();
   }
   else {
     this.walkSound.stop();
-    this.slideSound.stop();
+    // this.slideSound.stop();
 
     // check if the character just left the ground
     if (this.justLeaveGround === false && this.playerSprite.body.velocity.y > 0) {
@@ -398,7 +404,7 @@ BasicGame.Player.prototype.update = function () {
       if (!this.leftFirstPress) {
         this.leftFirstPress = true;
         this.currentJumpMultiplier = 0;
-        this.walkFeedback(true);
+        this.walkFeedback();
       }
       else {
         this.currentJumpMultiplier += this.JUMP_MULTIPLIER_AMOUNT;
@@ -469,6 +475,7 @@ BasicGame.Player.prototype.update = function () {
     if (!this.isJumping) {
       this.isJumping = true;
     }
+    this.playSlideSound = true;
   }
   else {
     this.isJumping = false;
@@ -582,7 +589,7 @@ BasicGame.Player.prototype.onGroundFeedback = function () {
 };
 
 BasicGame.Player.prototype.walkFeedback = function (left) {
-  var squashTween = null;
+  /* var squashTween = null;
 
   if (!this.walkTweenPlayed) {
     squashTween = this.game.add.tween(this.playerSprite);
@@ -595,7 +602,7 @@ BasicGame.Player.prototype.walkFeedback = function (left) {
     }, this);
     squashTween.start();
     this.walkTweenPlayed = true;
-  }
+  } */
 
   if (!this.walkSound.isPlaying) {
     this.walkSound.play();
@@ -622,7 +629,11 @@ BasicGame.Player.prototype.duckFeedback = function () {
 
 BasicGame.Player.prototype.onWallFeedback = function () {
   this.playBaseSizeTween();
-  if (!this.slideSound.isPlaying) this.slideSound.play();
+
+  if (!this.slideSound.isPlaying && this.playSlideSound === true) {
+    this.slideSound.play();
+    this.playSlideSound = false;
+  }
 };
 
 BasicGame.Player.prototype.playBaseSizeTween = function () {
@@ -661,9 +672,9 @@ BasicGame.Player.prototype.jumpFeedback = function () {
   // this.isJumping = true;
   this.currentJumpMultiplier = 0;
 
-  if (!this.jumpSound.isPlaying) {
-    this.jumpSound.play();
-  }
+  // if (!this.jumpSound.isPlaying) {
+  this.jumpSound.play();
+  // }
 };
 
 /**
