@@ -489,6 +489,7 @@ BasicGame.Game.prototype.shakeCamera = function () {
 
 BasicGame.Game.prototype.subtractLife = function () {
   var that = this;
+  var timer = null;
 
   // if the player collected all the pieces, don't kill him
   if (this.levelCompleted === true) {
@@ -524,10 +525,14 @@ BasicGame.Game.prototype.subtractLife = function () {
     // notify the PLAYER that its time to show the animation for dead
     this.player.explote();
 
-    // notify to the EYE the player has died
-    this.eye.rejoice((function () {
-      this.showDarkness(200);
-    }).bind(this));
+    timer = this.game.time.create(true);
+    timer.add(1000, function () {
+      // notify to the EYE the player has died
+      this.eye.rejoice((function () {
+        this.showDarkness(200);
+      }).bind(this));
+    }, this);
+    timer.start();
   }
 };
 

@@ -49,22 +49,23 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('pause_es', 'assets/sprites/pause_es.png');
   this.load.image('pause_en', 'assets/sprites/pause_en.png');
 
-  // this.load.spritesheet('noise', 'assets/sprites/noise.png', 1024, 640);
   this.load.spritesheet('player', 'assets/sprites/player.png', 32, 32, 1);
   this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 118, 4);
   this.load.spritesheet('checkbox', 'assets/sprites/checkbox.png', 24, 24, 2);
   this.load.spritesheet('mute', 'assets/sprites/mute.png', 24, 24, 2);
   this.load.spritesheet('pause', 'assets/sprites/pause.png', 24, 24, 2);
 
-  this.load.audio('jump', 'assets/audio/sfx/jump.ogg', true);
-  this.load.audio('walk', 'assets/audio/sfx/walk.ogg', true);
-  this.load.audio('slide', 'assets/audio/sfx/slide.ogg', true);
-  this.load.audio('fall', 'assets/audio/sfx/fall.ogg', true);
   this.load.audio('death', 'assets/audio/sfx/death.ogg', true);
-  this.load.audio('ray', 'assets/audio/sfx/ray.ogg', true);
-  this.load.audio('eye', 'assets/audio/sfx/eye.ogg', true);
-  this.load.audio('eye-anger', 'assets/audio/sfx/anger.ogg', true);
+  this.load.audio('eye-alarm', 'assets/audio/sfx/eye_alarm.ogg', true);
+  this.load.audio('eye-anger', 'assets/audio/sfx/eye_anger.ogg', true);
+  this.load.audio('eye-laugh', 'assets/audio/sfx/eye_laugh.ogg', true);
+  this.load.audio('fall', 'assets/audio/sfx/fall.ogg', true);
+  this.load.audio('jump', 'assets/audio/sfx/jump.ogg', true);
   this.load.audio('piece', 'assets/audio/sfx/piece.ogg', true);
+  this.load.audio('ray', 'assets/audio/sfx/ray.ogg', true);
+  this.load.audio('slide-ground', 'assets/audio/sfx/slide_ground.ogg', true);
+  this.load.audio('slide-wall', 'assets/audio/sfx/slide_wall.ogg', true);
+  this.load.audio('walk', 'assets/audio/sfx/walk.ogg', true);
 
   this.load.audio(levelMusic.key, levelMusic.file, true);
 
@@ -81,10 +82,12 @@ BasicGame.Preloader.prototype.preload = function () {
   // load this if the current level stored requires it, otherwise load it
   // when the player is near the end of the corresponding chapter
   this.load.spritesheet('spike-platform', 'assets/sprites/spike-platform.png', 32, 32);
+
   this.load.image('spike', 'assets/sprites/spike.png');
   this.load.image('spike-r', 'assets/sprites/spike-r.png');
   this.load.image('spike-l', 'assets/sprites/spike-l.png');
   this.load.image('spike-d', 'assets/sprites/spike-d.png');
+
   this.load.audio('spike', 'assets/audio/sfx/spike.ogg', true);
 
   levelData = BasicGame.Helper.prototype.getLevelIdAndName(BasicGame.currentLevel);

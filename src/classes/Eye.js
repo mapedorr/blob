@@ -50,6 +50,7 @@ BasicGame.Eye = function (game, gameObj) {
   this.bitmap = null;
   this.laughSound = null;
   this.angerSound = null;
+  this.alarmSound = null;
   this.viewZoneMovementTween = null;
   this.pupilMovementTween = null;
   this.invisibleZoneImage = null;
@@ -158,12 +159,16 @@ BasicGame.Eye.prototype.create = function (playerObj, level, lightning) {
 
   // ---------------------------------------------------------------------------
   // setup the sounds
-  if (!this.laughSound) {
-    this.laughSound = this.game.add.sound('eye');
-  }
-
   if (!this.angerSound) {
     this.angerSound = this.game.add.sound('eye-anger');
+  }
+
+  if (!this.alarmSound) {
+    this.alarmSound = this.game.add.sound('eye-alarm');
+  }
+
+  if (!this.laughSound) {
+    this.laughSound = this.game.add.sound('eye-laugh');
   }
 
   // ---------------------------------------------------------------------------
@@ -387,6 +392,10 @@ BasicGame.Eye.prototype.setPattern = function () {
   this.usedPatterns++;
 
   this.pattern = this.PATTERNS[this.currentPatternId];
+
+  if (this.currentPatternId === 2) {
+    this.alarmSound.play();
+  }
 
   // get the index of the initial step of the pattern
   this.currentPatternStep = !this.patternReversed ? 0 : this.pattern.length - 1;
