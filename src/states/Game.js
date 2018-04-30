@@ -25,7 +25,7 @@ BasicGame.Game = function (game) {
   this.savingText = null;
   this.uiGroup = null;
   this.pauseGroup = null;
-  this.conscienceSound = null;
+  this.factSound = null;
 
   // references to other classes
   this.days = null;
@@ -125,9 +125,9 @@ BasicGame.Game.prototype.create = function () {
   this.game.camera.setPosition(0, 0);
 
   // add the consience sound
-  if (!this.conscienceSound) {
-    this.conscienceSound = this.game.add.sound('the-fact');
-    this.conscienceSound.onStop.addOnce(function () {
+  if (!this.factSound) {
+    this.factSound = this.game.add.sound('the-fact-b');
+    this.factSound.onStop.addOnce(function () {
       if (BasicGame.currentLevel !== 30) {
         if (this.music && this.music.isPlaying === false) {
           this.music.play();
@@ -192,6 +192,7 @@ BasicGame.Game.prototype.create = function () {
   flashBitmap.ctx.fill();
   flashSprite = new Phaser.Sprite(this.game, 0, 0, flashBitmap);
   flashSprite.alpha = 0;
+  flashSprite.tint = 0x00FFFF;
   this.flashGroup.addChild(flashSprite);
 
   // ════════════════
@@ -301,8 +302,8 @@ BasicGame.Game.prototype.shutdown = function () {
   this.darknessGroup.destroy();
   // destroy sounds
   this.music.destroy();
-  if (this.conscienceSound) {
-    this.conscienceSound.destroy();
+  if (this.factSound) {
+    this.factSound.destroy();
   }
   // destroy tweens
   this.putDarkTween.stop();
@@ -507,16 +508,7 @@ BasicGame.Game.prototype.subtractLife = function () {
     Phaser.Easing.Quadratic.Out,
     true);
 
-  // create the tween for flashing the camera
-  var flashTween = this.game.add.tween(this.flashGroup.getChildAt(0));
-  flashTween.to({ alpha: 1 },
-    40,
-    Phaser.Easing.Sinusoidal.InOut,
-    false,
-    0,
-    4,
-    true);
-  flashTween.start();
+  this.flashScreen();
 
   if (this.lifes <= 0) {
     // save the current level
@@ -534,6 +526,37 @@ BasicGame.Game.prototype.subtractLife = function () {
     }, this);
     timer.start();
   }
+};
+
+BasicGame.Game.prototype.flashScreen = function (alarm) {
+  // create the tween for flashing the camera
+  var flashTween = this.game.add.tween(this.flashGroup.getChildAt(0));
+
+  if (alarm === true) {
+    this.flashGroup.getChildAt(0).tint = 0xE73729;
+
+    flashTween.to({ alpha: 1 },
+      63,
+      Phaser.Easing.Sinusoidal.InOut,
+      false,
+      0,
+      10,
+      true);
+  }
+  else {
+    this.flashGroup.getChildAt(0).tint = 0x00FFFF;
+
+    flashTween.to({ alpha: 1 },
+      40,
+      Phaser.Easing.Sinusoidal.InOut,
+      false,
+      0,
+      4,
+      true);
+  }
+
+  flashTween.start();
+
 };
 
 BasicGame.Game.prototype.subtractAllLifes = function (destroyPlayer) {
@@ -642,7 +665,7 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
   if (BasicGame.isRetrying === false) {
     // make the player say a line
     if (levelMusic.playFact === true) {
-      this.conscienceSound.play();
+      this.factSound.play();
     }
 
     this.showPlayerDialogue();

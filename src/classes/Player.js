@@ -170,11 +170,6 @@ BasicGame.Player.prototype.create = function (level) {
         this.slideWallSound.stop();
       }
     }, this);
-    // this.walkSound.onStop.add(function () {
-    //   if (this.onGround === true) {
-    //     this.slideGroundSound.play();
-    //   }
-    // }, this);
   }
 
   if (!this.fallSound) {
@@ -319,7 +314,7 @@ BasicGame.Player.prototype.update = function () {
       this.gameObj.helper.timer(this.waitTime, this.hideDialogue, this);
     }
 
-    if (this.gameObj.eye.eye.frame === 3) {
+    if (this.gameObj.eye.eye.frame === 3 && this.gameObj.inDarkness === false) {
       this.gameObj.eye.initSearch();
     }
   }
@@ -896,8 +891,8 @@ BasicGame.Player.prototype.gameInDarkness = function () {
 
   this.stopAnimationTweens();
 
-  // this.playerSprite.width = this.BASE_SIZE;
-  // this.playerSprite.height = this.BASE_SIZE;
+  this.playerSprite.width = this.BASE_SIZE;
+  this.playerSprite.height = this.BASE_SIZE;
 };
 
 BasicGame.Player.prototype.placeDialogueGroup = function () {
@@ -1000,6 +995,6 @@ BasicGame.Player.prototype.setPlayerPositionInLevel = function () {
 };
 
 BasicGame.Player.prototype.stopAnimationTweens = function () {
-  // this.game.tweens.removeFrom(this.playerSprite);
-  // console.log("Tweens running on player? ", this.game.tweens.isTweening(this.playerSprite));
+  console.log("Tweens running on player? ", this.game.tweens.isTweening(this.playerSprite));
+  this.game.tweens.removeFrom(this.playerSprite);
 };

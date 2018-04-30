@@ -36,7 +36,6 @@ BasicGame.Preloader.prototype.preload = function () {
 
   //  ---------------------------------
   //  ---| load the assets for the Game
-  this.load.image('pupil', 'assets/sprites/pupil_normal.png');
   this.load.image('light', 'assets/sprites/light.png');
   this.load.image('view_zone', 'assets/sprites/view_zone.png');
   this.load.image('piece', 'assets/sprites/piece.png');
@@ -49,6 +48,7 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.image('pause_es', 'assets/sprites/pause_es.png');
   this.load.image('pause_en', 'assets/sprites/pause_en.png');
 
+  this.load.spritesheet('pupil', 'assets/sprites/pupil.png', 64, 64, 2);
   this.load.spritesheet('player', 'assets/sprites/player.png', 32, 32, 1);
   this.load.spritesheet('eye', 'assets/sprites/eye.png', 222, 118, 4);
   this.load.spritesheet('checkbox', 'assets/sprites/checkbox.png', 24, 24, 2);
@@ -66,6 +66,7 @@ BasicGame.Preloader.prototype.preload = function () {
   this.load.audio('slide-ground', 'assets/audio/sfx/slide_ground.ogg', true);
   this.load.audio('slide-wall', 'assets/audio/sfx/slide_wall.ogg', true);
   this.load.audio('walk', 'assets/audio/sfx/walk.ogg', true);
+  this.load.audio('the-fact-b', 'assets/audio/music/TheFactB.ogg', true);
 
   this.load.audio(levelMusic.key, levelMusic.file, true);
 
@@ -106,6 +107,6 @@ BasicGame.Preloader.prototype.create = function () {
 BasicGame.Preloader.prototype.update = function () {
   if (this.ready === false) {
     this.ready = true;
-    this.state.start('MainMenu');
+    this.state.start('Game');
   }
 };
