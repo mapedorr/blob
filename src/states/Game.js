@@ -673,8 +673,6 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
 
   this.lifes = this.LIFES_AMOUNT;
 
-  // make the EYE seek for the player
-
   if (this.music && this.music.isPlaying === false && !levelMusic.playFact) {
     this.music.play();
   }
@@ -688,7 +686,6 @@ BasicGame.Game.prototype.removeDarkTweenCompleted = function () {
 BasicGame.Game.prototype.createLifeIndicators = function () {
   for (var i = 0; i < this.lifes; i++) {
     var lifeSprite = new Phaser.Sprite(this.game, 0, 0, "life");
-    // lifeSprite.scale.set(0.5, 0.8);
     lifeSprite.x = (i % 3) * (lifeSprite.width + 6);
 
     this.lifesGroup.addChild(lifeSprite);

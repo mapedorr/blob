@@ -470,20 +470,6 @@ BasicGame.Player.prototype.update = function () {
   if (this.playerSprite.left < 0) this.playerSprite.left = 0;
   if (this.playerSprite.right > this.game.world.width) this.playerSprite.left = this.game.world.width - this.playerSprite.width;
 
-  // make the jump a bit higher if the player keeps pressing the jump button
-  // if (this.input.keyboard.downDuration(this.jumpKey1, this.JUMP_TIME) === true ||
-  //     this.input.keyboard.downDuration(this.jumpKey2, this.JUMP_TIME)
-  // ) {
-  //   this.playerSprite.body.velocity.y += this.JUMP_SPEED * 0.1 * this.jumpMultiplier;
-  //   if (this.jumpMultiplier > 0.1)
-  //     this.jumpMultiplier *= 0.95;
-  //   else
-  //     this.jumpMultiplier = 0;
-  // }
-  // else {
-  //   this.jumpMultiplier = 0;
-  // }
-
   if (headHit && !this.fallSound.isPlaying) {
     this.fallSound.play();
   }
@@ -581,28 +567,8 @@ BasicGame.Player.prototype.slideGroundFeedback = function () {
 };
 
 BasicGame.Player.prototype.walkFeedback = function (left) {
-  /* var squashTween = null;
-
-  if (!this.walkTweenPlayed) {
-    squashTween = this.game.add.tween(this.playerSprite);
-    squashTween.to({
-      width: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE / 1.5
-    }, 150, Phaser.Easing.Exponential.Out);
-    squashTween.onComplete.add(function () {
-      this.playBaseSizeTween();
-      this.walkTweenPlayed = false;
-    }, this);
-    squashTween.start();
-    this.walkTweenPlayed = true;
-  } */
-
   if (!this.walkSound.isPlaying) {
     this.walkSound.play();
-    // this.gameObj.helper.timer(this.slideGroundTime, function () {
-    //   if (this.onGround === true) {
-    //     this.slideGroundSound.play();
-    //   }
-    // }, this);
   }
 };
 
@@ -615,11 +581,9 @@ BasicGame.Player.prototype.duckFeedback = function () {
       width: this.BASE_SIZE + this.STRETCH_SQUASH_VALUE,
       height: this.BASE_SIZE - this.STRETCH_SQUASH_VALUE
     }, 150, Phaser.Easing.Exponential.Out);
-    // squashTween.onComplete.add(function () {
-    //   this.playBaseSizeTween();
-    //   this.duckTweenPlaying = false;
-    // }, this);
+
     squashTween.start();
+
     this.duckTweenPlaying = true;
   }
 };

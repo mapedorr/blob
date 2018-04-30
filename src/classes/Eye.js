@@ -575,6 +575,10 @@ BasicGame.Eye.prototype.levelStart = function (levelRestarted) {
 
   this.shooting = false;
 
+  if (BasicGame.currentLevel >= 21) {
+    this.LAPS_PER_PATTERN = 1;
+  }
+
   this.destroyTimers();
   this.stopEyeTweens();
 };
@@ -750,7 +754,6 @@ BasicGame.Eye.prototype.getMad = function () {
       4,
       true);
   }
-
 
   this.madTween.onComplete.addOnce(function () {
     // restart the search after a while
