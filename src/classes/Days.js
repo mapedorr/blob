@@ -31,8 +31,8 @@ BasicGame.Days = function () {
     4: {
       'number': 839,
       'text': {
-        'en': 'I no longer need so many pills',
-        'es': 'Ya no necesito tantas píldoras'
+        'en': 'I thought that I wouldn\'t need pills',
+        'es': 'Pensé que ya no necesitaría píldoras'
       },
       'waitTime': 3
     },
@@ -111,8 +111,8 @@ BasicGame.Days = function () {
     14: {
       'number': 186,
       'text': {
-        'en': 'He deserved it, I know',
-        'es': 'Se lo merecía, lo sé'
+        'en': 'What I\'ve done was right, I know',
+        'es': 'Lo que hice estuvo bien, lo sé'
       },
       'waitTime': 5
     },
@@ -151,8 +151,8 @@ BasicGame.Days = function () {
     19: {
       'number': 74,
       'text': {
-        'en': 'A band was blamed, they wont keep looking',
-        'es': 'Una banda fue culpada, no van a seguir buscando'
+        'en': 'A gang was blamed, they wont keep looking',
+        'es': 'Una pandilla fue culpada, no van a seguir buscando'
       },
       'waitTime': 4
     },
@@ -191,48 +191,48 @@ BasicGame.Days = function () {
     24: {
       'number': 6,
       'text': {
-        'en': 'I saw him on the street today. That can\'t be!!!',
-        'es': 'Hoy me pareció verlo en la calle. ¡ESO NO PUEDE SER!'
+        'en': 'I had that nightmare again...',
+        'es': 'Otra vez tuve esa pesadilla...'
       },
       'waitTime': 5
     },
     25: {
       'number': 5,
       'text': {
-        'en': 'I can\'t take it anymore! I have to confess what I did',
-        'es': '¡No puedo más! Tengo que confesar lo que hice'
+        'en': 'I can\'t take it anymore! I have to...',
+        'es': '¡No puedo más! Tengo que...'
       },
       'waitTime': 4
     },
     26: {
       'number': 4,
       'text': {
-        'en': 'Bill was a damn drunk good for nothing! I had to do it',
-        'es': '¡Ernesto era un maldito borracho bueno para nada! Tenía que hacerlo'
+        'en': 'I had to do it',
+        'es': 'Tenía que hacerlo'
       },
       'waitTime': 6
     },
     27: {
       'number': 3,
       'text': {
-        'en': 'The police have been asking questions, WHAT AM I GOING TO DO!!!???',
-        'es': 'La policía ha estado preguntando cosas, ¿¡QUÉ VOY A HACER!?'
+        'en': '...WHAT AM I GOING TO DO!!!???',
+        'es': '...¿¡QUÉ VOY A HACER!?'
       },
       'waitTime': 6
     },
     28: {
       'number': 2,
       'text': {
-        'en': 'Reassure yourself, you know he deserved it',
-        'es': 'Tranquila, sabes que él lo merecía'
+        'en': 'Fuck! fuck! fuck! fuck!',
+        'es': 'Mierda! mierda! mierda!'
       },
       'waitTime': 7
     },
     29: {
       'number': 1,
       'text': {
-        'en': 'I have to...confess...I...I have to...',
-        'es': 'Tengo que...confesar...te...tengo que...'
+        'en': 'I have to...I...I have to...',
+        'es': 'Tengo que...te...tengo que...'
       },
       'waitTime': 3
     },

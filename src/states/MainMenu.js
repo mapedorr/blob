@@ -132,9 +132,6 @@ BasicGame.MainMenu.prototype.create = function () {
 
   // add the splash_music
   this.splashMusic = this.game.add.sound('the-fact');
-  // this.splashMusic.onFadeComplete.addOnce(function (soundObj) {
-  //   soundObj.stop();
-  // }, this);
   this.splashMusic.play();
 
   BasicGame.changeHTMLBackground(BasicGame.Helper.prototype.getSkyColor(BasicGame.currentLevel));

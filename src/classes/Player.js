@@ -882,7 +882,8 @@ BasicGame.Player.prototype.showDialogue = function (immediateHide) {
 
   if (dayObj.text) {
     this.waitTime = (immediateHide === true) ? 100 : dayObj.waitTime * 1000;
-    this.dialogueText.text = dayObj.text[BasicGame.language];
+    this.dialogueText.text = this.gameObj.level.dayNumberText.text + ': ' +
+      dayObj.text[BasicGame.language];
     this.dialogueBackground.height = this.dialogueText.textHeight + this.DIALOGUE_TEXT_V_PADDING * 2;
     this.dialogueMark.y = this.dialogueBackground.height + 8;
     dialogueHeight = this.dialogueBackground.height + 8 + this.dialogueMarkHeight;
