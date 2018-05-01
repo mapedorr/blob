@@ -60,7 +60,7 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.developmentMode = false;
 BasicGame.isRetrying = false;
-BasicGame.ignoreSave = false;
+BasicGame.ignoreSave = true;
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ PHASER STATE METHODS                                                     ║
@@ -380,8 +380,9 @@ BasicGame.Game.prototype.levelComplete = function () {
   BasicGame.isRetrying = false;
 
   if (BasicGame.currentLevel === 30) {
-    conscienceSound.play();
-    return;
+    this.music.fadeOut(1000);
+    this.factSound.play();
+    this.GO_TO_NEXT_LEVEL_DELAY = this.factSound.durationMS;
   }
 
   this.showDarkness();

@@ -557,8 +557,6 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
       this.searching = true;
 
       this.gameObj.helper.timer(this.WAIT_AFTER_SHOOT_TIME, function () {
-        console.log("Yeeeeeeep!!!!");
-
         if (this.levelComplete === true) {
           return;
         }

@@ -74,6 +74,7 @@ BasicGame.TheEnd.prototype.create = function () {
   var panelCounter = 0;
   var nextButton = null;
   var nextText = null;
+  var levelMusic = BasicGame.getLevelMusicData();
 
   this.nextClicked = false;
 
@@ -116,8 +117,8 @@ BasicGame.TheEnd.prototype.create = function () {
   this.buttonGroup.alpha = 0;
 
   // play the music
-  // this.music = this.game.add.sound('exit_music', 0.1, true);
-  // this.music.play();
+  this.music = this.game.add.sound(levelMusic.key);
+  this.music.play();
 
   // init the animations for the first page
   this.currentPanelIndex = 0;
@@ -136,7 +137,7 @@ BasicGame.TheEnd.prototype.shutdown = function () {
   this.panelsGroup.destroy();
   this.buttonGroup.destroy();
   this.footerText.destroy();
-  // this.music.destroy();
+  this.music.destroy();
   this.thanksText.destroy();
 };
 // ║                                                                           ║

@@ -328,6 +328,10 @@ BasicGame.Player.prototype.update = function () {
 
   if (headHit) {
     this.isJumping = false;
+
+    if (this.fallSound.isPlaying === false) {
+      this.fallSound.play();
+    }
   }
 
   // jump jump jump
@@ -469,10 +473,6 @@ BasicGame.Player.prototype.update = function () {
   // sprite out of the bounds of the game world
   if (this.playerSprite.left < 0) this.playerSprite.left = 0;
   if (this.playerSprite.right > this.game.world.width) this.playerSprite.left = this.game.world.width - this.playerSprite.width;
-
-  if (headHit && !this.fallSound.isPlaying) {
-    this.fallSound.play();
-  }
 
   if (BasicGame.Game.developmentMode === true) { // [ development mode ]
     this.bitmap.dirty = true;
@@ -671,9 +671,6 @@ BasicGame.Player.prototype.checkCollisions = function () {
     this.game.physics.arcade.collide(this.playerSprite, this.level.walls,
       function (player, spikePlatform) {
         if (spikePlatform.spikeRef && spikePlatform.spikeRef.isHidden === true) {
-          if (this.gameObj.level.spikeSound.isPlaying === false) {
-            this.gameObj.level.spikeSound.play();
-          }
           spikePlatform.spikeRef.showTween.start();
         }
       }, null, this);
@@ -853,7 +850,7 @@ BasicGame.Player.prototype.restartLevel = function (hideDarknessDelay) {
 BasicGame.Player.prototype.gameInDarkness = function () {
   this.playerSprite.alpha = 1;
 
-  this.stopAnimationTweens();
+  // this.stopAnimationTweens();
 
   this.playerSprite.width = this.BASE_SIZE;
   this.playerSprite.height = this.BASE_SIZE;

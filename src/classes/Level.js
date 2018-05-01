@@ -21,7 +21,6 @@ BasicGame.Level = function (game, gameObj) {
   this.walls = null;
   this.spikes = null;
   this.pieces = null;
-  this.spikeSound = null;
 
   // global properties
   this.game = game;
@@ -313,6 +312,10 @@ BasicGame.Level.prototype.createShowSpikeTween = function (spikeSprite, properti
       null,
       false,
       delay);
+
+  showSpikeTween.onStart.add(function () {
+    this.spikeSound.play();
+  }, this);
 
   showSpikeTween.onComplete.add(function () {
     this.isHidden = false;

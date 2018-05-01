@@ -390,7 +390,7 @@ BasicGame.MainMenu.prototype.showKeysDescription = function (show) {
 BasicGame.MainMenu.prototype.newGame = function () {
   var levelData = null;
   var skyName = null;
-  var levelMusic = BasicGame.getLevelMusicData();
+  var levelMusic = BasicGame.getLevelMusicData(1);
 
   this.disableMenu();
 
