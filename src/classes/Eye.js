@@ -547,7 +547,6 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
         return;
       }
 
-      // this.currentPatternCompleted = true;
       this.shooting = false;
 
       this.eye.frame = 0;
@@ -557,7 +556,7 @@ BasicGame.Eye.prototype.shootPlayer = function (target) {
       this.searching = true;
 
       this.gameObj.helper.timer(this.WAIT_AFTER_SHOOT_TIME, function () {
-        if (this.levelComplete === true) {
+        if (this.levelComplete === true || this.shooting === true) {
           return;
         }
 
