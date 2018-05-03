@@ -138,6 +138,14 @@ BasicGame.MainMenu.prototype.create = function () {
 };
 
 BasicGame.MainMenu.prototype.update = function () {
+  // fix the fucking change of Chrome ─────────────────────────────────────────┐
+  // thanks to https://github.com/photonstorm/phaser-ce/issues/437
+  if (this.game.sound.usingWebAudio &&
+    this.game.sound.context.state === 'suspended') {
+    this.game.input.onTap.addOnce(this.game.sound.context.resume, this.game.sound.context);
+  }
+  // └──────────────────────────────────────────────────────────────────────────
+
   this.followPointer();
 };
 
